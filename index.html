@@ -74,6 +74,23 @@ body[data-mode=menu] #menu{display:flex}
 #map .mlab{position:absolute;left:6px;top:3px;font:12px VT323,monospace;opacity:.6;color:#cfe8cf}
 body:not([data-mode=game]) #map{display:none!important}
 .scare #hud,.scare #dbg,.scare #map{display:none!important}
+/* 배전반 미니게임 */
+#brkp{background:rgba(6,6,4,.94);gap:14px}
+#brkp .bpt{font-family:VT323,monospace;font-size:22px;letter-spacing:3px;opacity:.7}
+#brkp .bhint{font-size:12px;opacity:.5}
+#bsw{display:flex;gap:10px;padding:14px 16px;background:#1b1b17;border:2px solid #34342c}
+#bsw .sw{width:46px;height:86px;padding:0;position:relative;background:#0c0c0a;border:1px solid #3a3a30;-webkit-touch-callout:none}
+#bsw .sw .h{position:absolute;left:9px;right:9px;height:30px;background:linear-gradient(#6a6a60,#2c2c28);top:8px;transition:top .08s}
+#bsw .sw.off .h{top:46px}
+#bsw .sw .l{position:absolute;left:50%;bottom:-16px;width:7px;height:7px;margin-left:-3.5px;border-radius:50%;background:#1a1a1a}
+#bsw .sw.on .l{background:#2c4;box-shadow:0 0 6px #2c4}
+#bsw .sw.off .l{background:#e22;box-shadow:0 0 6px #e22;animation:bl .9s infinite}
+#bsw .sw.dead .l{background:#1a1a1a;box-shadow:none;animation:none}
+#bsw .sw .n{position:absolute;top:-18px;left:0;right:0;font:12px VT323,monospace;opacity:.5;color:#d8cfa8}
+@keyframes bl{50%{opacity:.25}}
+#blever{min-width:220px;min-height:56px;background:#3a0d0a;border-color:#7a2a20;touch-action:none;-webkit-touch-callout:none}
+.bbar{height:6px;background:#222;margin-top:8px}.bbar i{display:block;height:100%;width:0;background:#e8c050}
+#brkp.spark{background:rgba(255,230,150,.55)}
 </style>
 </head>
 <body data-mode="menu">
@@ -116,6 +133,7 @@ body:not([data-mode=game]) #map{display:none!important}
 </div>
 
 <div class="ov" id="intro"><div class="big" id="introBig">12:00 AM</div><div class="small" id="introSmall"></div></div>
+<div class="ov" id="brkp"><div class="bpt">배전반 · MAIN BREAKER</div><div class="bhint">내려간 스위치를 모두 올린 뒤, 메인 레버를 끝까지 누르고 있기</div><div id="bsw"></div><div><button id="blever">메인 레버 (누르고 있기)</button><div class="bbar"><i id="bprog"></i></div></div><button id="bclose">닫기</button></div>
 <div class="ov" id="log"><pre id="logText"></pre><button id="logClose">닫기</button></div>
 <div class="ov" id="end"><h1 id="endTitle"></h1><pre id="endText"></pre><div style="display:flex;gap:8px"><button id="endBtn"></button><button id="endMenu">메인 메뉴</button></div></div>
 <div id="rot">가로 모드로 플레이하는 걸 권장합니다</div>
@@ -521,7 +539,7 @@ function setMode(m){mode=m;document.body.dataset.mode=m;$('dbg').style.display=(
 function newNight(n){
   S={night:n,t:0,power:100,san:100,view:1,mon:false,cam:0,door:false,light:true,brk:true,
      log:false,paused:true,over:false,msgT:0,shake:0,outSaid:false,silT:0,humOn:null,
-     camX:1,monA:0,camSw:0,flickT:0,flOn:true,peek:null,ambT:rnd(6,12),hbT:0,dgT:0,
+     camX:1,monA:0,camSw:0,sw:Array(6).fill(true),dead:-1,bp:false,holding:false,hold:0,lockT:0,flickT:0,flOn:true,peek:null,ambT:rnd(6,12),hbT:0,dgT:0,
      layout:CAMS.map((_,i)=>({kind:KIND[i],ox:rnd(-.08,.08),oy:rnd(-.04,.04),seed:ri(1e9)})), // 밤마다 공간 구조가 바뀜
      hum:{node:[5,6,7][ri(3)],spot:0,timer:rnd(10,16),wait:0,lock:0},
      gaze:{cam:ri(8),p:0,timer:15},
@@ -529,7 +547,7 @@ function newNight(n){
      clone:{cam:-1,t:0,timer:rnd(15,25)},
      fake:{cam:-1,type:'hum',timer:5}};
   buildCams();
-  ['end','start','devp','log'].forEach(id=>$(id)&&$(id).classList.remove('show'));
+  ['end','start','devp','log','brkp'].forEach(id=>$(id)&&$(id).classList.remove('show'));
   jump=0;document.body.classList.remove('scare');setMode('game');buildUI();updHUD();
   // 밤 시작 연출 → 근무 일지 → 닫으면 시간이 흐름
   $('introSmall').textContent=n+'일 차';
@@ -558,7 +576,7 @@ function update(dt){
 
   // 차단기
   if(S.brk&&S.power>0&&Math.random()<dt*.004*S.night){
-    S.brk=false;say('딸깍. 차단기가 내려갔다.');sfx(90,.3,'square',.2);buildUI();
+    S.brk=false;S.sw=Array(6).fill(true);for(let k=0,n=Math.min(5,1+S.night);k<n;){const i=ri(6);if(S.sw[i]){S.sw[i]=false;k++}}S.dead=S.night>=3?ri(6):-1;say('딸깍. 차단기가 내려갔다.');sfx(90,.3,'square',.2);buildUI();
   }
 
   // 웅웅이: 지도를 따라 관측실로 다가옴. 문 앞에 서면 형광등 소리가 끊김
@@ -659,6 +677,13 @@ function animate(dt){
   S.camX+=(S.view-S.camX)*Math.min(1,dt*7);
   const tgt=monOn()?1:0;S.monA+=Math.sign(tgt-S.monA)*Math.min(Math.abs(tgt-S.monA),dt*4.5);
   if(S.camSw>0)S.camSw-=dt;
+  if(S.lockT>0)S.lockT-=dt;
+  if(S.bp){
+    if(S.over||S.brk){S.bp=false;$('brkp').classList.remove('show')}
+    else if(S.holding&&S.lockT<=0){if(S.sw.every(x=>x)){S.hold+=dt/1.8;if(Math.random()<.15)thump(50,.1,.08,.3);if(S.hold>=1)finishBrk()}else spark()}
+    else S.hold=Math.max(0,S.hold-dt*2);
+    $('bprog').style.width=Math.min(100,S.hold*100)+'%';
+  }
   if(S.flickT>0){S.flickT-=dt;S.flOn=Math.random()>.45;if(!S.flOn&&Math.random()<.1)buzzClick()}else S.flOn=true;
   if(S.peek){S.peek.t+=dt;if(S.peek.t>1.8)S.peek=null}
   DUST.forEach(d=>{d.y+=d.v*dt;d.x+=Math.sin(T_*.5+d.p)*.0004;if(d.y>.88)d.y=.05});
@@ -667,7 +692,7 @@ function animate(dt){
 
 // ===================== 행동 =====================
 function turn(d){
-  if(!S||S.over||S.mon||S.log)return;
+  if(!S||S.over||S.mon||S.log||S.bp)return;
   const v=Math.max(0,Math.min(2,S.view+d));
   if(v!==S.view){S.view=v;whoosh();buildUI()}
 }
@@ -678,7 +703,16 @@ function toggleMon(){
 function setCam(i){S.cam=i;S.camSw=.25;sfx(1200,.03,'square',.05);buildUI()}
 function toggleDoor(){S.door=!S.door;sfx(120,.2,'square',.15);thump(70,.3,.3,-.3);S.shake=.15;buildUI()}
 function toggleLight(){S.light=!S.light;sfx(1500,.03,'square',.08);buildUI()}
-function resetBrk(){S.brk=true;sfx(200,.2,'square',.15);thump(90,.25,.25,.3);say('차단기를 올렸다.');buildUI()}
+function resetBrk(){if(S.brk||S.over)return;S.bp=true;S.holding=false;S.hold=0;$('brkp').classList.add('show');renderBrk();buildUI()} // 배전반 열기
+function closeBrk(){S.bp=false;S.holding=false;$('brkp').classList.remove('show');buildUI()}
+function finishBrk(){S.brk=true;S.bp=false;S.holding=false;S.hold=0;$('brkp').classList.remove('show');sfx(200,.2,'square',.15);thump(90,.25,.25,.3);say('차단기를 올렸다.');buildUI()}
+function toggleSw(i){if(!S.bp||S.lockT>0)return;S.sw[i]=!S.sw[i];sfx(S.sw[i]?1400:900,.03,'square',.08);thump(140,.08,.12,.3);renderBrk()}
+function spark(){ // 스위치가 덜 올라간 상태로 레버를 당기면 합선
+  S.lockT=1.4;S.holding=false;S.hold=0;S.shake=.3;nburst(5000,1,.35,.35,.3);thump(60,.4,.4,.3);
+  if(S.hum.node!==DOOR)S.hum.timer-=3; // 소리 때문에 웅웅이가 서두름
+  say('파직! 합선이다. 내려간 스위치부터 올려');const b=$('brkp');b.classList.add('spark');setTimeout(()=>b.classList.remove('spark'),120);
+}
+function renderBrk(){const box=$('bsw');box.innerHTML='';S.sw.forEach((on,i)=>{const b=document.createElement('button');b.className='sw '+(on?'on':'off')+(i===S.dead?' dead':'');b.innerHTML=`<span class="n">${i+1}</span><span class="h"></span><span class="l"></span>`;b.onclick=e=>{e.stopPropagation();toggleSw(i)};box.appendChild(b)})}
 function report(){
   if(!powered()){say('수화기 너머로 아무 소리도 없다');return}
   sfx(700,.08,'square',.1);
@@ -725,7 +759,7 @@ function die(c){
     if(c==='웅웅이'){S.hum.node=7;S.hum.spot=0;S.hum.timer=10}else if(c==='응시자')S.gaze.p=0;else if(c==='그림자')S.shadow.p=0;else S.san=50;
     return;
   }
-  S.over=true;S.mon=false;
+  S.over=true;S.mon=false;S.bp=false;$('brkp').classList.remove('show');
   if(humG)humG.gain.setTargetAtTime(0,AC.currentTime,.02);
   $('acts').innerHTML='';buildUI();
   const end=()=>{setMode('end');showEnd('신호 끊김',`${c}\n${DEATH[c]}`,'다시 하기',()=>newNight(S.night))};
@@ -760,9 +794,9 @@ function btn(t,f,on){
 }
 function buildUI(){
   const a=$('acts');a.innerHTML='';
-  const nav=!S.mon&&!S.log&&!S.over;
+  const nav=!S.mon&&!S.log&&!S.over&&!S.bp;
   $('map').style.display=S.mon&&!S.over?'block':'none';updMap();
-  if(S.over||S.log)return;
+  if(S.over||S.log||S.bp)return;
   if(nav&&S.view>0)btn('◀',()=>turn(-1));
   if(S.mon){
     btn('모니터 끄기',toggleMon);
@@ -772,7 +806,7 @@ function buildUI(){
     btn(S.door?'문 열기':'문 잠그기',toggleDoor,S.door);
   }else{
     btn(S.light?'조명 끄기':'조명 켜기',toggleLight,S.light);
-    if(!S.brk)btn('차단기 올리기',resetBrk,true);
+    if(!S.brk)btn('배전반 열기',resetBrk,true);
   }
   if(nav&&S.view<2)btn('▶',()=>turn(1));
 }
@@ -1039,6 +1073,7 @@ cv.addEventListener('touchend',e=>{
 addEventListener('keydown',e=>{
   if(mode!=='game'||!S||S.over)return;
   const k=e.key.toLowerCase();
+  if(S.bp){if(k>='1'&&k<='6')toggleSw(+k-1);else if(k==='r'||k===' '){e.preventDefault();S.holding=true}else if(k==='escape'||k==='arrowleft'||k==='a')closeBrk();return}
   if(k==='arrowleft'||k==='a')turn(-1);
   else if(k==='arrowright'||k==='d')turn(1);
   else if(k===' '){e.preventDefault();if(S.view===1&&!S.log)toggleMon()}
@@ -1049,6 +1084,9 @@ addEventListener('keydown',e=>{
   else if(k==='p'&&S.view===1&&!S.mon&&!S.log)report();
   else if(k==='j'&&S.view===1&&!S.mon)S.log?closeLog():openLog();
 });
+addEventListener('keyup',e=>{if(S&&S.bp&&(e.key.toLowerCase()==='r'||e.key===' '))S.holding=false});
+// 배전반 레버 / 닫기
+{const lv=$('blever'),on=e=>{e.preventDefault();if(S)S.holding=true},off=()=>{if(S)S.holding=false};lv.addEventListener('pointerdown',on);['pointerup','pointerleave','pointercancel'].forEach(t=>lv.addEventListener(t,off));lv.addEventListener('contextmenu',e=>e.preventDefault());$('bclose').onclick=closeBrk}
 // 브라우저는 첫 터치/클릭 전에는 소리를 못 냄
 const unlock=()=>{initAudio();if(staticG&&mode==='menu')staticG.gain.setTargetAtTime(.04,AC.currentTime,.3)};
 addEventListener('pointerdown',unlock);addEventListener('keydown',unlock);
@@ -1056,7 +1094,7 @@ addEventListener('pointerdown',unlock);addEventListener('keydown',unlock);
 // ===================== 메뉴 / 개발자 모드 =====================
 function toMenu(){
   if(S){S.over=true;if(humG)humG.gain.setTargetAtTime(0,AC.currentTime,.05)}
-  document.body.classList.remove('scare');S=null;['end','devp','log','intro'].forEach(id=>$(id).classList.remove('show'));
+  document.body.classList.remove('scare');S=null;['end','devp','log','intro','brkp'].forEach(id=>$(id).classList.remove('show'));
   $('lb').style.display=$('rb').style.display='none';
   $('mCont').style.display=savedNight>1?'block':'none';$('mCont').textContent=`이어하기 (${savedNight}일 차)`;
   setMode('menu');if(staticG)staticG.gain.setTargetAtTime(.04,AC.currentTime,.3);
