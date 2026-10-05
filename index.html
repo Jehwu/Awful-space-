@@ -391,7 +391,7 @@ function buildMenuCam(){MENUB=buildCam({kind:'endless',bw:.2,ox:0,oy:0,seed:4242
 
 // ===================== 존재들 그리기 =====================
 function limb(g,x1,y1,x2,y2,w1,w2){const dx=x2-x1,dy=y2-y1,l=Math.hypot(dx,dy)||1,nx=-dy/l,ny=dx/l;g.beginPath();g.moveTo(x1+nx*w1,y1+ny*w1);g.lineTo(x2+nx*w2,y2+ny*w2);g.lineTo(x2-nx*w2,y2-ny*w2);g.lineTo(x1-nx*w1,y1-ny*w1);g.closePath();g.fill();g.beginPath();g.arc(x2,y2,w2,0,7);g.fill();g.beginPath();g.arc(x1,y1,w1,0,7);g.fill()}
-// 웅웅이 얼굴: 퀭한 눈구멍 + 귀까지 찢어진 웃음
+// 교대자 얼굴: 퀭한 눈구멍 + 귀까지 찢어진 웃음
 function stalkerHead(g,h,t){
   const hg=g.createRadialGradient(-.015*h,-.02*h,0,0,0,.07*h);hg.addColorStop(0,'#e4dccb');hg.addColorStop(1,'#5e5545');g.fillStyle=hg;
   g.beginPath();g.ellipse(0,0,.044*h,.058*h,0,0,7);g.fill();
@@ -401,7 +401,7 @@ function stalkerHead(g,h,t){
   g.fillStyle='#0e0404';g.beginPath();g.moveTo(-.037*h,.01*h);g.quadraticCurveTo(0,.054*h,.037*h,.01*h);g.quadraticCurveTo(0,.03*h,-.037*h,.01*h);g.fill();
   g.fillStyle='#d4cba8';for(let k=-6;k<=6;k++){const p=(k+7)/14,x=-.037*h+.074*h*p,y=.01*h+.04*h*p*(1-p);g.fillRect(x-.0017*h,y,.0034*h,.0055*h)}
 }
-// 웅웅이 몸: 너무 길고 마른 몸, 튀어나온 무릎, 무릎까지 늘어진 팔
+// 교대자 몸: 너무 길고 마른 몸, 튀어나온 무릎, 무릎까지 늘어진 팔
 function drawStalker(g,x,y,h,a,t,pose){
   g.save();g.translate(x,y);g.globalAlpha=a;
   if(pose==='close')g.rotate(.18);
@@ -474,14 +474,14 @@ function drawCloneFig(g,x,y,h,a,t){
 // ===================== 점프스케어 이미지 =====================
 // jumpscare 폴더에 stalker.png / gazer.png / shadow.png / sanity.png 를 넣으면 그 이미지를 대신 씀
 const JUMP={},JIMG={};
-[['웅웅이','stalker'],['응시자','gazer'],['그림자','shadow'],['정신','sanity']].forEach(([k,f])=>{const im=new Image();im.onload=()=>{JIMG[k]=im};im.src='jumpscare/'+f+'.png'});
+[['교대자','stalker'],['응시자','gazer'],['그림자','shadow'],['정신','sanity']].forEach(([k,f])=>{const im=new Image();im.onload=()=>{JIMG[k]=im};im.src='jumpscare/'+f+'.png'});
 function jumpFin(g,S2){
   const d=g.getImageData(0,0,S2,S2),p=d.data;for(let i=0;i<p.length;i+=4){const n=(Math.random()-.5)*40;p[i]+=n;p[i+1]+=n;p[i+2]+=n}g.putImageData(d,0,0);
   const vg=g.createRadialGradient(256,256,120,256,256,380);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.95)');g.fillStyle=vg;g.fillRect(0,0,S2,S2);
 }
 function buildJumps(){
   const S2=512,mkJ=()=>{const c=mk(S2,S2),g=c.getContext('2d');g.fillStyle='#000';g.fillRect(0,0,S2,S2);return[c,g]};
-  // 웅웅이: 얼굴 클로즈업
+  // 교대자: 얼굴 클로즈업
   {const[c,g]=mkJ();g.save();g.translate(256,270);g.rotate(.14);
     const sk=g.createLinearGradient(-200,0,200,0);sk.addColorStop(0,'#bdb39c');sk.addColorStop(1,'#3a3328');g.fillStyle=sk;g.beginPath();g.moveTo(-60,180);g.lineTo(60,180);g.lineTo(240,420);g.lineTo(-240,420);g.closePath();g.fill();
     const fg=g.createRadialGradient(-50,-80,20,0,0,270);fg.addColorStop(0,'#ece4d2');fg.addColorStop(.55,'#9a8f78');fg.addColorStop(1,'#231d14');g.fillStyle=fg;g.beginPath();g.ellipse(0,0,185,245,0,0,7);g.fill();
@@ -496,7 +496,7 @@ function buildJumps(){
     for(let k=1;k<24;k++){const p=k/24,x=X(p),y=up(p),th=rnd(22,38);g.fillStyle=`rgb(${205+ri(30)},${192+ri(25)},${140+ri(30)})`;g.beginPath();g.moveTo(x-6.5,y-3);g.lineTo(x+6.5,y-3);g.lineTo(x+2,y+th);g.lineTo(x-2,y+th*.9);g.closePath();g.fill()}
     for(let k=2;k<23;k++){const p=k/24,x=X(p),y=lo(p),th=rnd(18,32);g.fillStyle=`rgb(${190+ri(30)},${180+ri(25)},${130+ri(30)})`;g.beginPath();g.moveTo(x-6,y+3);g.lineTo(x+6,y+3);g.lineTo(x+2,y-th);g.lineTo(x-2,y-th*.9);g.closePath();g.fill()}
     g.strokeStyle='#2a0808';g.lineWidth=5;g.beginPath();g.moveTo(-170,60);g.quadraticCurveTo(0,250,170,60);g.stroke();
-    g.restore();jumpFin(g,S2);JUMP['웅웅이']=c}
+    g.restore();jumpFin(g,S2);JUMP['교대자']=c}
   // 응시자: 화면을 꽉 채운 눈
   {const[c,g]=mkJ();texRect(g,T.wall,0,0,S2,S2,1);g.fillStyle='rgba(0,0,0,.55)';g.fillRect(0,0,S2,S2);
     drawEye(g,256,256,200,1,100,0,0);drawEye(g,80,100,50,1,90,0,1);drawEye(g,430,410,60,1,90,0,2);drawEye(g,420,90,40,1,90,0,3);
@@ -528,7 +528,7 @@ const RULES=[
   '오늘은 교대 인원이 도착한다. 문을 열어둘 것.'
 ];
 const DEATH={
-  '웅웅이':'문이 열려 있었다.',
+  '교대자':'문이 열려 있었다.',
   '응시자':'너무 오래 바라봤다.',
   '그림자':'어둠이 닿았다.',
   '정신':'더 이상 무엇이 진짜인지 모르겠다.'
@@ -579,7 +579,7 @@ function update(dt){
     S.brk=false;S.sw=Array(6).fill(true);for(let k=0,n=Math.min(5,1+S.night);k<n;){const i=ri(6);if(S.sw[i]){S.sw[i]=false;k++}}S.dead=S.night>=3?ri(6):-1;say('딸깍. 차단기가 내려갔다.');sfx(90,.3,'square',.2);buildUI();
   }
 
-  // 웅웅이: 지도를 따라 관측실로 다가옴. 문 앞에 서면 형광등 소리가 끊김
+  // 교대자: 지도를 따라 관측실로 다가옴. 문 앞에 서면 형광등 소리가 끊김
   const h=S.hum;
   if(h.node!==DOOR){
     h.timer-=dt;
@@ -597,7 +597,7 @@ function update(dt){
       if(h.lock>=4){h.node=[5,6,7][ri(3)];h.spot=0;h.timer=Math.max(3.5,rnd(7,12)-S.night);sfx(200,.15,'sine',.1);say('...형광등 소리가 다시 들린다')}
     }else{
       h.wait+=dt;
-      if(h.wait>=7-S.night*.5)return die('웅웅이');
+      if(h.wait>=7-S.night*.5)return die('교대자');
     }
   }
 
@@ -709,7 +709,7 @@ function finishBrk(){S.brk=true;S.bp=false;S.holding=false;S.hold=0;$('brkp').cl
 function toggleSw(i){if(!S.bp||S.lockT>0)return;S.sw[i]=!S.sw[i];sfx(S.sw[i]?1400:900,.03,'square',.08);thump(140,.08,.12,.3);renderBrk()}
 function spark(){ // 스위치가 덜 올라간 상태로 레버를 당기면 합선
   S.lockT=1.4;S.holding=false;S.hold=0;S.shake=.3;nburst(5000,1,.35,.35,.3);thump(60,.4,.4,.3);
-  if(S.hum.node!==DOOR)S.hum.timer-=3; // 소리 때문에 웅웅이가 서두름
+  if(S.hum.node!==DOOR)S.hum.timer-=3; // 소리 때문에 교대자가 서두름
   say('파직! 합선이다. 내려간 스위치부터 올려');const b=$('brkp');b.classList.add('spark');setTimeout(()=>b.classList.remove('spark'),120);
 }
 function renderBrk(){const box=$('bsw');box.innerHTML='';S.sw.forEach((on,i)=>{const b=document.createElement('button');b.className='sw '+(on?'on':'off')+(i===S.dead?' dead':'');b.innerHTML=`<span class="n">${i+1}</span><span class="h"></span><span class="l"></span>`;b.onclick=e=>{e.stopPropagation();toggleSw(i)};box.appendChild(b)})}
@@ -756,7 +756,7 @@ function updMapDot(){const d=$('hd');if(!d)return;if(!(DEV.on&&DEV.info)){d.styl
 function die(c){
   if(DEV.on&&DEV.god){
     say(`[무적] ${c} 사망 판정 무시`);
-    if(c==='웅웅이'){S.hum.node=7;S.hum.spot=0;S.hum.timer=10}else if(c==='응시자')S.gaze.p=0;else if(c==='그림자')S.shadow.p=0;else S.san=50;
+    if(c==='교대자'){S.hum.node=7;S.hum.spot=0;S.hum.timer=10}else if(c==='응시자')S.gaze.p=0;else if(c==='그림자')S.shadow.p=0;else S.san=50;
     return;
   }
   S.over=true;S.mon=false;S.bp=false;$('brkp').classList.remove('show');
@@ -977,7 +977,7 @@ function renderStatic(){
   cx.drawImage(VIG,0,0,W,H);
 }
 function drawJump(){
-  const t=1.1-jump,img=JIMG[jumpType]||JUMP[jumpType]||JUMP['웅웅이'];
+  const t=1.1-jump,img=JIMG[jumpType]||JUMP[jumpType]||JUMP['교대자'];
   cx.fillStyle='#000';cx.fillRect(0,0,W,H);
   if(t<.05){cx.fillStyle='#fff';cx.fillRect(0,0,W,H);return}
   const iw=img.naturalWidth||img.width,ih=img.naturalHeight||img.height;
@@ -998,7 +998,7 @@ function initAudio(){
   const comp=AC.createDynamicsCompressor();comp.connect(AC.destination);
   master=AC.createGain();master.gain.value=.8;master.connect(comp);
   NB=AC.createBuffer(1,AC.sampleRate*2,AC.sampleRate);const nd=NB.getChannelData(0);for(let i=0;i<nd.length;i++)nd[i]=Math.random()*2-1;
-  // 형광등 소리 (웅웅이 신호)
+  // 형광등 소리 (교대자 신호)
   humG=AC.createGain();humG.gain.value=0;
   const lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=400;
   humG.connect(lp);lp.connect(master);
@@ -1107,7 +1107,7 @@ function updDbg(){
   const h=S.hum,g=S.gaze,s=S.shadow,c=S.clone,n=S.night;
   $('dbgText').textContent=
 `[DEV] ${n}일 차 · ${DEV.speed}x
-웅웅이: ${h.node===DOOR?'문 앞!':'CAM '+CAMS[h.node]+' (위치 '+h.spot+')'} · 이동 ${h.timer.toFixed(1)}s
+교대자: ${h.node===DOOR?'문 앞!':'CAM '+CAMS[h.node]+' (위치 '+h.spot+')'} · 이동 ${h.timer.toFixed(1)}s
   대기 ${h.wait.toFixed(1)} / 잠금 ${h.lock.toFixed(1)}
 응시자: ${n>=2?'CAM '+CAMS[g.cam]+' · '+(g.p|0)+'%':'-'}
 그림자: ${n>=3?(s.p|0)+'%':'-'}
