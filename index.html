@@ -61,13 +61,17 @@ body[data-mode=menu] #menu{display:flex}
 #devp h2{font-family:VT323,monospace;font-size:34px;margin:0;letter-spacing:4px}
 #devp .row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
 #devp label{display:flex;gap:8px;align-items:center;min-height:36px;cursor:pointer}
-#dbg{position:fixed;left:12px;top:130px;z-index:3;font-size:11px;line-height:1.5;background:rgba(0,0,0,.6);padding:8px 10px;border:1px solid rgba(120,110,60,.5);display:none;max-width:280px}
+#dbg{position:fixed;left:8px;top:64px;z-index:3;font-size:11px;line-height:1.45;background:rgba(0,0,0,.6);padding:6px 8px;border:1px solid rgba(120,110,60,.5);display:none;max-width:260px}
+#dbg.min{background:none;border:none;padding:0}
+#dbg.min pre,#dbg.min .row{display:none}
+#dbgTog{font-size:11px;padding:2px 8px;min-height:28px;min-width:44px;background:rgba(0,0,0,.6)}
 #dbg pre{margin:0;font:inherit;white-space:pre-wrap}
 #dbg .row{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
 #dbg button{font-size:11px;padding:4px 7px;min-height:30px;min-width:30px}
-#rot{position:fixed;top:0;left:0;right:0;padding:6px;text-align:center;font-size:12px;background:rgba(80,20,10,.8);z-index:9;display:none}
-@media (orientation:portrait){#rot{display:block}}
-#map{position:fixed;right:12px;bottom:12px;width:min(42vw,300px);aspect-ratio:4/3;z-index:3;display:none;background:rgba(4,10,6,.62);border:1px solid rgba(170,220,170,.35)}
+#rot{display:none!important}
+/* 세로 화면이면 body를 90도 돌려서 가로 게임 화면으로 (안의 fixed 요소는 body 기준이 됨) */
+html.rot body{position:fixed;top:0;left:0;transform-origin:0 0;transform:rotate(90deg) translateY(-100%)}
+#map{position:fixed;right:12px;bottom:12px;width:300px;height:225px;z-index:3;display:none;background:rgba(4,10,6,.62);border:1px solid rgba(170,220,170,.35)}
 #map svg{position:absolute;inset:0;width:100%;height:100%}
 #map .cb{position:absolute;transform:translate(-50%,-50%);font-family:VT323,monospace;font-size:15px;padding:0 6px;min-width:30px;min-height:24px;background:rgba(8,18,10,.9);border:1px solid rgba(170,220,170,.6);color:#cfe8cf}
 #map .cb.on{background:#a8dca8;color:#061006}
@@ -108,7 +112,7 @@ body:not([data-mode=game]) #map{display:none!important}
 <button class="nav" id="rb">▶</button>
 <div id="acts"></div>
 <div id="map"></div>
-<div id="dbg"><pre id="dbgText"></pre><div class="row" id="dbgBtns"></div></div>
+<div id="dbg"><button id="dbgTog">DEV ▾</button><pre id="dbgText"></pre><div class="row" id="dbgBtns"></div></div>
 
 <div id="menu">
   <h1 id="title">AWFUL SPACE</h1>
@@ -574,7 +578,7 @@ function setMode(m){mode=m;document.body.dataset.mode=m;$('dbg').style.display=(
 function newNight(n){
   S={night:n,t:0,power:100,san:100,view:1,mon:false,cam:0,door:false,light:true,brk:true,
      log:false,paused:true,over:false,msgT:0,shake:0,outSaid:false,silT:0,humOn:null,
-     camX:1,monA:0,camSw:0,sw:Array(6).fill(true),dead:-1,bp:false,holding:false,hold:0,lockT:0,flickT:0,flOn:true,peek:null,ambT:rnd(6,12),hbT:0,dgT:0,
+     camX:1,monA:0,camSw:0,ring:0,ringT:rnd(60,150),monMsg:null,clockRev:0,sub:0,rattleT:0,h3:false,sw:Array(6).fill(true),dead:-1,bp:false,holding:false,hold:0,lockT:0,flickT:0,flOn:true,peek:null,ambT:rnd(6,12),hbT:0,dgT:0,
      layout:CAMS.map((_,i)=>({kind:KIND[i],ox:rnd(-.08,.08),oy:rnd(-.04,.04),seed:ri(1e9)})), // 밤마다 공간 구조가 바뀜
      hum:{node:[5,6,7][ri(3)],spot:0,timer:rnd(10,16),wait:0,lock:0},
      gaze:{cam:ri(8),p:0,timer:15},
@@ -683,7 +687,7 @@ function update(dt){
   setHum(h.node!==DOOR&&!(S.silT>0));
   if(S.msgT>0)S.msgT-=dt;
   if(S.shake>0)S.shake-=dt;
-  ambient(dt);heartbeat(dt);
+  ambient(dt);heartbeat(dt);phoneTick(dt);doorTick(dt);threeAM();if(S.monMsg){S.monMsg.t+=dt;if(S.monMsg.t>1.6)S.monMsg=null}if(S.clockRev>0)S.clockRev-=dt;
   updHUD();
 }
 
@@ -699,14 +703,36 @@ function ambient(dt){
   else if(r<.5)Math.random()<.5?metal():(squelch(rnd(-1,1),.12),setTimeout(()=>crack(rnd(-1,1),.18),400));
   else if(r<.63&&S.hum.node!==DOOR){S.peek={type:'window',t:0};footsteps(-.7,3)}
   else if(r<.73)S.peek={type:'face',t:0};
-  else if(r<.86)flicker(rnd(.4,1.3));
+  else if(r<.8)flicker(rnd(.4,1.3));
+  else if(r<.86){const m=['뒤를 봐','교대 시간입니다','그는 문 앞에 있다','나가','왜 아직 여기 있어?','당신도 곧 교대합니다','보고 있어'];S.monMsg={t:0,txt:m[ri(m.length)]};nburst(3000,1,.2,.06,0)}
+  else if(r<.9){S.clockRev=rnd(2,4)} // 시계가 거꾸로 돈다
+  else if(r<.93&&S.night>=2)musicBoxFar();
   else if(S.san<60)whisper();
   else if(S.hum.node!==DOOR&&DIST[S.hum.node]>=2)knock();
 }
-function flicker(d){S.flickT=d;buzzClick()}
+function flicker(d){S.flickT=d;buzzClick();if(S.night>=2&&Math.random()<.25)S.sub=1} // 깜빡이는 순간 무언가 비침
+// 아무도 없는데 울리는 전화
+function phoneTick(dt){
+  if(S.night<2||S.over)return;
+  if(S.ring>0){if(!S.rUI){S.rUI=1;buildUI()}S.ring-=dt;S.rgB=(S.rgB||0)-dt;if(S.rgB<=0){S.rgB=2.6;ringTone()}if(S.ring<=0){S.rUI=0;say('...전화가 끊겼다');buildUI()}return}
+  S.ringT-=dt;if(S.ringT<=0){S.ringT=rnd(70,160);S.ring=11;S.rgB=0}
+}
+function answerCall(){
+  S.ring=0;S.rUI=0;buildUI();const L=['(숨소리만 들린다)','"...거기 누구 있어요?"','"문 열어줘. 나야."','"뒤에 누가 서 있어요."','"너도 곧 교대할 거야."','"여기는 너무 추워."','(수화기 너머로 당신 목소리가 들린다)'];
+  say(L[ri(L.length)]);S.san-=6;setTimeout(()=>{if(S&&!S.over){breathe(0,.28);if(Math.random()<.5)giggle(0,.06)}},300);
+}
+// 교대자가 문 앞에서 손잡이를 흔듦
+function doorTick(dt){
+  if(S.hum.node!==DOOR)return;S.rattleT-=dt;
+  if(S.rattleT<=0){S.rattleT=rnd(1.8,3.2);for(let k=0;k<4;k++){nburst(1800,6,.06,.2,-.7,k*.09);thump(140,.05,.15,-.7,k*.09)}if(S.view===0)S.shake=.2}
+}
+// 새벽 3시
+function threeAM(){
+  if(S.h3||S.t<HOUR*3)return;S.h3=true;flicker(2.4);musicBoxFar();setTimeout(()=>{if(S&&!S.over){wail(.8,.05);say('03:00')}},2600);
+}
 function heartbeat(dt){
   const d=danger();
-  S.dgT-=dt;if(S.dgT<=0&&droneG){S.dgT=.5;droneG.gain.setTargetAtTime(.03+d*.08,AC.currentTime,.6)}
+  S.dgT-=dt;if(S.dgT<=0&&droneG){S.dgT=.5;droneG.gain.setTargetAtTime(.03+S.night*.006+d*.09,AC.currentTime,.6)}
   if(d<.45)return;S.hbT-=dt;if(S.hbT<=0){heart();S.hbT=lerp(1.1,.42,(d-.45)/.55)}
 }
 // 실제 시간으로 흐르는 연출
@@ -752,6 +778,7 @@ function spark(){ // 스위치가 덜 올라간 상태로 레버를 당기면 �
 }
 function renderBrk(){const box=$('bsw');box.innerHTML='';S.sw.forEach((on,i)=>{const b=document.createElement('button');b.className='sw '+(on?'on':'off')+(i===S.dead?' dead':'');b.innerHTML=`<span class="n">${i+1}</span><span class="h"></span><span class="l"></span>`;b.onclick=e=>{e.stopPropagation();toggleSw(i)};box.appendChild(b)})}
 function report(){
+  if(S.ring>0){answerCall();return}
   if(!powered()){say('수화기 너머로 아무 소리도 없다');return}
   sfx(700,.08,'square',.1);
   if(S.night<4){say('뚜... 뚜... 아무도 받지 않는다');return}
@@ -841,7 +868,7 @@ function buildUI(){
   if(S.mon){
     btn('모니터 끄기',toggleMon);
   }else if(S.view===1){
-    btn('모니터',toggleMon);btn('전화',report);btn('근무 일지',openLog);
+    btn('모니터',toggleMon);btn(S.ring>0?'☎ 전화 받기':'전화',report,S.ring>0);btn('근무 일지',openLog);
   }else if(S.view===0){
     btn(S.door?'문 열기':'문 잠그기',toggleDoor,S.door);
   }else{
@@ -896,8 +923,12 @@ function render(){
 function litView(i,ox){
   const I=VIEWS[i].info;cx.save();cx.translate(ox,0);
   if(i===0&&doorOn()){const d=I.door;for(let k=0;k<3;k++){const y=d.y+d.h*(.3+k*.2),gr=cx.createLinearGradient(0,y,0,y+d.h*.04);gr.addColorStop(0,'#7a7a70');gr.addColorStop(1,'#2e2e2a');cx.fillStyle=gr;cx.fillRect(d.x-d.w*.06,y,d.w*1.12,d.h*.04)}}
-  if(i===1){const c=I.clock,hr=(S.t/HOUR)%12,mn=((S.t/HOUR)%1)*60;cx.strokeStyle='#111';cx.lineCap='round';
+  if(i===1){const c=I.clock,rv=S.clockRev>0?-T_*1.7:0,hr=(S.t/HOUR)%12,mn=(((S.t/HOUR)%1)*60+rv*60%60+600)%60;cx.strokeStyle='#111';cx.lineCap='round';
     [[hr/12,c.r*.5,3],[mn/60,c.r*.75,2]].forEach(([f,len,lw])=>{const a=f*Math.PI*2-Math.PI/2;cx.lineWidth=lw;cx.beginPath();cx.moveTo(c.x,c.y);cx.lineTo(c.x+Math.cos(a)*len,c.y+Math.sin(a)*len);cx.stroke()})}
+  if(S.night>=3){cx.save();cx.fillStyle='rgba(90,10,6,.55)';cx.font=`bold ${H*.06}px 'Nanum Myeongjo',serif`;cx.textAlign='center';
+    if(i===0){cx.translate(W*.23,H*.45);cx.rotate(-.12);cx.fillText('교대는 없다',0,0)}
+    if(i===2&&S.night>=4){cx.translate(W*.8,H*.3);cx.rotate(.1);cx.fillText('나가',0,0);cx.font=`bold ${H*.035}px 'Nanum Myeongjo',serif`;cx.fillText('나가 나가',W*.01,H*.07)}
+    cx.restore()}
   if(i===2){const m=I.main;cx.fillStyle='#0e0e0d';cx.fillRect(m.x,m.y,m.w,m.h);cx.fillStyle='#8e1e16';cx.fillRect(m.x+m.w*.2,S.brk?m.y+m.h*.08:m.y+m.h*.55,m.w*.6,m.h*.37);
     const s=I.sw;cx.fillStyle='#9a9482';cx.fillRect(s.x,s.y,s.w,s.h);cx.fillStyle='#e8e2ce';cx.fillRect(s.x+s.w*.15,S.light?s.y+s.h*.08:s.y+s.h*.5,s.w*.7,s.h*.42)}
   cx.restore();
@@ -936,13 +967,14 @@ function emitView(i,ox){
       cx.fillStyle='#08160c';cx.fillRect(m.x,m.y,m.w,m.h);
       cx.fillStyle='rgba(120,220,140,.75)';cx.font=`${Math.max(9,m.h*.085)}px VT323,monospace`;cx.textAlign='left';cx.textBaseline='top';
       cx.fillText('AWFUL SPACE · OBS SYS',m.x+m.w*.07,m.y+m.h*.1);cx.fillText('CAM A-F ....... ONLINE',m.x+m.w*.07,m.y+m.h*.22);
+      if(S.monMsg&&Math.random()>.15){cx.fillStyle='rgba(230,40,30,.95)';cx.font=`bold ${Math.max(12,m.h*.17)}px 'Nanum Gothic Coding',monospace`;cx.textAlign='center';cx.fillText(S.monMsg.txt,m.x+m.w/2+rnd(-2,2),m.y+m.h*.48);cx.textAlign='left'}
       if(T_%1<.5)cx.fillRect(m.x+m.w*.07,m.y+m.h*.36,m.h*.05,m.h*.08);
       if(S.peek&&S.peek.type==='face'&&S.peek.t<.22){cx.globalAlpha=.6;if(PIC.cface){const ih=m.h*1.15,iw=ih*PIC.cface.width/PIC.cface.height;cx.drawImage(PIC.cface,m.x+m.w/2-iw/2,m.y-m.h*.05,iw,ih)}else drawCloneFig(cx,m.x+m.w/2,m.y+m.h*1.25,m.h*1.3,1,T_);cx.globalAlpha=1}
       cx.fillStyle='rgba(0,0,0,.3)';for(let y=m.y;y<m.y+m.h;y+=3)cx.fillRect(m.x,y,m.w,1);
     }
     cx.restore();
     if(powered()){cx.globalCompositeOperation='lighter';const gr=cx.createRadialGradient(m.x+m.w/2,m.y+m.h/2,0,m.x+m.w/2,m.y+m.h/2,m.w);gr.addColorStop(0,'rgba(60,140,80,.12)');gr.addColorStop(1,'rgba(60,140,80,0)');cx.fillStyle=gr;cx.fillRect(m.x-m.w/2,m.y-m.h/2,m.w*2,m.h*2);cx.globalCompositeOperation='source-over';led(I.monLed.x,I.monLed.y,2,'#3c3')}
-    if(powered())led(I.phoneLed.x,I.phoneLed.y,2,'#c22');
+    if(powered())led(I.phoneLed.x,I.phoneLed.y,S.ring>0?4:2,S.ring>0&&T_%.5<.25?'#f44':'#c22');
   }else{
     led(I.led.x,I.led.y,3,S.power<=0?'#100':S.brk?'#2c3':'#e21');
   }
@@ -951,6 +983,8 @@ function emitView(i,ox){
 function post(){
   cx.save();cx.globalAlpha=.05+(100-(S?S.san:100))/100*.12;cx.translate(rnd(-128,0),rnd(-128,0));cx.fillStyle=NPm[ri(4)];cx.fillRect(0,0,W+128,H+128);cx.restore();
   cx.drawImage(VIG,0,0,W,H);
+  if(S&&mode==='game'){const d=danger();if(d>.3){cx.globalAlpha=Math.min(.8,(d-.3)*1.1);cx.drawImage(VIG,-W*.08,-H*.08,W*1.16,H*1.16);cx.drawImage(VIG,0,0,W,H);cx.globalAlpha=1}
+    if(S.sub>0&&!S.flOn&&!monOn()&&STK.close){S.sub=0;const ih=H*1.1,iw=ih*STK.close.width/STK.close.height;cx.globalAlpha=.16;cx.drawImage(STK.close,W/2-iw/2,-H*.05,iw,ih);cx.globalAlpha=1}}
   if(S&&S.san<35&&Math.random()<.3){cx.save();cx.globalAlpha=.13;cx.globalCompositeOperation='screen';cx.drawImage(cv,rnd(4,10),0,W,H);cx.restore()}
   if(S&&S.san<25&&Math.random()<.05){const y=rnd(0,H),h=rnd(6,30);cx.drawImage(cv,0,y*DPR,W*DPR,h*DPR,rnd(-30,30),y,W,h)}
 }
@@ -1080,6 +1114,8 @@ function drag(pan,v=.2){if(!AC)return;const t=AC.currentTime,s2=AC.createBufferS
 function drip(pan){if(!AC)return;const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(rnd(1400,2200),t);o.frequency.exponentialRampToValueAtTime(500,t+.07);g.gain.setValueAtTime(.06,t);g.gain.exponentialRampToValueAtTime(.001,t+.12);o.connect(g);g.connect(out(pan));o.start(t);o.stop(t+.13)}
 // 키득거리는 웃음
 function giggle(pan,v=.07){if(!AC)return;const n=rnd(5,8);for(let k=0;k<n;k++){const t=AC.currentTime+k*(.13-k*.008),o=AC.createOscillator(),d=dist(4),f=AC.createBiquadFilter(),g=AC.createGain();o.type='sawtooth';o.frequency.setValueAtTime(rnd(300,380),t);o.frequency.linearRampToValueAtTime(rnd(240,280),t+.08);f.type='bandpass';f.frequency.value=1500;f.Q.value=4;g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v,t+.015);g.gain.exponentialRampToValueAtTime(.001,t+.09);o.connect(d);d.connect(f);f.connect(g);g.connect(out(pan));o.start(t);o.stop(t+.1)}}
+function ringTone(){if(!AC)return;const t=AC.currentTime;for(let k=0;k<2;k++){const o=AC.createOscillator(),o2=AC.createOscillator(),g=AC.createGain(),am=AC.createOscillator(),ag=AC.createGain();o.frequency.value=440;o2.frequency.value=480;am.frequency.value=20;ag.gain.value=.5;am.connect(ag);ag.connect(g.gain);g.gain.setValueAtTime(.0001,t+k*.5);g.gain.linearRampToValueAtTime(.05,t+k*.5+.02);g.gain.setValueAtTime(.05,t+k*.5+.38);g.gain.linearRampToValueAtTime(.0001,t+k*.5+.42);[o,o2].forEach(x=>x.connect(g));g.connect(out(.35));[o,o2,am].forEach(x=>{x.start(t+k*.5);x.stop(t+k*.5+.45)})}}
+function musicBoxFar(){if(!AC)return;const save=master.gain.value;const lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=900;const g=AC.createGain();g.gain.value=.5;lp.connect(g);g.connect(out(rnd(-1,1)));const notes=[659,622,587,523,494],t0=AC.currentTime;notes.forEach((fq,k)=>{const t=t0+k*.7*(1+k*.08),o=AC.createOscillator(),gg=AC.createGain();o.frequency.setValueAtTime(fq*(1-k*.01),t);gg.gain.setValueAtTime(.0001,t);gg.gain.linearRampToValueAtTime(.05,t+.005);gg.gain.exponentialRampToValueAtTime(.001,t+1.3);o.connect(gg);gg.connect(lp);o.start(t);o.stop(t+1.4)})}
 // 메뉴의 고장 난 오르골
 function musicBox(){if(!AC)return;const notes=[659,622,587,523,494,523,587,440,415,440],t0=AC.currentTime;notes.forEach((fq,k)=>{const t=t0+k*.55*(1+k*.04),o=AC.createOscillator(),o2=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(fq,t);o2.frequency.setValueAtTime(fq*2.01,t);if(k===notes.length-1)o.frequency.linearRampToValueAtTime(fq*.8,t+1.5);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(.05,t+.005);g.gain.exponentialRampToValueAtTime(.001,t+1.4);o.connect(g);o2.connect(g);g.connect(out(0));o.start(t);o2.start(t);o.stop(t+1.5);o2.stop(t+1.5)})}
 function setHum(on){
@@ -1120,7 +1156,12 @@ function scream(){
 let LC=mk(10,10),lg=LC.getContext('2d'),VIG=mk(10,10);
 function makeVig(w,h,a){const c=mk(w,h),g=c.getContext('2d'),gr=g.createRadialGradient(w/2,h/2,Math.min(w,h)*.25,w/2,h/2,Math.max(w,h)*.72);gr.addColorStop(0,'rgba(0,0,0,0)');gr.addColorStop(1,`rgba(0,0,0,${a})`);g.fillStyle=gr;g.fillRect(0,0,w,h);return c}
 function resize(){
-  DPR=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;
+  DPR=Math.min(devicePixelRatio||1,2);
+  const rot=innerHeight>innerWidth;document.documentElement.classList.toggle('rot',rot);
+  W=rot?innerHeight:innerWidth;H=rot?innerWidth:innerHeight; // 게임 화면은 항상 가로
+  document.body.style.width=rot?W+'px':'';document.body.style.height=rot?H+'px':'';
+  {const mw=Math.min(W*.36,300,H*.56*4/3),m=$('map');m.style.width=mw+'px';m.style.height=mw*.75+'px'} // 지도 크기
+  $('dbg').classList.toggle('min',H<520||W<700);
   cv.width=W*DPR;cv.height=H*DPR;cx.setTransform(DPR,0,0,DPR,0,0);
   LC.width=W*DPR;LC.height=H*DPR;
   VIG=makeVig(W,H,.85);
@@ -1135,9 +1176,10 @@ $('lb').onclick=()=>turn(-1);
 $('rb').onclick=()=>turn(1);
 $('logClose').onclick=closeLog;
 let tx=null;
-cv.addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});
+const isRot=()=>document.documentElement.classList.contains('rot');
+cv.addEventListener('touchstart',e=>{const t=e.touches[0];tx=isRot()?t.clientY:t.clientX},{passive:true});
 cv.addEventListener('touchend',e=>{
-  if(tx==null)return;const dx=e.changedTouches[0].clientX-tx;tx=null;
+  if(tx==null)return;const t=e.changedTouches[0],dx=(isRot()?t.clientY:t.clientX)-tx;tx=null; // 돌린 화면에서는 세로 이동이 좌우
   if(Math.abs(dx)>60)turn(dx>0?-1:1);
 });
 // 조작은 PC·모바일 모두 화면 버튼 클릭으로만 (키보드 단축키 없음)
@@ -1163,6 +1205,7 @@ $('devBack').onclick=()=>$('devp').classList.remove('show');
 $('endMenu').onclick=toMenu;
 for(let n=1;n<=NIGHTS;n++){const b=document.createElement('button');b.textContent=n+'일 차';b.onclick=()=>startGame(n,true);$('devNights').appendChild(b)}
 [['dNoScare','noScare'],['dInfo','info'],['dGod','god'],['dBright','bright']].forEach(([id,k])=>{$(id).onchange=e=>{DEV[k]=e.target.checked;buildDbg()}});
+$('dbgTog').onclick=e=>{e.stopPropagation();const d=$('dbg');d.classList.toggle('min');$('dbgTog').textContent=d.classList.contains('min')?'DEV ▸':'DEV ▾'};
 function buildDbg(){
   const box=$('dbgBtns');box.innerHTML='';
   const mb=(t,f,on)=>{const b=document.createElement('button');b.textContent=t;if(on)b.className='on';b.onclick=e=>{e.stopPropagation();f();buildDbg()};box.appendChild(b)};
@@ -1172,6 +1215,7 @@ function buildDbg(){
   mb('6시로',()=>{if(S&&!S.over)S.t=HOUR*6-3});
   mb('메뉴',toMenu);
   $('dbg').style.display=(mode==='game'&&DEV.on&&DEV.info)?'block':'none';
+  $('dbgTog').textContent=$('dbg').classList.contains('min')?'DEV ▸':'DEV ▾';
 }
 function updDbg(){
   const h=S.hum,g=S.gaze,s=S.shadow,c=S.clone,n=S.night;
