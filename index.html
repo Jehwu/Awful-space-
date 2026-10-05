@@ -331,8 +331,8 @@ function deskBase(g,G,I){
   I.mon={x:mx+mw*.09,y:my+mh*.1,w:mw*.82,h:mh*.72};I.monLed={x:mx+mw*.9,y:my+mh*.93};
   // 키보드
   g.fillStyle='#24231e';polyG(g,[[w*.4,top+h*.035],[w*.6,top+h*.035],[w*.62,top+h*.085],[w*.38,top+h*.085]]);g.fillStyle='#3a3830';for(let k=0;k<3;k++)for(let j=0;j<12;j++)g.fillRect(w*.395+j*w*.0185+k*w*.004,top+h*(.042+k*.013),w*.014,h*.009);
-  // 모니터 포스트잇
-  g.save();g.translate(mx+mw*.78,my+mh*.02);g.rotate(.12);g.fillStyle='#c9b84a';g.fillRect(0,0,mw*.2,mw*.2);g.fillStyle='#5a1010';g.font=`${Math.max(7,mw*.035)}px 'Nanum Gothic Coding',monospace`;g.textBaseline='top';g.fillText('뒤 돌아보지',mw*.015,mw*.04);g.fillText('마세요',mw*.015,mw*.09);g.restore();
+  // 모니터 옆 포스트잇 (화면에 가려지지 않게 모니터 바깥쪽에 붙임)
+  g.save();g.translate(mx+mw*1.01,my+mh*.06);g.rotate(.1);g.fillStyle='#c9b84a';g.fillRect(0,0,mw*.24,mw*.2);g.fillStyle='#5a1010';g.font=`${Math.max(7,mw*.036)}px 'Nanum Gothic Coding',monospace`;g.textBaseline='top';g.fillText('문을 절대',mw*.02,mw*.04);g.fillText('열지 마세요',mw*.02,mw*.1);g.restore();
   // 전화기
   const px=w*.7,py=h*.6;g.fillStyle='#2e1010';rr(g,px,py-h*.035,w*.1,h*.05,6);g.fill();g.fillStyle='#401616';rr(g,px-w*.005,py-h*.06,w*.11,h*.028,8);g.fill();
   g.fillStyle='#120606';for(let k=0;k<9;k++)g.fillRect(px+w*.015+(k%3)*w*.025,py-h*.025+Math.floor(k/3)*h*.011,w*.012,h*.006);
