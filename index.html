@@ -420,12 +420,19 @@ function drawStalker(g,x,y,h,a,t,pose){
   g.save();g.translate(.03*h,-.905*h);g.rotate(.5+tw);stalkerHead(g,h,t);g.restore();
   g.restore();
 }
+// 교대자 AI 이미지 (img 폴더). 못 불러오면 코드로 그린 버전 사용
+const STK={},PEEK_EDGE=.2985; // peek 이미지에서 벽 모서리 위치(가로 비율)
+['full','peek','close'].forEach(k=>{const im=new Image();im.onload=()=>{STK[k]=im};im.src='img/stalker_'+k+'.png'});
+function stkImg(g,im,x,y,h,a,flip){const w=h*im.width/im.height,j=Math.random()<.03?rnd(-2,2):0;g.save();g.globalAlpha=a;g.translate(x+j,y);if(flip)g.scale(-1,1);g.drawImage(im,0,0,w,h);g.restore()}
+function stalkerFull(g,x,y,hh,a,t){if(STK.full){const w=hh*STK.full.width/STK.full.height;stkImg(g,STK.full,x-w/2,y-hh,hh,a)}else drawStalker(g,x,y,hh,a,t,'stand')}
 // CCTV 속 위치별 자세
 function drawSpot(g,I,spot,a,t){
   const sp=I.spots[spot];
-  if(sp.pose==='close'){drawStalker(g,CW*.12,CH*1.8,CH*1.6,a,t,'close');return}
-  if(sp.pose==='peek'){g.save();g.beginPath();if(sp.side)g.rect(0,0,sp.ex,CH);else g.rect(sp.ex,0,CW-sp.ex,CH);g.clip();g.translate(sp.x,sp.y);g.rotate(sp.side?-.22:.22);drawStalker(g,0,0,sp.hh,a,t,'stand');g.restore();return}
-  drawStalker(g,sp.x,sp.y,sp.hh,a,t,'stand');
+  if(sp.pose==='close'){if(STK.close)stkImg(g,STK.close,CW*.03+Math.sin(t*.6)*2,CH*.08,CH*1.02,a);else drawStalker(g,CW*.12,CH*1.8,CH*1.6,a,t,'close');return}
+  if(sp.pose==='peek'){
+    if(STK.peek){const h=sp.hh*.62,w=h*STK.peek.width/STK.peek.height,e=w*PEEK_EDGE;stkImg(g,STK.peek,sp.side?sp.ex+e:sp.ex-e,sp.y-sp.hh*.98,h,a,sp.side===1);return} // 벽 모서리를 통로 끝에 맞춤
+    g.save();g.beginPath();if(sp.side)g.rect(0,0,sp.ex,CH);else g.rect(sp.ex,0,CW-sp.ex,CH);g.clip();g.translate(sp.x,sp.y);g.rotate(sp.side?-.22:.22);drawStalker(g,0,0,sp.hh,a,t,'stand');g.restore();return}
+  stalkerFull(g,sp.x,sp.y,sp.hh,a,t);
 }
 function drawEye(g,x,y,s,a,p,t,k){
   g.save();g.translate(x,y);g.globalAlpha=a;
@@ -881,7 +888,8 @@ function emitView(i,ox){
   if(i===0){
     const w=I.win;cx.save();cx.beginPath();cx.rect(w.x,w.y,w.w,w.h);cx.clip();
     const g=cx.createLinearGradient(0,w.y,0,w.y+w.h);g.addColorStop(0,'#2a2510');g.addColorStop(1,'#110f07');cx.fillStyle=g;cx.fillRect(w.x,w.y,w.w,w.h);
-    if(humAtDoor()){cx.fillStyle='#050403';cx.fillRect(w.x+w.w*.15,w.y+w.h*.8,w.w*.7,w.h*.4);cx.save();cx.translate(w.x+w.w*.5,w.y+w.h*.52);cx.rotate(.4);cx.globalAlpha=.85;stalkerHead(cx,w.h*.8/.116,T_);cx.restore()}
+    if(humAtDoor()&&STK.close){const ih=w.h*1.7,iw=ih*STK.close.width/STK.close.height;cx.globalAlpha=.8;cx.drawImage(STK.close,w.x+w.w/2-iw/2,w.y-w.h*.05,iw,ih);cx.globalAlpha=1;cx.fillStyle='rgba(20,15,5,.3)';cx.fillRect(w.x,w.y,w.w,w.h)}
+    else if(humAtDoor()){cx.fillStyle='#050403';cx.fillRect(w.x+w.w*.15,w.y+w.h*.8,w.w*.7,w.h*.4);cx.save();cx.translate(w.x+w.w*.5,w.y+w.h*.52);cx.rotate(.4);cx.globalAlpha=.85;stalkerHead(cx,w.h*.8/.116,T_);cx.restore()}
     if(S.peek&&S.peek.type==='window'){const p=S.peek.t/1.6;cx.fillStyle='rgba(4,3,2,.95)';cx.beginPath();cx.ellipse(w.x+w.w*(1.25-p*1.5),w.y+w.h*.6,w.w*.12,w.h*.45,0,0,7);cx.fill()}
     cx.strokeStyle='rgba(120,120,110,.35)';cx.lineWidth=1;cx.beginPath();for(let k=-w.h;k<w.w;k+=8){cx.moveTo(w.x+k,w.y);cx.lineTo(w.x+k+w.h,w.y+w.h);cx.moveTo(w.x+k+w.h,w.y);cx.lineTo(w.x+k,w.y+w.h)}cx.stroke();
     cx.restore();
@@ -920,10 +928,10 @@ function renderCam(i,menu){
     if(S.hum.node===i)drawSpot(g,I,S.hum.spot,1,t);
     if(S.night>=2&&S.gaze.cam===i){const e=I.eye,n=1+Math.floor(S.gaze.p/30);for(let k=0;k<n&&k<4;k++){const o=I.eyeOff[k];drawEye(g,e.x+o[0]*e.s,e.y+o[1]*e.s,e.s*.11*(k?.6:1),1,S.gaze.p,t,k)}}
     if(S.night>=4&&S.clone.cam===i){const a=I.seat;drawCloneFig(g,a.x,a.y,a.hh*.8,1,t)}
-    if(S.fake.cam===i){const a=I.fakeA;g.save();g.translate(rnd(-3,3),0);S.fake.type==='hum'?drawStalker(g,a.x,a.y,a.hh*.95,.7,t,'stand'):drawCloneFig(g,a.x,a.y,a.hh*.8,.7,t);g.restore()}
+    if(S.fake.cam===i){const a=I.fakeA;g.save();g.translate(rnd(-3,3),0);S.fake.type==='hum'?stalkerFull(g,a.x,a.y,a.hh*.95,.7,t):drawCloneFig(g,a.x,a.y,a.hh*.8,.7,t);g.restore()}
   }else{
     const cyc=menuT%13;
-    if(cyc>8&&cyc<10&&Math.random()>.12){const a=I.far;drawStalker(g,a.x,a.y,a.hh*.95,1,t,'stand')}
+    if(cyc>8&&cyc<10&&Math.random()>.12){const a=I.far;stalkerFull(g,a.x,a.y,a.hh*.95,1,t)}
   }
   if(Math.random()<.04){g.fillStyle='rgba(0,0,0,.4)';g.fillRect(0,0,CW,CH)}
   // 흑백 + 녹색 톤
@@ -981,7 +989,7 @@ function drawJump(){
   cx.fillStyle='#000';cx.fillRect(0,0,W,H);
   if(t<.05){cx.fillStyle='#fff';cx.fillRect(0,0,W,H);return}
   const iw=img.naturalWidth||img.width,ih=img.naturalHeight||img.height;
-  const sc=Math.max(W/iw,H/ih)*(1.05+t*.3),dw=iw*sc,dh=ih*sc;
+  const sc=Math.max(H/ih,W/iw*.62)*(1.1+t*.8),dw=iw*sc,dh=ih*sc; // 얼굴 전체가 보이게, 빠르게 커지며 덮쳐옴
   const x=W/2-dw/2+rnd(-30,30),y=H/2-dh/2+rnd(-30,30)+(1-Math.min(1,t*5))*H*.25;
   cx.drawImage(img,x,y,dw,dh);
   cx.save();cx.globalAlpha=.3;cx.globalCompositeOperation='screen';cx.drawImage(img,x+rnd(8,18),y,dw,dh);cx.restore();
