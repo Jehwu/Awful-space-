@@ -300,9 +300,27 @@ function doorBase(g,G,I){
   g.fillStyle='#d8c8b0';g.font=`bold ${Math.max(8,bh*.026)}px 'Nanum Gothic Coding',sans-serif`;g.textAlign='center';g.textBaseline='middle';g.fillText('관측실 · 외부 출입 금지',bx+bw/2,dy-bh*.08);
   const lx=dx+dw*1.15,ly=dy+dh*.42;g.fillStyle='#26251f';g.fillRect(lx,ly,dw*.18,dh*.16);g.fillStyle='#0d0d0c';g.fillRect(lx+dw*.03,ly+dh*.02,dw*.12,dh*.05);
   I.lock={x:lx+dw*.09,y:ly+dh*.11,r:dw*.03};
+  // 옷걸이: 경비 점퍼와 모자
+  {const x=bx+bw*.16,y=by+bh*.18;g.fillStyle='#3a2a18';g.fillRect(x-bw*.05,y,bw*.1,bh*.025);[-1,1].forEach(k=>{g.fillStyle='#888';g.fillRect(x+k*bw*.03,y+bh*.02,3,bh*.03)});
+   const jg=g.createLinearGradient(x-bw*.06,0,x+bw*.06,0);jg.addColorStop(0,'#14181f');jg.addColorStop(.5,'#2a3140');jg.addColorStop(1,'#10131a');g.fillStyle=jg;g.beginPath();g.moveTo(x-bw*.012,y+bh*.045);g.lineTo(x-bw*.05,y+bh*.075);g.lineTo(x-bw*.062,y+bh*.32);g.lineTo(x-bw*.05,y+bh*.33);g.lineTo(x-bw*.045,y+bh*.4);g.lineTo(x+bw*.045,y+bh*.4);g.lineTo(x+bw*.05,y+bh*.33);g.lineTo(x+bw*.062,y+bh*.32);g.lineTo(x+bw*.05,y+bh*.075);g.lineTo(x+bw*.012,y+bh*.045);g.closePath();g.fill(); // 어깨, 소매가 있는 점퍼
+   g.strokeStyle='rgba(0,0,0,.5)';g.lineWidth=1.5;g.beginPath();g.moveTo(x-bw*.04,y+bh*.1);g.lineTo(x-bw*.043,y+bh*.32);g.moveTo(x+bw*.04,y+bh*.1);g.lineTo(x+bw*.043,y+bh*.32);g.moveTo(x,y+bh*.06);g.lineTo(x,y+bh*.4);g.stroke(); // 소매 경계, 지퍼
+   g.fillStyle='#0c0e12';g.beginPath();g.moveTo(x-bw*.014,y+bh*.045);g.lineTo(x,y+bh*.09);g.lineTo(x+bw*.014,y+bh*.045);g.closePath();g.fill(); // 깃
+   g.fillStyle='#c8b040';g.fillRect(x-bw*.035,y+bh*.13,bw*.022,bh*.03);g.fillStyle='rgba(220,220,200,.45)';g.fillRect(x-bw*.045,y+bh*.3,bw*.09,bh*.012);
+   g.fillStyle='#1a1d24';g.beginPath();g.ellipse(x+bw*.032,y+bh*.06,bw*.03,bh*.022,0,Math.PI,0);g.fill();g.fillRect(x+bw*.032,y+bh*.055,bw*.04,bh*.008)}
+  // 출입 기록부 (클립보드)
+  {const x=bx+bw*.27,y=by+bh*.42;g.fillStyle='#5a4228';g.fillRect(x,y,bw*.06,bh*.14);g.fillStyle='#d8d2bc';g.fillRect(x+bw*.004,y+bh*.015,bw*.052,bh*.12);g.fillStyle='#888';g.fillRect(x+bw*.018,y-bh*.004,bw*.024,bh*.015);g.fillStyle='rgba(30,30,60,.5)';for(let k=0;k<7;k++)g.fillRect(x+bw*.01,y+bh*(.035+k*.014),bw*.04,1)}
+  // 전등 스위치
+  g.fillStyle='#cfc8b0';g.fillRect(bx+bw*.72,by+bh*.45,bw*.025,bh*.06);g.fillStyle='#e8e2cc';g.fillRect(bx+bw*.727,by+bh*.46,bw*.011,bh*.025);
+  // 소화기
+  {const p=floorAt(G,.97,.8);extinguisher(g,p.x,p.y,p.hh*.22)}
+  // 문 앞 매트
+  {const a=floorAt(G,.8,.38),b=floorAt(G,.8,.62),c=floorAt(G,.97,.62),d=floorAt(G,.97,.38);g.fillStyle='#2a2a22';polyG(g,[[a.x,a.y],[b.x,b.y],[c.x,c.y],[d.x,d.y]]);g.fillStyle='rgba(0,0,0,.35)';polyG(g,shrink([[a.x,a.y],[b.x,b.y],[c.x,c.y],[d.x,d.y]],.8))}
   // 바닥 얼룩
   const p=floorAt(G,.6,.5);const gr=g.createRadialGradient(p.x,p.y,0,p.x,p.y,p.hh*.4);gr.addColorStop(0,'rgba(15,10,3,.5)');gr.addColorStop(1,'rgba(15,10,3,0)');g.fillStyle=gr;g.save();g.translate(p.x,p.y);g.scale(1,.25);g.translate(-p.x,-p.y);g.fillRect(p.x-p.hh*.4,p.y-p.hh*.4,p.hh*.8,p.hh*.8);g.restore();
 }
+// 글씨 (지정한 폭을 넘지 않게 줄여서 잘림 방지)
+function txt(g,t,x,y,size,col,maxW,font){g.font=`${font||''} ${Math.max(6,size)}px 'Nanum Gothic Coding',monospace`;g.fillStyle=col;g.textBaseline='top';g.textAlign='left';const m=g.measureText(t).width;if(maxW&&m>maxW){g.save();g.translate(x,y);g.scale(maxW/m,1);g.fillText(t,0,0);g.restore()}else g.fillText(t,x,y)}
+function extinguisher(g,x,y,hh){const w=hh*.32;g.fillStyle='#1a1a18';g.fillRect(x-w*.15,y-hh*1.12,w*.3,hh*.12);const eg=g.createLinearGradient(x-w/2,0,x+w/2,0);eg.addColorStop(0,'#5a0c08');eg.addColorStop(.35,'#a01c14');eg.addColorStop(1,'#3a0604');g.fillStyle=eg;rr(g,x-w/2,y-hh,w,hh,w*.4);g.fill();g.fillStyle='#d8d0b8';g.fillRect(x-w*.32,y-hh*.62,w*.64,hh*.22);g.fillStyle='#600';g.fillRect(x-w*.24,y-hh*.56,w*.48,hh*.04);g.strokeStyle='#111';g.lineWidth=Math.max(1,w*.08);g.beginPath();g.moveTo(x+w*.1,y-hh*1.05);g.quadraticCurveTo(x+w*.9,y-hh*.9,x+w*.55,y-hh*.35);g.stroke()}
 function deskBase(g,G,I){
   const {w,h,bx,by,bw,bh}=G,r=mulberry(23);
   // 코르크 보드
@@ -331,8 +349,6 @@ function deskBase(g,G,I){
   I.mon={x:mx+mw*.09,y:my+mh*.1,w:mw*.82,h:mh*.72};I.monLed={x:mx+mw*.9,y:my+mh*.93};
   // 키보드
   g.fillStyle='#24231e';polyG(g,[[w*.4,top+h*.035],[w*.6,top+h*.035],[w*.62,top+h*.085],[w*.38,top+h*.085]]);g.fillStyle='#3a3830';for(let k=0;k<3;k++)for(let j=0;j<12;j++)g.fillRect(w*.395+j*w*.0185+k*w*.004,top+h*(.042+k*.013),w*.014,h*.009);
-  // 모니터 옆 포스트잇 (화면에 가려지지 않게 모니터 바깥쪽에 붙임)
-  g.save();g.translate(mx+mw*1.01,my+mh*.06);g.rotate(.1);g.fillStyle='#c9b84a';g.fillRect(0,0,mw*.24,mw*.2);g.fillStyle='#5a1010';g.font=`${Math.max(7,mw*.036)}px 'Nanum Gothic Coding',monospace`;g.textBaseline='top';g.fillText('문을 절대',mw*.02,mw*.04);g.fillText('열지 마세요',mw*.02,mw*.1);g.restore();
   // 전화기
   const px=w*.7,py=h*.6;g.fillStyle='#2e1010';rr(g,px,py-h*.035,w*.1,h*.05,6);g.fill();g.fillStyle='#401616';rr(g,px-w*.005,py-h*.06,w*.11,h*.028,8);g.fill();
   g.fillStyle='#120606';for(let k=0;k<9;k++)g.fillRect(px+w*.015+(k%3)*w*.025,py-h*.025+Math.floor(k/3)*h*.011,w*.012,h*.006);
@@ -342,6 +358,30 @@ function deskBase(g,G,I){
   // 머그컵, 서류
   g.fillStyle='#b8b09a';g.fillRect(w*.31,h*.585,w*.025,h*.045);g.fillStyle='#1e1408';g.beginPath();g.ellipse(w*.3225,h*.585,w*.0125,h*.006,0,0,7);g.fill();
   g.save();g.translate(w*.6,h*.665);g.rotate(.15);g.fillStyle='#cdc6ac';g.fillRect(0,0,w*.08,h*.04);g.restore();
+  // ---- 경비실 소품 ----
+  // 근무 교대표 (화이트보드)
+  {const x=bx+bw*.02,y=by+bh*.4,ww=bw*.25,hh=bh*.38;g.fillStyle='#8a8a84';g.fillRect(x-3,y-3,ww+6,hh+6);g.fillStyle='#d6d4ca';g.fillRect(x,y,ww,hh);
+   const sh=g.createLinearGradient(x,y,x+ww,y+hh);sh.addColorStop(0,'rgba(255,255,255,.15)');sh.addColorStop(1,'rgba(0,0,0,.25)');g.fillStyle=sh;g.fillRect(x,y,ww,hh);
+   const fs=hh*.085,lx=x+ww*.06,mw2=ww*.88;txt(g,'야간 근무 교대표',lx,y+hh*.06,fs*1.1,'#1a2a6a',mw2,'bold');
+   const rows=[['1','이O철'],['2','박O수'],['3','최O영'],['4','정O훈'],['5','']];
+   rows.forEach(([d,n],k)=>{const yy=y+hh*(.24+k*.145);txt(g,d+'일 차',lx,yy,fs,'#222',ww*.3);txt(g,n||'',lx+ww*.38,yy,fs,'#222',ww*.4);
+     if(n){g.strokeStyle='rgba(170,20,20,.85)';g.lineWidth=Math.max(1.5,fs*.18);g.beginPath();g.moveTo(lx+ww*.35,yy+fs*.55);g.lineTo(lx+ww*.82,yy+fs*.45);g.stroke()}
+     else{g.strokeStyle='#222';g.lineWidth=1;g.beginPath();g.moveTo(lx+ww*.38,yy+fs*1.05);g.lineTo(lx+ww*.85,yy+fs*1.05);g.stroke();txt(g,'← 당신',lx+ww*.58,yy-fs*.05,fs*.85,'rgba(150,15,15,.9)',ww*.32)}});
+   g.fillStyle='#555';g.fillRect(x+ww*.1,y+hh,ww*.8,hh*.03);g.fillStyle='#1a3a8a';g.fillRect(x+ww*.15,y+hh-hh*.02,ww*.08,hh*.025)}
+  // 열쇠 보관함
+  {const x=bx+bw*.885,y=by+bh*.3,ww=bw*.08,hh=bh*.16;g.fillStyle='#3a2a18';g.fillRect(x,y,ww,hh);g.fillStyle='#4e3a22';g.fillRect(x+2,y+2,ww-4,hh-4);
+   for(let k=0;k<6;k++){const kx=x+ww*(.18+(k%3)*.32),ky=y+hh*(.2+Math.floor(k/3)*.45);g.fillStyle='#999';g.fillRect(kx-1,ky,2,hh*.06);if(k!==4){g.fillStyle='#b8a050';g.fillRect(kx-ww*.05,ky+hh*.06,ww*.1,hh*.14);g.fillStyle=['#c22','#2a6','#22c','#cc2','#888','#c6c'][k];g.fillRect(kx-ww*.06,ky+hh*.2,ww*.12,hh*.08)}}}
+  // 천장 구석 감시 카메라
+  {const cx2=bx+bw*.93,cy2=by+bh*.03;g.fillStyle='#2a2a26';g.fillRect(cx2,by-4,bw*.012,bh*.05);g.save();g.translate(cx2,cy2+bh*.04);g.rotate(.5);g.fillStyle='#d0ccc0';rr(g,-bw*.05,-bh*.025,bw*.06,bh*.05,3);g.fill();g.fillStyle='#111';g.beginPath();g.arc(-bw*.05,0,bh*.018,0,7);g.fill();g.restore();I.camLed={x:cx2-bw*.005,y:cy2+bh*.03}}
+  // 스탠드 조명
+  {const x=w*.08,y=h*.63;g.fillStyle='#1a1a17';g.beginPath();g.ellipse(x,y,w*.03,h*.01,0,0,7);g.fill();g.strokeStyle='#22221e';g.lineWidth=Math.max(2,w*.004);g.beginPath();g.moveTo(x,y);g.quadraticCurveTo(x-w*.01,h*.5,x+w*.05,h*.47);g.stroke();
+   g.save();g.translate(x+w*.05,h*.47);g.rotate(.6);g.fillStyle='#2a2a24';g.beginPath();g.moveTo(-w*.025,0);g.lineTo(w*.025,0);g.lineTo(w*.015,-h*.035);g.lineTo(-w*.015,-h*.035);g.closePath();g.fill();g.restore()}
+  // 무전기 + 충전기
+  {const x=w*.86,y=h*.655;g.fillStyle='#1c1c1a';g.fillRect(x-w*.02,y-h*.012,w*.04,h*.02);g.fillStyle='#262624';rr(g,x-w*.011,y-h*.075,w*.022,h*.068,3);g.fill();g.fillStyle='#111';g.fillRect(x-w*.002,y-h*.1,w*.005,h*.03);g.fillStyle='#3a3a36';for(let k=0;k<4;k++)g.fillRect(x-w*.007,y-h*.062+k*h*.008,w*.014,h*.003);I.radioLed={x:x+w*.013,y:y-h*.006}}
+  // 손전등
+  {g.save();g.translate(w*.73,h*.715);g.rotate(-.25);const fg=g.createLinearGradient(0,-h*.01,0,h*.01);fg.addColorStop(0,'#4a4a44');fg.addColorStop(1,'#1a1a18');g.fillStyle=fg;g.fillRect(0,-h*.009,w*.06,h*.018);g.fillStyle='#2a2a26';g.fillRect(w*.058,-h*.013,w*.018,h*.026);g.fillStyle='#8a8670';g.fillRect(w*.075,-h*.011,w*.003,h*.022);g.restore()}
+  // 신분증 목걸이
+  {g.save();g.translate(w*.45,h*.73);g.rotate(.2);g.strokeStyle='#1a3a7a';g.lineWidth=2;g.beginPath();g.moveTo(-w*.04,-h*.01);g.quadraticCurveTo(0,h*.03,w*.03,-h*.012);g.stroke();g.fillStyle='#e0dcd0';g.fillRect(-w*.012,h*.005,w*.028,h*.03);g.fillStyle='#555';g.fillRect(-w*.008,h*.009,w*.01,h*.014);g.restore()}
 }
 function panelBase(g,G,I){
   const {bx,by,bw,bh}=G;
@@ -355,6 +395,19 @@ function panelBase(g,G,I){
   const sx=px+pw*.76,sy=py+ph*.1,ss=pw*.14;g.fillStyle='#c8a818';g.beginPath();g.moveTo(sx,sy+ss);g.lineTo(sx+ss/2,sy);g.lineTo(sx+ss,sy+ss);g.closePath();g.fill();g.fillStyle='#111';g.fillRect(sx+ss*.46,sy+ss*.35,ss*.08,ss*.35);g.fillRect(sx+ss*.46,sy+ss*.78,ss*.08,ss*.08);
   {const r=mulberry(37);g.strokeStyle='rgba(55,8,6,.5)';g.lineCap='round';for(let f=0;f<4;f++){g.lineWidth=bh*.012;g.beginPath();const x0=px+pw+bw*.02+f*bw*.012;g.moveTo(x0,py+ph*.2);g.quadraticCurveTo(x0+bw*.01,py+ph*.5,x0-bw*.005,py+ph*(.75+r()*.2));g.stroke()}} // 벽을 긁고 내려간 핏자국
   const lx=bx+bw*.68,ly=by+bh*.42;g.fillStyle='#c8c2ac';g.fillRect(lx,ly,bw*.05,bh*.11);I.sw={x:lx+bw*.015,y:ly+bh*.02,w:bw*.02,h:bh*.07};
+  // 철제 사물함
+  {const x=bx+bw*.04,y=by+bh*.2,ww=bw*.2,hh=bh*.8;texRect(g,T.metal,x,y,ww,hh,.45);g.fillStyle='rgba(0,0,0,.25)';g.fillRect(x,y,ww,hh);
+   [0,1].forEach(k=>{const dx2=x+k*ww/2;g.strokeStyle='#111';g.lineWidth=2;g.strokeRect(dx2+2,y+2,ww/2-4,hh-4);g.fillStyle='#0c0c0b';for(let j=0;j<5;j++)g.fillRect(dx2+ww*.12,y+hh*(.06+j*.025),ww*.26,hh*.008);g.fillStyle='#8a8a80';g.fillRect(dx2+ww*.4,y+hh*.45,ww*.04,hh*.08)});
+   g.fillStyle='#050505';g.save();g.translate(x+ww*.98,y);g.transform(1,0,-.05,1,0,0);g.fillRect(0,0,ww*.06,hh);g.restore(); // 살짝 열린 틈
+   txt(g,'경비 01',x+ww*.08,y+hh*.13,hh*.035,'#d8d2c0',ww*.3);txt(g,'경비 02',x+ww*.58,y+hh*.13,hh*.035,'#d8d2c0',ww*.3)}
+  // 선반과 상자
+  {const x=bx+bw*.62,y=by+bh*.18,ww=bw*.2;g.fillStyle='#3a3a34';g.fillRect(x,y,ww,bh*.015);g.fillRect(x+ww*.05,y,bw*.006,bh*.04);g.fillRect(x+ww*.9,y,bw*.006,bh*.04);
+   [[.02,.12,'#6a5638'],[.36,.09,'#5a4a30'],[.62,.14,'#6e5a3a']].forEach(([f,hh2,c])=>{g.fillStyle=c;g.fillRect(x+ww*f,y-bh*hh2,ww*.3,bh*hh2);g.fillStyle='rgba(0,0,0,.25)';g.fillRect(x+ww*f,y-bh*hh2,ww*.3,bh*.012)})}
+  // 천장 배관
+  {g.strokeStyle='#3e3c34';g.lineWidth=bh*.03;g.beginPath();g.moveTo(bx-bw*.1,by+bh*.05);g.lineTo(bx+bw*1.1,by+bh*.05);g.stroke();g.strokeStyle='rgba(255,255,255,.08)';g.lineWidth=bh*.006;g.beginPath();g.moveTo(bx,by+bh*.042);g.lineTo(bx+bw,by+bh*.042);g.stroke();
+   g.fillStyle='#2a2924';[.15,.5,.85].forEach(f=>g.fillRect(bx+bw*f,by+bh*.025,bw*.015,bh*.05))}
+  // 대걸레와 양동이
+  {const p=floorAt(G,.97,.77);const bw2=p.hh*.14;g.fillStyle='#4a5a6a';polyG(g,[[p.x-bw2/2,p.y-p.hh*.16],[p.x+bw2/2,p.y-p.hh*.16],[p.x+bw2*.4,p.y],[p.x-bw2*.4,p.y]]);g.strokeStyle='#6a5a3a';g.lineWidth=Math.max(2,p.hh*.012);g.beginPath();g.moveTo(p.x,p.y-p.hh*.14);g.lineTo(p.x+p.hh*.06,p.y-p.hh*.7);g.stroke();g.fillStyle='#8a8270';g.beginPath();g.ellipse(p.x,p.y-p.hh*.12,bw2*.45,p.hh*.03,0,0,7);g.fill()}
   // 누수 자국 + 웅덩이
   const lk=g.createLinearGradient(0,by,0,by+bh);lk.addColorStop(0,'rgba(40,30,8,.5)');lk.addColorStop(1,'rgba(40,30,8,0)');g.fillStyle=lk;g.fillRect(bx+bw*.84,by,bw*.04,bh);
   const p=floorAt(G,.55,.8);g.save();g.translate(p.x,p.y);g.scale(1,.22);const pg=g.createRadialGradient(0,0,0,0,0,p.hh*.35);pg.addColorStop(0,'rgba(10,12,8,.65)');pg.addColorStop(.8,'rgba(60,60,40,.2)');pg.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=pg;g.fillRect(-p.hh*.35,-p.hh*.35,p.hh*.7,p.hh*.7);g.restore();
@@ -926,7 +979,7 @@ function litView(i,ox){
   if(i===1){const c=I.clock,rv=S.clockRev>0?-T_*1.7:0,hr=(S.t/HOUR)%12,mn=(((S.t/HOUR)%1)*60+rv*60%60+600)%60;cx.strokeStyle='#111';cx.lineCap='round';
     [[hr/12,c.r*.5,3],[mn/60,c.r*.75,2]].forEach(([f,len,lw])=>{const a=f*Math.PI*2-Math.PI/2;cx.lineWidth=lw;cx.beginPath();cx.moveTo(c.x,c.y);cx.lineTo(c.x+Math.cos(a)*len,c.y+Math.sin(a)*len);cx.stroke()})}
   if(S.night>=3){cx.save();cx.fillStyle='rgba(90,10,6,.55)';cx.font=`bold ${H*.06}px 'Nanum Myeongjo',serif`;cx.textAlign='center';
-    if(i===0){cx.translate(W*.23,H*.45);cx.rotate(-.12);cx.fillText('교대는 없다',0,0)}
+    if(i===0){cx.translate(W*.24,H*.6);cx.rotate(-.08);cx.fillText('교대는 없다',0,0)} // 점퍼 아래 빈 벽
     if(i===2&&S.night>=4){cx.translate(W*.8,H*.3);cx.rotate(.1);cx.fillText('나가',0,0);cx.font=`bold ${H*.035}px 'Nanum Myeongjo',serif`;cx.fillText('나가 나가',W*.01,H*.07)}
     cx.restore()}
   if(i===2){const m=I.main;cx.fillStyle='#0e0e0d';cx.fillRect(m.x,m.y,m.w,m.h);cx.fillStyle='#8e1e16';cx.fillRect(m.x+m.w*.2,S.brk?m.y+m.h*.08:m.y+m.h*.55,m.w*.6,m.h*.37);
@@ -973,7 +1026,11 @@ function emitView(i,ox){
       cx.fillStyle='rgba(0,0,0,.3)';for(let y=m.y;y<m.y+m.h;y+=3)cx.fillRect(m.x,y,m.w,1);
     }
     cx.restore();
+    {const nw=m.w*.24,nh=m.w*.2;cx.save();cx.translate(m.x+m.w*.86,m.y+m.h*.74);cx.rotate(-.07);cx.shadowColor='rgba(0,0,0,.6)';cx.shadowBlur=6;cx.shadowOffsetY=2;cx.fillStyle='#cdbb4c';cx.fillRect(0,0,nw,nh);cx.shadowColor='transparent';
+     cx.fillStyle='rgba(0,0,0,.12)';cx.fillRect(0,0,nw,nh*.12);txt(cx,'문을 절대',nw*.08,nh*.22,nh*.2,'#5a1010',nw*.84);txt(cx,'열지 마세요',nw*.08,nh*.52,nh*.2,'#5a1010',nw*.84);
+     cx.fillStyle=`rgba(0,0,0,${lightVis()?.3:.85})`;cx.fillRect(0,0,nw,nh);cx.restore()} // 모니터 오른쪽 아래 모서리에 붙은 포스트잇
     if(powered()){cx.globalCompositeOperation='lighter';const gr=cx.createRadialGradient(m.x+m.w/2,m.y+m.h/2,0,m.x+m.w/2,m.y+m.h/2,m.w);gr.addColorStop(0,'rgba(60,140,80,.12)');gr.addColorStop(1,'rgba(60,140,80,0)');cx.fillStyle=gr;cx.fillRect(m.x-m.w/2,m.y-m.h/2,m.w*2,m.h*2);cx.globalCompositeOperation='source-over';led(I.monLed.x,I.monLed.y,2,'#3c3')}
+    if(powered()&&T_%2<1)led(I.camLed.x,I.camLed.y,2,'#e22');if(powered())led(I.radioLed.x,I.radioLed.y,1.5,'#3c3');
     if(powered())led(I.phoneLed.x,I.phoneLed.y,S.ring>0?4:2,S.ring>0&&T_%.5<.25?'#f44':'#c22');
   }else{
     led(I.led.x,I.led.y,3,S.power<=0?'#100':S.brk?'#2c3':'#e21');
