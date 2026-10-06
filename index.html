@@ -210,7 +210,7 @@ body:not([data-mode=game]) #map{display:none!important}
 <script nomodule>window.THREE_ERR='nomodule'</script>
 <script>
 // ===================== 기본 =====================
-const VER='0.6.1'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
+const VER='0.7.0'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
 const $=id=>document.getElementById(id);
 const cv=$('cv'),cx=cv.getContext('2d');
 let W,H,DPR=1;
@@ -773,7 +773,7 @@ function buildCam(l){
   I.eye={x:bx+bw*.5,y:by+bh*(open?.5:.42),s:bh};
   return{c,info:I};
 }
-function buildCams(){if(S&&READY)CAMB=S.layout.map(l=>buildCam(l))}
+function buildCams(){if(!S||!READY)return;if(R3.ok)buildCams3D();else CAMB=S.layout.map(l=>buildCam(l))}
 function buildMenuCam(){MENUB=buildCam({kind:'endless',bw:.2,ox:0,oy:0,seed:4242})}
 
 // ===================== 존재들 그리기 =====================
@@ -1394,12 +1394,14 @@ function init3D(){
     const sc=new T3.Scene();sc.background=new T3.Color(0x000000);sc.fog=new T3.Fog(0x050403,4,9);R3.sc=sc;
     R3.cam=new T3.PerspectiveCamera(60,W/H,.03,20);R3.cam.rotation.order='YXZ';R3.cam.position.set(0,CAMY,CAMZ);
     R3.hot={};R3.dyn={};build3D();resize3D();
-  }catch(e){console.error(e);try{rd.dispose();rd.forceContextLoss()}catch(_){}R3.rd=R3.T=null;R3.hot={};R3.dyn={};return fail3D('3D 장면 오류: '+(e&&e.message||e),true)}
+    C3.menu=buildCam3D({kind:'endless',seed:4242,ox:0,oy:0});if(S)buildCams3D(); // CCTV 복도도 3D
+  }catch(e){console.error(e);try{rd.dispose();rd.forceContextLoss()}catch(_){}R3.rd=R3.T=null;R3.hot={};R3.dyn={};C3.cams=[];C3.menu=null;C3.M=null;C3.tx={};C3.key='';return fail3D('3D 장면 오류: '+(e&&e.message||e),true)}
   R3.ok=true;R3.state='ok';VIEWS=[];updFoot(); // 2D 방은 이제 필요 없으니 메모리 비움
 }
 function resize3D(){if(!R3.rd)return;R3.rd.setPixelRatio(Math.min(DPR,R3.spot&&!R3.spot.castShadow?1:1.5));R3.rd.setSize(W,H,false);R3.cam.aspect=W/H;R3.cam.fov=W/H<1.5?74:W/H>1.95?62:68;R3.cam.updateProjectionMatrix()}
 // ---- 재료/도형 도우미 ----
-function tx3(img,rx=1,ry=1,srgb=true){const T3=R3.T,t=new T3.Texture(img);if(srgb)t.colorSpace=T3.SRGBColorSpace;t.wrapS=t.wrapT=T3.RepeatWrapping;t.repeat.set(rx,ry);t.anisotropy=8;t.needsUpdate=true;return t}
+function tx3(img,rx=1,ry=1,srgb=true){const T3=R3.T,t=new T3.Texture(img),src=R3.src||(R3.src=new Map());if(srgb)t.colorSpace=T3.SRGBColorSpace;t.wrapS=t.wrapT=T3.RepeatWrapping;t.repeat.set(rx,ry);t.anisotropy=8;
+  if(src.has(img)){t.source=src.get(img);t.version++}else{src.set(img,t.source);t.needsUpdate=true}return t} // 같은 그림은 GPU에 한 번만 올림 (경비실·복도가 같이 씀)
 function ctx3(c){const T3=R3.T,t=new T3.CanvasTexture(c);t.colorSpace=T3.SRGBColorSpace;t.anisotropy=8;return t}
 function cvs(w,h,fn){const c=mk(w,h),g=c.getContext('2d');fn(g,w,h);return c}
 const MS=o=>new R3.T.MeshStandardMaterial(o);
@@ -1623,6 +1625,167 @@ function scrRect(obj){
   for(let k=0;k<8;k++){v.set(k&1?b.max.x:b.min.x,k&2?b.max.y:b.min.y,k&4?b.max.z:b.min.z).project(R3.cam);if(v.z>1)return null;const x=(v.x+1)/2*W,y=(1-v.y)/2*H;x0=Math.min(x0,x);y0=Math.min(y0,y);x1=Math.max(x1,x);y1=Math.max(y1,y)}
   if(x1<0||y1<0||x0>W||y0>H)return null;return{x:x0,y:y0,w:x1-x0,h:y1-y0}}
 
+// ===================== 3D CCTV 복도 =====================
+// 구역마다 장면 하나. 카메라는 복도 입구 천장 가까이에서 안쪽(-z)을 비춤. 바닥 y=0, 양쪽 벽 x=±w/2, 끝 벽 z=-L
+// 괴물·이상 현상은 미리 만들어 숨겨 두고 매 프레임 보이기만 바꿈. 3D가 안 되면 기존 2D 그림(buildCam)을 씀
+const C3={cams:[],menu:null,key:'',tx:{},M:null};
+const CK={corr:[2.3,13,2.7],bend:[2.3,10,2.7],wet:[2.7,12,2.7],pillar:[6,14,3.1],office:[7,12,2.6],machine:[2.5,12,2.8],endless:[1.9,44,2.6],void:[2.8,14,2.8]}; // 폭, 길이, 높이(m)
+// 세계 좌표로 UV를 매겨서 벽 조각이 여러 개여도 무늬가 이어지고, 재질 하나를 모든 복도가 같이 씀
+function wUV(g,tw,th){const p=g.attributes.position,n=g.attributes.normal,uv=g.attributes.uv;for(let i=0;i<p.count;i++){const ax=Math.abs(n.getX(i)),ay=Math.abs(n.getY(i));uv.setXY(i,(ax>.5?p.getZ(i):p.getX(i))/tw,(ay>.5?p.getZ(i):p.getY(i))/th)}return g}
+function wq(par,M,w,h,rx,ry,x,y,z,tw,th){const T3=R3.T,g=new T3.PlaneGeometry(w,h);if(rx)g.rotateX(rx);if(ry)g.rotateY(ry);g.translate(x,y,z);wUV(g,tw,th);const m=new T3.Mesh(g,M);par.add(m);return m}
+function c3keep(k,fn){let t=C3.tx[k];if(!t){t=fn();t.userData.keep=true;C3.tx[k]=t}return t}
+function c3cv(k,w,h,fn){return c3keep(k,()=>ctx3(cvs(w,h,fn)))}
+function imgTex(im){return c3keep(im.src,()=>{const t=new R3.T.Texture(im);t.colorSpace=R3.T.SRGBColorSpace;t.needsUpdate=true;return t})}
+function c3mats(){
+  if(C3.M)return C3.M;const T3=R3.T,k=o=>{const m=MS(o);m.userData.keep=true;return m};
+  const t=(img,srgb=true)=>tx3(img,1,1,srgb);
+  C3.M={wall:k({map:t(T.wall),bumpMap:t(T.wall,false),bumpScale:1,roughness:.92}),
+    wallD:k({map:t(T.wall),bumpMap:t(T.wall,false),bumpScale:1,roughness:.95,color:0x77736a}),
+    conc:k({map:t(T.conc),bumpMap:t(T.conc,false),bumpScale:1.4,roughness:.95}),
+    carpet:k({map:t(T.floorW),bumpMap:t(T.floorW,false),bumpScale:2,roughness:1}),
+    concF:k({map:t(T.conc),bumpMap:t(T.conc,false),bumpScale:1.2,roughness:.85,color:0xb8b4a8}),
+    ceil:k({map:t(T.ceilW),bumpMap:t(T.ceilW,false),bumpScale:.8,roughness:.95}),
+    wood:k({map:t(T.wood),bumpMap:t(T.wood,false),bumpScale:.4,roughness:.6}),
+    metal:k({map:t(T.metal),bumpMap:t(T.metal,false),bumpScale:.6,roughness:.6,metalness:.5}),
+    metal2:k({map:t(T.metalG),bumpMap:t(T.metalG,false),bumpScale:.6,roughness:.55,metalness:.5}),
+    dark:k({color:0x141210,roughness:.8}),black:k({color:0x040404,roughness:.9}),grey:k({color:0x6a685f,roughness:.5,metalness:.4}),
+    base:k({color:0x2a1e10,roughness:.7}),pipe:k({color:0x3e3c34,roughness:.5,metalness:.6}),
+    water:k({color:0x0e0d09,roughness:.06,metalness:.2}),paper:k({color:0xcfc8b0,roughness:.9,side:T3.DoubleSide}),
+    housing:k({color:0x1c1b17,roughness:.6}),tubeOn:Object.assign(new T3.MeshBasicMaterial({color:0xfff6dc}),{userData:{keep:true}}),tubeOff:Object.assign(new T3.MeshBasicMaterial({color:0x34322a}),{userData:{keep:true}})};
+  C3.unit=new T3.PlaneGeometry(1,1);return C3.M;
+}
+// 의자 (사무실 책상, 쓰러진 의자, 복도 한가운데 놓인 의자)
+function chair3(par,x,y,z,ry){
+  const M=C3.M,g=grp(x,y,z,ry,par),cM=MS({color:0x222220,roughness:.6});
+  for(let k=0;k<5;k++){const a=k/5*Math.PI*2,leg=BOX(.3,.025,.04,M.black,Math.cos(a)*.15,.06,Math.sin(a)*.15,g);leg.rotation.y=-a;CYL(.025,.025,.03,M.black,Math.cos(a)*.29,.02,Math.sin(a)*.29,g,8)}
+  CYL(.025,.025,.35,M.grey,0,.25,0,g,10);BOX(.48,.07,.46,cM,0,.46,0,g);BOX(.44,.5,.06,cM,0,.8,-.21,g).rotation.x=-.1;BOX(.04,.25,.04,M.black,0,.58,-.22,g);
+  return g;
+}
+// 사진을 붙인 판 (교대자·복제자·그림자 형체). 바닥에 그림자 얼룩을 깔아서 떠 보이지 않게 함
+function bb3(par,h,x,z,cam,op=1,shadow=true){
+  const T3=R3.T,g=new T3.Group();g.position.set(x,0,z);par.add(g);
+  const m=new T3.Mesh(C3.unit,new T3.MeshBasicMaterial({transparent:true,opacity:op,alphaTest:.04,side:T3.DoubleSide,color:0xd6d6d0,depthWrite:op>=1,fog:false}));m.position.y=h/2;m.scale.set(h*.35,h,1);g.add(m);
+  if(shadow){const s=new T3.Mesh(C3.unit,new T3.MeshBasicMaterial({map:c3cv('blob',128,128,(q,w,hh)=>{const gr=q.createRadialGradient(w/2,hh/2,0,w/2,hh/2,w/2);gr.addColorStop(0,'rgba(0,0,0,.85)');gr.addColorStop(1,'rgba(0,0,0,0)');q.fillStyle=gr;q.fillRect(0,0,w,hh)}),transparent:true,depthWrite:false,opacity:op}));s.rotation.x=-Math.PI/2;s.position.y=.006;s.scale.set(h*.42,h*.16,1);g.add(s)}
+  g.lookAt(cam.position.x,0,cam.position.z);g.visible=false;g.userData={h,m,x0:x};return g;
+}
+function bbImg(o,im,flip){if(!o||!im||o.userData.im===im)return;const u=o.userData,m=u.m;m.material.map=imgTex(im);m.material.needsUpdate=true;const w=u.h*im.width/im.height;m.scale.x=flip?-w:w;u.im=im;if(u.peek){const e=w*PEEK_EDGE;o.position.x=u.side?u.cx-w/2+e:u.cx+w/2-e}}
+function buildCam3D(l){
+  const T3=R3.T,V3=T3.Vector3,r=mulberry(l.seed),k=l.kind,M=c3mats();
+  const ck=CK[k]||CK.corr,w=ck[0]*(.92+r()*.16),L=ck[1],Hc=ck[2],hw=w/2;
+  const sc=new T3.Scene();sc.background=new T3.Color(0);
+  sc.fog=new T3.Fog(0,{endless:3,void:3}[k]??5,{endless:19,void:16}[k]??L+7);
+  const C={sc,k,w,L,Hc,dyn:{},lights:[],anom:{},flick:-1};
+  const cam=new T3.PerspectiveCamera(56,CW/CH,.05,80);cam.rotation.order='YXZ';cam.position.set((l.ox||0)*w*.6,Hc-.62,.25);cam.rotation.set(-.16+(l.oy||0)*1.4,-(l.ox||0)*.9,0);C.cam=cam;
+  const wallM=k==='machine'?M.conc:k==='void'?M.wallD:M.wall,floorM=k==='machine'||k==='pillar'||k==='void'?M.concF:M.carpet,ceilM=k==='machine'?M.conc:M.ceil;
+  const open=k==='endless'||k==='void'||(k!=='bend'&&r()<.45);C.open=open;
+  const Leff=Math.min(L,16),zAt=u=>-(1.2+u*(Leff-1.2)),zL=u=>-(1.2+u*(L-1.2)),xAt=fx=>(fx-.5)*w*.9;
+  const Z0=.6,TW=3.9,TH=2.6; // 벽지 한 장 크기(m)
+  // ---- 바닥·천장 ----
+  wq(sc,floorM,w,L+Z0,-Math.PI/2,0,0,0,(Z0-L)/2,floorM===M.carpet?2.35:2,floorM===M.carpet?.8:2);
+  wq(sc,ceilM,w,L+Z0,Math.PI/2,0,0,Hc,(Z0-L)/2,ceilM===M.ceil?7.1:2,ceilM===M.ceil?2.4:2);
+  // ---- 옆 통로 (괴물이 몸을 내미는 곳) ----
+  let op=null;if(k==='bend'||r()<.55){const u1=k==='bend'?.68:.2+r()*.35,z1=zAt(u1),z2=z1-Math.max(1.1,(Leff-1.2)*.12);op={side:r()<.5?0:1,z1,z2,oh:Hc*.82}}C.op=op;
+  // ---- 양쪽 벽 (옆 통로가 있으면 그 자리만 비움) + 걸레받이 ----
+  [0,1].forEach(sd=>{const x=sd?hw:-hw,ry=sd?-Math.PI/2:Math.PI/2,segs=op&&op.side===sd?[[Z0,op.z1],[op.z2,-L]]:[[Z0,-L]];
+    segs.forEach(([a,b])=>{wq(sc,wallM,a-b,Hc,0,ry,x,Hc/2,(a+b)/2,TW,TH);BOX(.02,.1,a-b,M.base,sd?x-.01:x+.01,.05,(a+b)/2,sc)});
+    if(op&&op.side===sd){const a=op.z1,b=op.z2,d=3,xo=sd?hw+d:-hw-d;wq(sc,wallM,a-b,Hc-op.oh,0,ry,x,(Hc+op.oh)/2,(a+b)/2,TW,TH); // 문틀 위 벽
+      wq(sc,floorM,d,a-b,-Math.PI/2,0,(x+xo)/2,0,(a+b)/2,2,2);wq(sc,ceilM,d,a-b,Math.PI/2,0,(x+xo)/2,op.oh,(a+b)/2,7,2.4);wq(sc,wallM,a-b,op.oh,0,ry,xo,op.oh/2,(a+b)/2,TW,TH);
+      wq(sc,wallM,d,op.oh,0,0,(x+xo)/2,op.oh/2,b,TW,TH);wq(sc,wallM,d,op.oh,0,Math.PI,(x+xo)/2,op.oh/2,a,TW,TH)}});
+  // ---- 끝 벽 (열린 곳은 문틀만 남기고 그 너머는 어둠) ----
+  if(open){const ow=w*(k==='void'?.85:.5),oh=Hc*.82;[[-hw,-ow/2],[ow/2,hw]].forEach(([a,b])=>wq(sc,wallM,b-a,Hc,0,0,(a+b)/2,Hc/2,-L,TW,TH));wq(sc,wallM,ow,Hc-oh,0,0,0,(Hc+oh)/2,-L,TW,TH);C.eyeP=new V3(0,oh*.5,k==='endless'?-Leff:-L)}
+  else{wq(sc,wallM,w,Hc,0,0,0,Hc/2,-L,TW,TH);BOX(w,.1,.02,M.base,0,.05,-L+.01,sc);C.eyeP=new V3(0,Hc*.45,-L)}
+  // ---- 천장 형광등 (일부는 고장) ----
+  const brk={void:.85,machine:.5}[k]??.25,fz=k==='endless'?Array.from({length:Math.floor((L-2)/4)},(_,j)=>-2-j*4):[.12,.35,.6,.85].map(zL);
+  const fon=fz.map(()=>r()>=brk);{const need=k==='void'?1:2;[1,2,0,3].forEach(j=>{if(fon.slice(0,4).filter(x=>x).length<need)fon[j]=true})} // 다 고장이면 아무것도 안 보이니 몇 개는 켜 둠
+  fz.forEach((z,j)=>{const on=fon[j];BOX(1.2,.05,.3,M.housing,0,Hc-.025,z,sc);mesh(new T3.BoxGeometry(1.1,.012,.22),on?M.tubeOn:M.tubeOff,0,Hc-.055,z,sc,false);
+    if(j<4){const pl=new T3.PointLight(0xffefc4,on?7:0,9,1.5);pl.position.set(0,Hc-.3,z);pl.userData={on,I:7};sc.add(pl);C.lights.push(pl)}});
+  while(C.lights.length<4){const pl=new T3.PointLight(0xffefc4,0,1,2);pl.userData={on:false,I:0};sc.add(pl);C.lights.push(pl)} // 셰이더를 복도끼리 같이 쓰도록 조명 개수를 맞춤
+  {const on=C.lights.map((p,j)=>p.userData.on?j:-1).filter(j=>j>=0);if(on.length&&r()<.6)C.flick=on[Math.floor(r()*on.length)]} // 깜빡이는 등 하나
+  sc.add(C.hemi=new T3.HemisphereLight(0xc8d0b0,0x1a140a,{void:.12,machine:.14}[k]??.22));
+  const sp=new T3.PointLight(0x40ff70,0,3,2);sc.add(sp);C.spec=sp; // 구역마다 특별한 빛 하나 (비상구 초록빛, 기계실 붉은 경광등)
+  // ---- 비상구 표시 ----
+  if(k==='corr'||k==='machine'||k==='office'){const t=c3cv('exit',128,48,(q,cw,ch)=>{q.fillStyle='#0a2a10';q.fillRect(0,0,cw,ch);q.fillStyle='#5f6';q.font='bold 30px sans-serif';q.textAlign='center';q.textBaseline='middle';q.fillText('EXIT',cw/2,ch/2+1)});
+    BOX(.4,.16,.06,M.dark,0,Hc-.2,-L+.03,sc);mesh(new T3.PlaneGeometry(.36,.13),new T3.MeshBasicMaterial({map:t}),0,Hc-.2,-L+.061,sc,false);sp.position.set(0,Hc-.35,-L+.5);sp.intensity=.8}
+  // ---- 옆문 ----
+  const sideDoor=(sd,z)=>{const g=grp(sd?hw:-hw,0,z,sd?-Math.PI/2:Math.PI/2,sc),dM=r()<.5?M.wood:M.metal2;BOX(.9,2.05,.04,dM,0,1.025,.02,g);BOX(.06,2.12,.06,M.dark,-.48,1.06,.02,g);BOX(.06,2.12,.06,M.dark,.48,1.06,.02,g);BOX(1.02,.06,.06,M.dark,0,2.12,.02,g);
+    mesh(new T3.SphereGeometry(.03,10,8),M.grey,.36,1.0,.06,g);if(r()<.5)BOX(.22,.08,.005,MS({color:0xbdb59a,roughness:.7}),0,1.6,.042,g)};
+  const near=z=>op&&z<op.z1+1.2&&z>op.z2-1.2;
+  if(k==='corr'||k==='bend')[.15,.42,.7].forEach((u,j)=>{const z=zL(u);if(r()<.7&&!near(z))sideDoor(j%2,z)});
+  if(k==='endless')for(let z=-2.5,j=0;z>-L+2;z-=3.4,j++)if(r()<.75&&!near(z))sideDoor(j%2,z);
+  // ---- 콘센트, 환풍구 ----
+  if(k!=='void')for(let j=0,n=2+Math.floor(r()*3);j<n;j++){const sd=r()<.5?0:1;BOX(.012,.11,.07,MS({color:0xd8d2bc,roughness:.5}),sd?hw-.006:-hw+.006,.32,zAt(.15+r()*.6),sc)}
+  if(r()<.6){const t=c3cv('grille',128,96,(q,cw,ch)=>{q.fillStyle='#1a1915';q.fillRect(0,0,cw,ch);q.fillStyle='#050504';for(let j=1;j<8;j++)q.fillRect(6,j*ch/8-3,cw-12,5)});const v=mesh(new T3.PlaneGeometry(.55,.4),MS({map:t,roughness:.8}),xAt(.25),Hc-.004,zL(.52),sc,false);v.rotation.x=Math.PI/2}
+  // ---- 구역별 ----
+  if(k==='pillar')[.3,.6].forEach(u=>[.22,.78].forEach(fx=>{const p=new T3.Mesh(wUV(new T3.BoxGeometry(.55,Hc,.55),2,2),M.conc);p.position.set(xAt(fx),Hc/2,zAt(u));sc.add(p)}));
+  if(k==='wet'){const pt=c3cv('puddle',256,256,(q,cw,ch)=>{for(let j=0;j<6;j++){const x=cw*(.35+Math.random()*.3),y=ch*(.35+Math.random()*.3),rr=cw*(.18+Math.random()*.16),gr=q.createRadialGradient(x,y,0,x,y,rr);gr.addColorStop(0,'rgba(30,28,20,.7)');gr.addColorStop(.7,'rgba(30,28,20,.45)');gr.addColorStop(1,'rgba(30,28,20,0)');q.fillStyle=gr;q.fillRect(0,0,cw,ch)}}),pM=MS({map:pt,transparent:true,depthWrite:false,roughness:.08,metalness:.1});
+    [[.25,.4,.9],[.45,.62,.75],[.65,.45,1.1]].forEach(([u,fx,s])=>{const p=mesh(new T3.PlaneGeometry(s*2,s*2),pM,xAt(fx),.004,zAt(u),sc,false);p.rotation.set(-Math.PI/2,0,r()*6);p.scale.set(1.3,.9+r()*.3,1)});
+    const t=c3cv('streak',256,256,(q,cw,ch)=>{for(let j=0;j<14;j++){const x=Math.random()*cw,len=ch*(.3+Math.random()*.7),gr=q.createLinearGradient(0,0,0,len);gr.addColorStop(0,'rgba(25,16,4,.75)');gr.addColorStop(1,'rgba(25,16,4,0)');q.fillStyle=gr;q.fillRect(x,0,2+Math.random()*4,len)}});
+    mesh(new T3.PlaneGeometry(w*.8,Hc*.7),MS({map:t,transparent:true,roughness:.4,depthWrite:false}),0,Hc*.65,-L+.01,sc,false);[0,1].forEach(sd=>{const s=mesh(new T3.PlaneGeometry(2.4,Hc*.6),MS({map:t,transparent:true,roughness:.4,depthWrite:false}),sd?hw-.01:-hw+.01,Hc*.7,zAt(.3+sd*.3),sc,false);s.rotation.y=sd?-Math.PI/2:Math.PI/2})}
+  if(k==='office'){[.25,.5,.72].forEach(u=>[.18,.82].forEach(fx=>{const g=grp(xAt(fx),0,zAt(u),fx<.5?Math.PI/2:-Math.PI/2,sc),tM=MS({color:0x5a5c58,roughness:.6});
+      BOX(1.3,.04,.7,tM,0,.74,0,g);BOX(.04,.72,.66,M.dark,-.62,.36,0,g);BOX(.04,.72,.66,M.dark,.62,.36,0,g);BOX(1.34,1.25,.04,MS({color:0x4a4e4a,roughness:.95}),0,.63,-.37,g);
+      BOX(.4,.32,.36,MS({color:0xb8b096,roughness:.6}),.1,.92,-.12,g);mesh(new T3.PlaneGeometry(.32,.24),MS({color:0x0a0c0a,roughness:.2}),.1,.93,.061,g,false);if(r()<.7)chair3(g,.1,0,.45,Math.PI+(r()-.5)*.8)}));
+    chair3(sc,xAt(.45),.24,zAt(.38),1.2).rotation.z=Math.PI/2; // 쓰러진 의자
+    for(let j=0;j<12;j++){const p=mesh(new T3.PlaneGeometry(.21,.29),M.paper,xAt(.2+r()*.6),.003+j*.0004,zAt(.15+r()*.6),sc,false);p.rotation.set(-Math.PI/2,0,r()*6)}}
+  if(k==='machine'){[0,1].forEach(sd=>[.08,.14,.2].forEach((f,j)=>{const p=CYL(.05+j*.015,.05+j*.015,L+Z0,M.pipe,sd?hw-.1-j*.05:-hw+.1+j*.05,Hc*(1-f),(Z0-L)/2,sc,10);p.rotation.x=Math.PI/2}));
+    for(let z=-1.5;z>-L;z-=2.5)[0,1].forEach(sd=>BOX(.25,.04,.04,M.dark,sd?hw-.12:-hw+.12,Hc*.88,z,sc));
+    {const g=grp(xAt(.8),0,zAt(.4),0,sc);CYL(.42,.42,1.6,MS({color:0x4a4840,roughness:.45,metalness:.6}),0,.8,0,g,24);mesh(new T3.SphereGeometry(.42,24,12,0,Math.PI*2,0,Math.PI/2),M.metal,0,1.6,0,g);CYL(.06,.06,.6,M.pipe,0,2.1,0,g,10)}
+    {const t=c3cv('tape',256,32,(q,cw,ch)=>{for(let j=0;j<16;j++){q.fillStyle=j%2?'#c8a818':'#111';q.beginPath();q.moveTo(j*16,0);q.lineTo(j*16+16,0);q.lineTo(j*16,ch);q.lineTo(j*16-16,ch);q.closePath();q.fill()}});const tp=mesh(new T3.PlaneGeometry(w,.18),MS({map:t,roughness:.7}),0,.004,-L+1.2,sc,false);tp.rotation.x=-Math.PI/2}
+    const lamp=mesh(new T3.SphereGeometry(.07,12,8),new T3.MeshBasicMaterial({color:0xff3a20}),-hw+.2,Hc-.25,zL(.2),sc,false);C.dyn.lamp=lamp;sp.color.setHex(0xff3020);sp.distance=10;sp.position.set(-hw+.4,Hc-.4,zL(.2));sp.intensity=4}
+  if(k==='void')for(let j=0;j<7;j++){const x=xAt(r()),z=zAt(.1+r()*.8),y1=1+r()*.8,c=new T3.CatmullRomCurve3([new V3(x,Hc,z),new V3(x+(r()-.5)*.4,(Hc+y1)/2,z+(r()-.5)*.3),new V3(x+(r()-.5)*.3,y1,z+(r()-.5)*.2)]);mesh(new T3.TubeGeometry(c,12,.012,5),M.black,0,0,0,sc)}
+  if(k==='wet'||k==='endless'){const t=c3cv('drag',64,512,(q,cw,ch)=>{const gr=q.createLinearGradient(0,0,0,ch);gr.addColorStop(0,'rgba(25,8,4,.6)');gr.addColorStop(1,'rgba(25,8,4,.1)');q.fillStyle=gr;q.beginPath();q.moveTo(cw*.3,0);q.lineTo(cw*.7,0);q.lineTo(cw*.56,ch);q.lineTo(cw*.44,ch);q.closePath();q.fill()});
+    const a=zAt(.05),b=zAt(.85),d=mesh(new T3.PlaneGeometry(.5,a-b),MS({map:t,transparent:true,roughness:.6,depthWrite:false}),xAt(.48),.003,(a+b)/2,sc,false);d.rotation.x=-Math.PI/2}
+  // ---- 괴물 자리: 0 멀리, 1 중간(옆 통로에서 몸 내밀기), 2 카메라 바로 앞(2D로 덧그림) ----
+  const D=C.dyn;
+  D.far=bb3(sc,2.35,xAt(.5),zAt(k==='endless'?.9:.8),cam);
+  if(op){const g=bb3(sc,Hc*.55,0,op.z1+.03,cam,1,false);g.rotation.set(0,0,0);Object.assign(g.userData,{peek:true,side:op.side,cx:op.side?hw:-hw});g.userData.m.position.y=Hc*.86-Hc*.275;D.mid=g}
+  else D.mid=bb3(sc,2.35,xAt(r()<.5?.36:.64),zAt(.45),cam);
+  D.seat=bb3(sc,1.35,xAt(.68),zAt(.3),cam);
+  D.fakeH=bb3(sc,2.35,xAt(.32),zAt(.55),cam,.7);D.fakeC=bb3(sc,1.78,xAt(.32),zAt(.55),cam,.7);
+  // ---- 이상 현상 (평소엔 숨김) ----
+  const A=C.anom;
+  A.chair=chair3(sc,xAt(.4),0,zAt(.4),.3+r()*.4);
+  {const sd=op?1-op.side:0,z=zAt(.33),g=grp(sd?hw:-hw,0,z,sd?-Math.PI/2:Math.PI/2,sc);mesh(new T3.PlaneGeometry(.9,2.0),M.black,0,1.0,.004,g,false);BOX(.06,2.08,.06,M.dark,-.48,1.04,.02,g);BOX(.06,2.08,.06,M.dark,.48,1.04,.02,g);BOX(1.02,.06,.06,M.dark,0,2.08,.02,g);
+   const lf=grp(-.45,0,.02,0,g);BOX(.9,2.0,.04,M.wood,.45,1.0,0,lf);lf.rotation.y=sd?.7:-.7; // 열린 문짝
+   const hand=c3cv('hand',64,128,(q,cw,ch)=>{q.fillStyle='#d8d2c0';for(let f=0;f<4;f++){q.beginPath();q.ellipse(cw*.5,ch*(.2+f*.18),cw*.42,ch*.07,0,0,7);q.fill()}q.fillStyle='rgba(0,0,0,.35)';for(let f=0;f<4;f++)q.fillRect(cw*.2,ch*(.2+f*.18)+ch*.04,cw*.6,2)});
+   mesh(new T3.PlaneGeometry(.07,.15),new T3.MeshBasicMaterial({map:hand,transparent:true,color:0xc8c8c0}),.42,1.15,.05,g,false);g.visible=false;A.door=g}
+  {const t=c3cv('blood',128,1024,(q,cw,ch)=>{q.strokeStyle='rgba(30,2,1,1)';q.lineCap='round';for(let s=0;s<5;s++){q.beginPath();for(let j=0;j<=20;j++){const x=cw*(.3+s*.1+Math.sin(j*.7+s)*.04),y=j/20*ch;q.lineWidth=Math.max(3,14*(1-j/24));j?q.lineTo(x,y):q.moveTo(x,y)}q.stroke()}
+      q.fillStyle='rgba(70,8,4,.9)';[[.3,.05],[.65,.1],[.35,.16]].forEach(([x,y])=>{q.beginPath();q.ellipse(cw*x,ch*y,cw*.12,ch*.012,0,0,7);q.fill();for(let f=0;f<4;f++){q.beginPath();q.ellipse(cw*(x-.08+f*.05),ch*(y-.02),cw*.02,ch*.008,0,0,7);q.fill()}})});
+   const a=zAt(.08),b=zAt(.85),bl=mesh(new T3.PlaneGeometry(1.1,a-b),MS({map:t,transparent:true,roughness:.25,depthWrite:false,color:0x333333}),xAt(.5),.005,(a+b)/2,sc,false);bl.rotation.x=-Math.PI/2;bl.visible=false;A.blood=bl}
+  {const t=c3cv('figure',256,512,(q,cw,ch)=>{drawShadowFig(q,cw*.5,ch,ch*.95,1);const hh=ch*.95;q.fillStyle='#f4f0dc';q.shadowColor='#fff';q.shadowBlur=8;[-1,1].forEach(s=>{q.beginPath();q.arc(cw*.5+hh*.012+s*hh*.026,ch-hh*.95,hh*.011,0,7);q.fill()})});const f=bb3(sc,2.2,xAt(.42),zAt(open?.62:.78),cam);f.userData.m.material.map=t;f.userData.m.scale.x=1.1;f.userData.m.material.color.setHex(0xffffff);f.userData.m.material.fog=true;A.figure=f} // 그림자 형체: 열린 끝(어둠) 앞에 서면 안 보이니 조금 앞으로
+  {const c=mk(512,160);C.writC=c;const m=mesh(new T3.PlaneGeometry(Math.min(w*.95,2.6),.85),MS({map:ctx3(c),transparent:true,roughness:.8,depthWrite:false}),0,Hc*.6,-L+.012,sc,false);if(open){const sd=op&&op.side===0?1:0;m.position.set(sd?hw-.012:-hw+.012,1.5,zAt(.4));m.rotation.y=sd?-Math.PI/2:Math.PI/2;m.scale.set(1.3,1.3,1)}m.visible=false;A.writing=m}
+  return C;
+}
+function disposeCam3D(C){if(!C)return;C.sc.traverse(o=>{if(o.geometry&&o.geometry!==C3.unit)o.geometry.dispose();const m=o.material;if(!m||m.userData.keep)return;['map','bumpMap'].forEach(k=>{const t=m[k];if(t&&!t.userData.keep)t.dispose()});m.dispose()})}
+function buildCams3D(){C3.cams.forEach(disposeCam3D);C3.cams=S.layout.map(l=>buildCam3D(l));C3.key=S.night+'|'+S.layout[0].seed}
+// 응시자 눈이 처음 뜨는 자리: 끝 벽(또는 어둠) 가운데를 CCTV 화면 좌표로
+function eye3(C){const v=C.eyeP.clone().project(C.cam),u=C.eyeP.clone();u.y+=C.Hc/2;u.project(C.cam);const d=C.eyeP.clone();d.y-=C.Hc/2;d.project(C.cam);return{x:(v.x+1)/2*CW,y:(1-v.y)/2*CH,s:Math.abs(u.y-d.y)/2*CH}}
+function c3vig(){if(!C3.vig||C3.vig.width!==CW||C3.vig.height!==CH){C3.vig=cvs(CW,CH,(g,w,h)=>{const vg=g.createRadialGradient(w/2,h/2,h*.2,w/2,h/2,w*.7);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.7)');g.fillStyle=vg;g.fillRect(0,0,w,h)})}return C3.vig}
+function drawCam3D(g,C,i,menu,t){
+  const D=C.dyn,hum=!menu&&S.hum.node===i?S.hum.spot:-1,cyc=menuT%13;
+  bbImg(D.far,STK.full);bbImg(D.mid,D.mid.userData.peek?STK.peek:STK.full,D.mid.userData.peek&&D.mid.userData.side===1);bbImg(D.seat,PIC.cseat);bbImg(D.fakeH,STK.full);bbImg(D.fakeC,PIC.cstand);
+  D.far.visible=menu?cyc>8&&cyc<10&&Math.random()>.12&&!!STK.full:hum===0&&!!STK.full;
+  D.mid.visible=hum===1&&!!D.mid.userData.im;
+  D.seat.visible=!menu&&S.night>=4&&S.clone.cam===i&&!!PIC.cseat;
+  const fk=!menu&&S.fake.cam===i;D.fakeH.visible=fk&&S.fake.type==='hum'&&!!STK.full;D.fakeC.visible=fk&&S.fake.type!=='hum'&&!!PIC.cstand;
+  [D.fakeH,D.fakeC].forEach(o=>{if(o.visible)o.position.x=o.userData.x0+rnd(-.04,.04)});
+  // 이상 현상
+  const on={};if(!menu)S.anom.forEach(a=>{if(a.cam===i)on[a.type]=a});
+  for(const k in C.anom)C.anom[k].visible=!!on[k];
+  if(on.writing&&C.writTxt!==on.writing.txt){const c=C.writC,q=c.getContext('2d'),w=c.width,h=c.height;q.clearRect(0,0,w,h);q.fillStyle='rgba(36,2,1,.97)';q.font=`bold ${h*.6}px 'Nanum Myeongjo',serif`;q.textAlign='center';q.textBaseline='top';q.fillText(on.writing.txt,w/2,h*.06);
+    const tw=Math.min(w,q.measureText(on.writing.txt).width);q.fillStyle='rgba(36,2,1,.85)';for(let k=0;k<9;k++)q.fillRect(w/2-tw/2+tw*((k+.5)/9),h*.6,4,h*(.1+((k*37)%11)/40));C.anom.writing.material.map.needsUpdate=true;C.writTxt=on.writing.txt}
+  // 조명: 붉게 변한 조명, 깜빡이는 등
+  const red=!!on.redlight;C.lights.forEach((p,j)=>{let I=p.userData.on?p.userData.I:0;if((j===C.flick||red)&&I&&(Math.sin(t*13+j*2.3)>.6||Math.random()<.05))I*=.12;p.intensity=I});
+  if(D.lamp){const b=Math.sin(t*4)>0;D.lamp.material.color.setHex(b?0xff3a20:0x300804);C.spec.intensity=b?4:.4}
+  // 렌더러 화면 왼쪽 아래 CW×CH 칸에 그린 뒤 CCTV 캔버스로 옮김
+  const rd=R3.rd,pr=rd.getPixelRatio();
+  if(C.cam.aspect!==CW/CH){C.cam.aspect=CW/CH;C.cam.updateProjectionMatrix()}
+  rd.setViewport(0,0,CW/pr,CH/pr);rd.render(C.sc,C.cam);rd.setViewport(0,0,W,H);
+  g.drawImage(rd.domElement,0,rd.domElement.height-CH,CW,CH,0,0,CW,CH);
+  g.drawImage(c3vig(),0,0);
+  if(hum===2)drawSpot(g,{spots:[0,0,{pose:'close'}]},2,1,t);
+  if(!menu&&S.night>=2&&S.gaze.cam===i)drawGazer(g,eye3(C),S.gaze.p,t);
+}
+
 // ===================== 게임 화면 그리기 =====================
 const SPOTS=[[.8,.95],[.06,.98],[.88,.96]]; // 그림자가 서는 자리 (방향별)
 function render(){
@@ -1753,8 +1916,11 @@ function post(){
 
 // CCTV 화면
 function renderCam(i,menu){
-  const g=cg,B=menu?MENUB:CAMB[i],I=B.info,t=T_;
-  g.globalCompositeOperation='source-over';g.globalAlpha=1;g.drawImage(B.c,0,0);
+  const g=cg,t=T_;let C=null;
+  g.globalCompositeOperation='source-over';g.globalAlpha=1;
+  if(R3.ok){if(menu)C=C3.menu;else{if(C3.key!==S.night+'|'+S.layout[0].seed)buildCams3D();C=C3.cams[i]}}
+  if(C)drawCam3D(g,C,i,menu,t);
+  else{const B=menu?MENUB:CAMB[i],I=B.info;g.drawImage(B.c,0,0);
   if(!menu){
     if(S.hum.node===i)drawSpot(g,I,S.hum.spot,1,t);
     if(S.night>=2&&S.gaze.cam===i)drawGazer(g,I.eye,S.gaze.p,t);
@@ -1764,7 +1930,7 @@ function renderCam(i,menu){
   }else{
     const cyc=menuT%13;
     if(cyc>8&&cyc<10&&Math.random()>.12){const a=I.far;stalkerFull(g,a.x,a.y,a.hh*.95,1,t)}
-  }
+  }}
   if(Math.random()<.04){g.fillStyle='rgba(0,0,0,.4)';g.fillRect(0,0,CW,CH)}
   // 흑백 + 녹색 톤
   g.globalCompositeOperation='saturation';g.fillStyle='#888';g.fillRect(0,0,CW,CH);
@@ -1929,7 +2095,7 @@ function resize(){
   LC.width=W*DPR;LC.height=H*DPR;
   VIG=makeVig(W,H,.85);
   CW=Math.round(W*.62);CH=Math.round(H*.62);camC.width=CW;camC.height=CH;
-  if(READY){buildViews();buildMenuCam();buildCams()}
+  if(READY){buildViews();buildMenuCam();if(!R3.ok)buildCams()}
   resize3D();
 }
 let READY=false,rzT=0;addEventListener('resize',()=>{clearTimeout(rzT);rzT=setTimeout(resize,150)});
