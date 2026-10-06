@@ -258,7 +258,7 @@ body[data-mode=game] #pauseBtn{display:flex}
 <script nomodule>window.THREE_ERR='nomodule'</script>
 <script>
 // ===================== 기본 =====================
-const VER='0.9.0'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
+const VER='0.9.1'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
 const $=id=>document.getElementById(id);
 const cv=$('cv'),cx=cv.getContext('2d');
 let W,H,DPR=1;
@@ -1066,7 +1066,7 @@ function newNight(n){
 function pickMods(n){const k=n<4?1:2,ids=Object.keys(MODS),out=[];while(out.length<k){const m=ids[ri(ids.length)];if(!out.includes(m))out.push(m)}return out}
 const powered=()=>S.brk&&S.power>0&&!(S.outT>0);
 const lightOn=()=>S.light&&powered();
-const doorOn=()=>S.door&&powered();
+const doorOn=()=>S.door&&S.power>0; // 빗장은 기계식이라 차단기가 내려가거나 정전이 와도 걸려 있음. 전력이 0%가 되면 풀림
 const monOn=()=>S.mon&&powered();
 const lightVis=()=>lightOn()&&S.flOn;
 
@@ -1086,7 +1086,7 @@ function update(dt){
 
   // 차단기
   if(S.brk&&S.power>0&&Math.random()<dt*.004*S.night*(S.hard?1:.6)*(hasMod('wire')?2.2:1)){
-    S.brk=false;S.sw=Array(6).fill(true);for(let k=0,n=Math.min(5,1+S.night);k<n;){const i=ri(6);if(S.sw[i]){S.sw[i]=false;k++}}say('딸깍. 차단기가 내려갔다.');sfx(90,.3,'square',.2);buildUI();
+    S.brk=false;S.sw=Array(6).fill(true);for(let k=0,n=Math.min(5,1+S.night);k<n;){const i=ri(6);if(S.sw[i]){S.sw[i]=false;k++}}say(S.door?'딸깍. 차단기가 내려갔다. 빗장은 그대로다.':'딸깍. 차단기가 내려갔다.');sfx(90,.3,'square',.2);buildUI();
   }
 
   // 교대자: 지도를 따라 관측실로 다가옴. 문 앞에 서면 형광등 소리가 끊김
@@ -1138,7 +1138,7 @@ function update(dt){
       else{st.wait+=dt;if(Math.random()<dt*3)nburst(900,5,.08,.12,.8);if(st.wait>=(S.hard?2.4:3.4))return die('잡음')}
     }
     if(S.vent){S.san-=dt*.3}
-    if(radioG){const v=st.duct<0?(st.enter>0?.012:0):st.duct<1?.02+st.duct*.13:.18;radioG.gain.setTargetAtTime(v*(Math.random()<.1?.3:1),AC.currentTime,.08)}
+    radioTick(dt,st.duct<0?(st.enter>0?.15:0):st.duct<1?.2+st.duct*.8:1);
   }
 
   // 응시자 (2일 차~): 같은 카메라를 오래 보면 위험
@@ -1179,7 +1179,7 @@ function update(dt){
   }
   if(S.repCD>0)S.repCD-=dt;
   // 정전 예보
-  if(S.blackT>0&&S.t>=S.blackT){S.blackT=-1;S.outT=9;S.mon=false;buildUI();say('불이 다 나갔다.','bad');sfx(45,1.6,'sawtooth',.2);thump(40,.8,.4,0)}
+  if(S.blackT>0&&S.t>=S.blackT){S.blackT=-1;S.outT=9;S.mon=false;buildUI();say(S.door?'불이 다 나갔다. 빗장은 그대로 걸려 있다.':'불이 다 나갔다.','bad');sfx(45,1.6,'sawtooth',.2);thump(40,.8,.4,0)}
   if(S.outT>0){S.outT-=dt;if(S.outT<=0){say('불이 들어왔다.');buzzClick()}}
   if(hasMod('fog')&&monOn()&&Math.random()<dt*.22)S.camSw=Math.max(S.camSw,.35);
   if(S.call){S.call.t+=dt;if(S.call.t>=3.8){S.call.t=0;S.call.i++;const c=S.call,ln=c.lines[c.i];if(c.i<c.lines.length){if(ln)say(ln,'voice',4.2);if(c.door&&c.i===c.lines.length-1&&S.hum.node!==DOOR){const h=S.hum,prev=h.node;h.node=DOOR;h.wait=0;h.lock=0;humMoved(prev)}}else{S.call=null;sfx(420,.08,'square',.05)}}} // 5일 차 마지막 줄은 문 앞에서 건 것
@@ -2532,8 +2532,32 @@ function initAudio(){
   const bs=AC.createBufferSource();bs.buffer=bb;bs.loop=true;const bf=AC.createBiquadFilter();bf.type='lowpass';bf.frequency.value=260;const bg=AC.createGain();bg.gain.value=.12;bs.connect(bf);bf.connect(bg);bg.connect(AMB);bs.start();
   // 지지직 (CCTV, 메뉴)
   const ss=AC.createBufferSource();ss.buffer=NB;ss.loop=true;const sf=AC.createBiquadFilter();sf.type='bandpass';sf.frequency.value=2600;sf.Q.value=.7;staticG=AC.createGain();staticG.gain.value=0;ss.connect(sf);sf.connect(staticG);staticG.connect(AMB);ss.start();
-  {const rs=AC.createBufferSource();rs.buffer=NB;rs.loop=true;const f=AC.createBiquadFilter();f.type='bandpass';f.frequency.value=1700;f.Q.value=2.5;const am=AC.createGain(),lfo=AC.createOscillator(),lg=AC.createGain();lfo.type='square';lfo.frequency.value=13;lg.gain.value=.5;am.gain.value=.5;lfo.connect(lg);lg.connect(am.gain);radioG=AC.createGain();radioG.gain.value=0;const pn=AC.createStereoPanner?AC.createStereoPanner():null;rs.connect(f);f.connect(am);am.connect(radioG);if(pn){pn.pan.value=-.35;radioG.connect(pn);pn.connect(master)}else radioG.connect(master);rs.start();lfo.start()} // 책상 무전기 잡음 (잡음이 덕트 안에 있을 때)
+  {const rs=AC.createBufferSource();rs.buffer=NB;rs.loop=true;const f=AC.createBiquadFilter();f.type='bandpass';f.frequency.value=1700;f.Q.value=2.5;const am=AC.createGain(),lfo=AC.createOscillator(),lg=AC.createGain();lfo.type='square';lfo.frequency.value=13;lg.gain.value=0;am.gain.value=.5;lfo.connect(lg);lg.connect(am.gain);radioG=AC.createGain();radioG.gain.value=0;const pn=AC.createStereoPanner?AC.createStereoPanner():null;rs.connect(f);f.connect(am);am.connect(radioG);if(pn){pn.pan.value=-.35;radioG.connect(pn);pn.connect(master)}else radioG.connect(master);rs.start();lfo.start()} // 책상 무전기 잡음 (잡음이 덕트 안에 있을 때)
   applySet();
+}
+// ---- 무전기 ----
+// 가까울수록(lv 0~1) 자주, 크게: 스켈치(치익) → 지직이는 잡음 → 가끔 알아듣기 힘든 목소리 → 딸깍
+function radioTick(dt,lv){
+  if(!AC||!S)return;if(radioG)radioG.gain.setTargetAtTime(lv>0?.004+lv*.01:0,AC.currentTime,.2); // 잔잡음
+  if(lv<=0){S.rdT=rnd(.5,1.5);return}
+  S.rdT=(S.rdT??1)-dt;if(S.rdT>0)return;S.rdT=lerp(5,1.3,lv)*rnd(.7,1.3);radioBurst(lv);
+}
+function radioBus(){const t=AC.currentTime,hp=AC.createBiquadFilter(),lp=AC.createBiquadFilter(),ds=dist(18),g=AC.createGain();hp.type='highpass';hp.frequency.value=380;lp.type='lowpass';lp.frequency.value=2900;hp.connect(lp);lp.connect(ds);ds.connect(g);if(AC.createStereoPanner){const pn=AC.createStereoPanner();pn.pan.value=-.4;g.connect(pn);pn.connect(master)}else g.connect(master);return{inp:hp,g,t}} // 울림 없이 책상 위 스피커에서 바로 // 작은 스피커 소리
+function radioBurst(lv){
+  const B=radioBus(),t=B.t,len=rnd(.35,.6)+lv*rnd(.4,1.2),v=.05+lv*.11;B.g.gain.value=v;
+  // 스켈치 열림: 짧고 센 치익
+  {const s=AC.createBufferSource();s.buffer=NB;const g=AC.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(1,t+.01);g.gain.exponentialRampToValueAtTime(.25,t+.09);s.connect(g);g.connect(B.inp);s.start(t,Math.random());
+   // 지직: 잡음을 빠르게 끊었다 이었다
+   const n=Math.floor(len*28);for(let k=0;k<n;k++){const tk=t+.09+k*len/n;g.gain.setValueAtTime(Math.random()<.35?.05:rnd(.25,.7),tk)}
+   g.gain.setValueAtTime(.9,t+.09+len);g.gain.exponentialRampToValueAtTime(.001,t+.09+len+.12);s.stop(t+.09+len+.15)}
+  // 딱딱 튀는 소리
+  for(let k=0;k<4+lv*10;k++){const tk=t+rnd(.05,len),o=AC.createOscillator(),g=AC.createGain();o.type='square';o.frequency.value=rnd(900,2600);g.gain.setValueAtTime(.5,tk);g.gain.exponentialRampToValueAtTime(.001,tk+.006);o.connect(g);g.connect(B.inp);o.start(tk);o.stop(tk+.01)}
+  // 알아듣기 힘든 목소리 (가까울수록 자주)
+  if(Math.random()<.15+lv*.55){const vt=t+.12,vl=len*.8,o=AC.createOscillator(),f1=AC.createBiquadFilter(),f2=AC.createBiquadFilter(),g=AC.createGain();o.type='sawtooth';f1.type='bandpass';f1.Q.value=7;f2.type='bandpass';f2.Q.value=8;
+    const low=Math.random()<.5;for(let k=0;k*.09<vl;k++){const tk=vt+k*.09;o.frequency.setValueAtTime((low?rnd(85,120):rnd(150,210))*(lv>.9?.7:1),tk);f1.frequency.setValueAtTime(rnd(350,850),tk);f2.frequency.setValueAtTime(rnd(1000,2300),tk);g.gain.setValueAtTime(Math.random()<.25?0:rnd(.9,1.6),tk)}
+    g.gain.setValueAtTime(0,vt+vl);o.connect(f1);o.connect(f2);f1.connect(g);f2.connect(g);g.connect(B.inp);o.start(vt);o.stop(vt+vl+.02)}
+  // 스켈치 닫힘 딸깍
+  {const tk=t+.09+len+.1,o=AC.createOscillator(),g=AC.createGain();o.frequency.value=1250;g.gain.setValueAtTime(.35,tk);g.gain.exponentialRampToValueAtTime(.001,tk+.04);o.connect(g);g.connect(B.inp);o.start(tk);o.stop(tk+.05)}
 }
 let REV=null;
 function out(pan){let n=master;if(pan!==undefined&&AC.createStereoPanner){const p=AC.createStereoPanner();p.pan.value=Math.max(-1,Math.min(1,pan));p.connect(master);n=p}
