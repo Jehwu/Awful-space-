@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>텍스처 생성기</title>
+<style>body{background:#111;color:#ddd;font-family:sans-serif;padding:16px}canvas{max-width:100%;display:block;margin:8px 0 20px}a{color:#fc6}</style></head>
+<body><h1>Awful Space 텍스처 생성기</h1><p>만들어진 jpg를 내려받아 <code>img/tex/</code>에 같은 이름으로 넣으세요.</p><div id="out">생성 중...</div>
+<script src="textures.js"></script>
+<script>
+setTimeout(()=>{const T=buildAllTextures(),o=document.getElementById('out');o.innerHTML='';
+  for(const k in T){const a=document.createElement('a');a.download=k+'.jpg';a.href=T[k].toDataURL('image/jpeg',.88);a.textContent=k+'.jpg 내려받기';o.appendChild(a);o.appendChild(T[k])}},50);
+</script></body></html>
