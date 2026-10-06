@@ -90,7 +90,8 @@ body[data-mode=menu] #menu{display:flex}
 .mbtn::before{content:'   ';white-space:pre;font-family:VT323,monospace}
 .mbtn:hover::before{content:'>> '}
 #mHard{color:#e09a8a}#mHard small{font-size:.6em;opacity:.7;margin-left:10px;letter-spacing:.05em}
-#menu .foot{position:fixed;left:9vw;bottom:18px;font-size:12px;opacity:.35}
+#menu .foot{position:fixed;left:9vw;right:9vw;bottom:18px;font-size:12px;opacity:.35}
+#menu .foot.warn{opacity:.75;color:#d9b36a}
 .glitch{text-shadow:4px 0 rgba(255,30,30,.55),-4px 0 rgba(30,255,255,.45)!important;transform:translateX(3px) skewX(-4deg)}
 @keyframes flick{0%,100%{opacity:1}41%{opacity:1}42%{opacity:.35}43%{opacity:1}70%{opacity:.9}71%{opacity:.2}72%{opacity:.85}}
 
@@ -182,7 +183,7 @@ body:not([data-mode=game]) #map{display:none!important}
   <button class="mbtn" id="mCont">이어하기</button>
   <button class="mbtn" id="mHard">하드 모드</button>
   <button class="mbtn" id="mDev">개발자 모드</button>
-  <div class="foot">v0.6 · 3D · 이어폰 권장</div>
+  <div class="foot" id="foot">이어폰 권장</div>
 </div>
 
 <div class="ov" id="devp">
@@ -205,9 +206,11 @@ body:not([data-mode=game]) #map{display:none!important}
 <div class="ov" id="end"><h1 id="endTitle"></h1><pre id="endText"></pre><div style="display:flex;gap:8px"><button id="endBtn"></button><button id="endMenu">메인 메뉴</button></div></div>
 <div id="rot">가로 모드로 플레이하는 걸 권장합니다</div>
 
-<script type="module">import * as THREE from './lib/three.module.min.js';window.THREE=THREE;dispatchEvent(new Event('three'))</script>
+<script type="module">import('./lib/three.module.min.js').then(m=>{window.THREE=m},e=>{window.THREE_ERR=String(e&&e.message||e)}).then(()=>dispatchEvent(new Event('three')))</script>
+<script nomodule>window.THREE_ERR='nomodule'</script>
 <script>
 // ===================== 기본 =====================
+const VER='0.6.1'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
 const $=id=>document.getElementById(id);
 const cv=$('cv'),cx=cv.getContext('2d');
 let W,H,DPR=1;
@@ -301,8 +304,8 @@ function bakeLight(g,G,I){
 }
 // ===================== 관측실 3방향 (미리 그려두기) =====================
 let VIEWS=[];
-function buildViews(){ // 3D가 안 될 때 쓰는 2D 방
-  if(R3.ok)return;
+function buildViews(force){ // 3D가 안 될 때만 쓰는 2D 방. 한 번 만든 뒤에만 크기 바뀔 때 다시 그림
+  if(R3.ok||!READY||(!force&&!VIEWS.length))return;
   VIEWS=[0,1,2].map(i=>{
     const c=mk(W*DPR,H*DPR),g=c.getContext('2d');g.setTransform(DPR,0,0,DPR,0,0);
     const G=geom(W,H);drawBox(g,G,2.2,i*610+90);
@@ -1332,6 +1335,7 @@ const VNAME=['출입문','책상','배전반'];
 function hots(i){const lock=()=>S.door?'문 잠금 풀기':'문 잠그기',lab={lock,door:lock,mon:()=>'CCTV 모니터',phone:()=>S.ring>0?'전화 받기':S.call?'전화 끊기':S.missed?'음성 메시지 듣기':'전화',log:()=>'근무 일지',cab:()=>S.brk?'배전반':'차단기 올리기',sw:()=>S.light?'조명 끄기':'조명 켜기'},
   act={lock:toggleDoor,door:toggleDoor,mon:toggleMon,phone:report,log:openLog,cab:()=>S.brk?say('배전반은 정상이다.'):resetBrk(),sw:toggleLight},keys=[['lock','door'],['mon','phone','log'],['cab','sw']][i];
   if(R3.ok)return keys.map(k=>({k,r:R3.hot[k]?scrRect(R3.hot[k]):null,lab:lab[k],act:act[k]})); // 3D: 물건이 지금 화면 어디에 있는지 계산
+  if(!VIEWS.length)buildViews(true);
   const I=VIEWS[i].info,rk={lock:'lockB',door:'door',mon:'monB',phone:'phoneB',log:'logB',cab:'cab',sw:'swB'};return keys.map(k=>({k,r:I[rk[k]],lab:lab[k],act:act[k]}));
 }
 const canAct=()=>S&&mode==='game'&&!S.over&&!S.paused&&!S.log&&!S.bp&&!S.mon&&jump<=0;
@@ -1374,15 +1378,24 @@ function drawNav(){
 // ===================== 3D 경비실 (Three.js) =====================
 // 의자에 앉은 시점에서 고개를 돌림: 0=출입문(왼쪽 -X) 1=책상(정면 -Z) 2=배전반(오른쪽 +X)
 // 단위 m. 방은 x -2~2, z -1.4(책상 벽)~1.8, 높이 2.6. WebGL이 안 되면 기존 2D 방을 씀
-const R3={ok:false,hot:{},dyn:{}};
+// state: wait=엔진·텍스처 오는 중, ok=3D, fail=2D로 대체 (why=메뉴 아래에 보여줄 이유)
+const R3={ok:false,hot:{},dyn:{},state:'wait',why:''};
 const CAMZ=-.1,CAMY=1.2,RX=2;
+function fail3D(why,hard){R3.state='fail';R3.why=why;R3.hard=hard;console.warn('3D 대신 2D로 표시:',why);updFoot()}
+function glWhy(){try{const c=document.createElement('canvas');if(c.getContext('webgl2'))return '3D 초기화 실패';if(c.getContext('webgl'))return 'WebGL2 미지원 브라우저';return 'WebGL 꺼짐 · 하드웨어 가속 확인'}catch(e){return 'WebGL 사용 불가'}}
 function init3D(){
-  const T3=window.THREE;if(R3.ok||!T3||!READY)return;
-  let rd;try{rd=new T3.WebGLRenderer({antialias:true,powerPreference:'high-performance'})}catch(e){console.warn('3D를 쓸 수 없어 2D로 표시',e);return}
-  R3.T=T3;R3.rd=rd;rd.shadowMap.enabled=true;rd.shadowMap.type=T3.PCFSoftShadowMap;rd.toneMapping=T3.ACESFilmicToneMapping;rd.toneMappingExposure=1.05;
-  const sc=new T3.Scene();sc.background=new T3.Color(0x000000);sc.fog=new T3.Fog(0x050403,4,9);R3.sc=sc;
-  R3.cam=new T3.PerspectiveCamera(60,W/H,.03,20);R3.cam.rotation.order='YXZ';R3.cam.position.set(0,CAMY,CAMZ);
-  build3D();resize3D();R3.ok=true;
+  const T3=window.THREE;if(R3.ok||R3.hard||!READY)return;
+  if(!T3){if(window.THREE_ERR)fail3D('3D 엔진 불러오기 실패',true);return}
+  let rd=null; // 안티에일리어싱 등을 못 켜는 기기도 있어서 옵션을 낮춰가며 다시 시도
+  for(const o of[{antialias:true,powerPreference:'high-performance'},{antialias:false},{antialias:false,precision:'mediump'}]){try{rd=new T3.WebGLRenderer(o);break}catch(e){console.warn('WebGL 생성 실패',o,e)}}
+  if(!rd)return fail3D(glWhy(),true);
+  try{
+    R3.T=T3;R3.rd=rd;rd.shadowMap.enabled=true;rd.shadowMap.type=T3.PCFSoftShadowMap;rd.toneMapping=T3.ACESFilmicToneMapping;rd.toneMappingExposure=1.05;
+    const sc=new T3.Scene();sc.background=new T3.Color(0x000000);sc.fog=new T3.Fog(0x050403,4,9);R3.sc=sc;
+    R3.cam=new T3.PerspectiveCamera(60,W/H,.03,20);R3.cam.rotation.order='YXZ';R3.cam.position.set(0,CAMY,CAMZ);
+    R3.hot={};R3.dyn={};build3D();resize3D();
+  }catch(e){console.error(e);try{rd.dispose();rd.forceContextLoss()}catch(_){}R3.rd=R3.T=null;R3.hot={};R3.dyn={};return fail3D('3D 장면 오류: '+(e&&e.message||e),true)}
+  R3.ok=true;R3.state='ok';VIEWS=[];updFoot(); // 2D 방은 이제 필요 없으니 메모리 비움
 }
 function resize3D(){if(!R3.rd)return;R3.rd.setPixelRatio(Math.min(DPR,R3.spot&&!R3.spot.castShadow?1:1.5));R3.rd.setSize(W,H,false);R3.cam.aspect=W/H;R3.cam.fov=W/H<1.5?74:W/H>1.95?62:68;R3.cam.updateProjectionMatrix()}
 // ---- 재료/도형 도우미 ----
@@ -1614,6 +1627,7 @@ function scrRect(obj){
 const SPOTS=[[.8,.95],[.06,.98],[.88,.96]]; // 그림자가 서는 자리 (방향별)
 function render(){
   if(R3.ok)return render3D();
+  if(!VIEWS.length)buildViews(true);
   cx.save();
   const turning=Math.abs(S.view-S.camX),sway=(.6+(100-S.san)/40)*Math.sin(T_*.7)*2;
   const z=1.03+Math.min(turning,1)*.03,bob=Math.sin(T_*1.1)*1.2;S.tf=[z,sway,bob];
@@ -1956,13 +1970,21 @@ function toMenu(){
   setMode('menu');if(staticG)staticG.gain.setTargetAtTime(.04,AC.currentTime,.3);
 }
 function startGame(n,dev,hard=false){initAudio();DEV.on=dev;HARD=dev?DEV.hard:hard;DEV.speed=1;if(staticG)staticG.gain.setTargetAtTime(0,AC.currentTime,.1);newNight(n);buildDbg()}
-$('mNew').onclick=()=>startGame(1,false);
-$('mCont').onclick=()=>startGame(savedNight,false);
-$('mHard').onclick=()=>startGame(savedHard,false,true);
+// 3D 엔진(700KB)이 아직 오는 중이면 잠깐 기다렸다 시작. 안 그러면 느린 폰 회선에서 2D 방으로 시작됨
+let going=false;
+function go(fn){
+  if(going)return;if(R3.state!=='wait')return fn();
+  going=true;const t0=performance.now(),iv=setInterval(()=>{if(R3.state==='wait'&&performance.now()-t0<10000)return;
+    clearInterval(iv);going=false;if(R3.state==='wait'){R3.state='fail';R3.why='3D 로딩이 너무 느림';updFoot()}fn()},100); // 늦게라도 오면 게임 중에 3D로 바뀜
+}
+function updFoot(){const f=$('foot'),st=R3.state;f.textContent=`v${VER} · ${st==='ok'?'3D':st==='wait'?'3D 불러오는 중…':'2D 모드 ('+R3.why+')'} · 이어폰 권장`;f.classList.toggle('warn',st==='fail')}
+$('mNew').onclick=()=>go(()=>startGame(1,false));
+$('mCont').onclick=()=>go(()=>startGame(savedNight,false));
+$('mHard').onclick=()=>go(()=>startGame(savedHard,false,true));
 $('mDev').onclick=()=>$('devp').classList.add('show');
 $('devBack').onclick=()=>$('devp').classList.remove('show');
 $('endMenu').onclick=toMenu;
-for(let n=1;n<=NIGHTS;n++){const b=document.createElement('button');b.textContent=n+'일 차';b.onclick=()=>startGame(n,true);$('devNights').appendChild(b)}
+for(let n=1;n<=NIGHTS;n++){const b=document.createElement('button');b.textContent=n+'일 차';b.onclick=()=>go(()=>startGame(n,true));$('devNights').appendChild(b)}
 [['dHard','hard'],['dNoScare','noScare'],['dInfo','info'],['dGod','god'],['dBright','bright']].forEach(([id,k])=>{$(id).onchange=e=>{DEV[k]=e.target.checked;buildDbg()}});
 $('dbgTog').onclick=e=>{e.stopPropagation();const d=$('dbg');d.classList.toggle('min');$('dbgTog').textContent=d.classList.contains('min')?'DEV ▸':'DEV ▾'};
 function buildDbg(){
@@ -1993,9 +2015,20 @@ function updDbg(){
 // 타이틀 글리치
 setInterval(()=>{if(mode!=='menu'||Math.random()>.3)return;const t=$('title');t.classList.add('glitch');setTimeout(()=>t.classList.remove('glitch'),80+Math.random()*120)},700);
 
-buildMap();
+buildMap();updFoot();
 texReady.then(()=>{READY=true;resize();buildJumps();init3D()});
 addEventListener('three',()=>init3D()); // 3D 엔진이 늦게 오면 그때 시작
+if(window.THREE_ERR)init3D();
+// 예전 버전이 캐시에 남아 있으면(디스코드 앱 안 브라우저 등) 새 버전으로 한 번 새로고침. 버전은 이 파일의 VER로 비교
+function checkVer(){
+  if(location.protocol==='file:')return;
+  fetch(location.pathname,{cache:'no-cache'}).then(r=>r.ok?r.text():'').then(t=>{
+    const v=(t.match(/const VER='([^']+)'/)||[])[1];if(!v||v===VER||mode!=='menu')return;
+    const k='awful_ver_'+v;try{if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1')}catch(e){return}
+    location.replace(location.pathname+'?v='+encodeURIComponent(v)+location.hash);
+  }).catch(()=>{});
+}
+checkVer();addEventListener('pageshow',e=>{if(e.persisted)checkVer()});
 try{Promise.all(["40px 'Nanum Pen Script'","20px 'Nanum Gothic Coding'"].map(f=>document.fonts.load(f))).then(()=>{if(READY)buildViews()}).catch(()=>{})}catch(e){} // 손글씨 폰트가 늦게 오면 방을 다시 그림
 toMenu();
 if(/[?&]test/.test(location.search))$('devp').classList.add('show');
