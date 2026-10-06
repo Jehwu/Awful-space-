@@ -17,45 +17,48 @@ function makeTex(w,h,fn,bump=2){
   g.putImageData(id,0,0);return c}
 
 // 벽지 1536x1024: 세로 = 벽 전체 높이(위=천장, 아래=바닥), 가로는 벽지 6폭
-// 위에서 흘러내린 물 자국, 얼룩과 그 테두리, 바닥 쪽 때와 곰팡이, 벽지 이음새
+// 백룸의 단색 노란 줄무늬 벽지. 대체로 깨끗하고, 물이 샌 곳(넓은 얼룩 영역)에만 얼룩·흘러내림·곰팡이
 function makeWall(){
-  const W=1536,H=1024,R=mulberry(7),big=FBM(70,9,6,5),st=FBM(71,6,4,5),drip=FBM(72,108,2,3),mold=FBM(73,120,80,3),pap=FBM(74,384,256,2),sp=FBM(76,24,16,3),hand=FBM(77,3,2,3);
+  const W=1536,H=1024,R=mulberry(7),big=FBM(70,9,6,5),st=FBM(71,6,4,5),drip=FBM(72,108,2,3),mold=FBM(73,120,80,3),pap=FBM(74,384,256,2),dmg=FBM(78,4,3,4);
   return makeTex(W,H,(u,v,o)=>{
-    const su=(u*24)%1,sv=(v*16)%1,ds=Math.abs(su-.5)*1.4+Math.abs(sv-.5);
-    let pr=0;if(su<.035||su>.965)pr=-14;else if(Math.abs(su-.5)<.014)pr=-8;if(ds<.15&&ds>.09)pr+=10; // 인쇄 무늬: 세로줄 + 작은 마름모
-    const k=.82+big(u,v)*.34;
-    o[0]=(188+pr)*k;o[1]=(168+pr)*k;o[2]=(104+pr*.5)*k;
-    const s=st(u,v),stain=sstep(.54,.64,s),ring=gau((s-.64)/.018);
-    mixc(o,132,100,48,stain*.42);const rk=1-ring*.2;o[0]*=rk;o[1]*=rk;o[2]*=rk*.94;
-    const d=drip(u,v),dk=1-sstep(.5,.78,d)*(1-v)*.5;o[0]*=dk;o[1]*=dk;o[2]*=dk*.92;
-    const top=1-sstep(.12,0,v)*.35,bot=1-sstep(.72,1,v)*.5,hd=1-sstep(.5,.75,hand(u,v))*sstep(.35,.6,v)*sstep(.9,.7,v)*.12;const kk=top*bot*hd;o[0]*=kk;o[1]*=kk;o[2]*=kk; // 손 닿는 높이의 손때
-    const m=mold(u,v),ma=sstep(.6,.78,m)*Math.max(stain*.8,sstep(.8,.98,v),sstep(.16,0,v))*(.4+sp(u,v));mixc(o,44,50,26,Math.min(1,ma)*.6);
-    const seam=(u*6)%1,sd=Math.min(seam,1-seam)*W/6;if(sd<1.2){o[0]*=.7;o[1]*=.7;o[2]*=.7}
-    const n=(R()-.5)*10;o[0]+=n;o[1]+=n;o[2]+=n;
-    o[3]=pap(u,v)*.22+ring*.25+(sd<2?.5:0)+ma*.3;
-  },1.6);
+    const col=Math.floor(u*24),su=(u*24)%1,sv=(v*16)%1,ds=Math.abs(su-.5)*1.4+Math.abs(sv-.5);
+    let pr=(col&1)?5:0;if(su<.025||su>.975)pr-=9;if(!(col&1)&&ds>.085&&ds<.13)pr+=6; // 밝고 어두운 줄이 번갈아, 어두운 줄에만 작은 마름모
+    const k=.93+big(u,v)*.14;
+    o[0]=(204+pr)*k;o[1]=(184+pr)*k;o[2]=(102+pr*.5)*k;
+    const m=sstep(.55,.75,dmg(u,v)); // 물이 샌 곳
+    const s=st(u,v),stain=sstep(.6,.68,s)*m,ring=gau((s-.68)/.016)*m;
+    mixc(o,150,122,58,stain*.3);const rk=1-ring*.14;o[0]*=rk;o[1]*=rk;o[2]*=rk*.95;
+    const d=drip(u,v),dk=1-sstep(.55,.8,d)*(1-v)*.22*m;o[0]*=dk;o[1]*=dk;o[2]*=dk*.94;
+    if(v>.9)mixc(o,70,64,30,sstep(.6,.78,mold(u,v))*m*.25);
+    const kk=(1-sstep(.1,0,v)*.12)*(1-sstep(.85,1,v)*.25);o[0]*=kk;o[1]*=kk;o[2]*=kk; // 천장 쪽 누렇게, 바닥 쪽 때
+    const seam=(u*6)%1,sd=Math.min(seam,1-seam)*W/6;
+    if(sd<1.2){o[0]*=.85;o[1]*=.85;o[2]*=.85}else if(sd<4&&m>.7)mixc(o,228,216,172,.7); // 이음새, 젖은 곳은 들떠서 뒷종이가 보임
+    const n=(R()-.5)*12;o[0]+=n;o[1]+=n;o[2]+=n;
+    o[3]=pap(u,v)*.18+ring*.2+(sd<2?.4:0);
+  },1.2);
 }
-// 카펫 1536x512 (가로·세로 반복): 올 굵은 섬유, 축축하게 젖은 얼룩과 마른 테두리, 닳은 자국
+// 카펫 1536x512 (가로·세로 반복): 축축한 베이지빛 노란 카펫, 젖은 얼룩과 마른 테두리, 닳은 자국
 function makeCarpet(){
-  const R=mulberry(11),big=FBM(80,12,4,5),wet=FBM(81,9,3,5),fib=FBM(82,480,160,2),wear=FBM(83,6,2,4);
+  const R=mulberry(11),big=FBM(80,12,4,5),wet=FBM(81,9,3,5),fib=FBM(82,480,160,2),wear=FBM(83,6,2,4),damp=FBM(84,5,2,4);
   return makeTex(1536,512,(u,v,o)=>{
-    const f=fib(u,v)*.7+R()*.5,ck=((Math.floor(u*12)+Math.floor(v*4))&1)?6:-6,k=(.75+big(u,v)*.45)*(1-sstep(.55,.75,wear(u,v))*.15);
-    o[0]=(88+f*34+ck)*k;o[1]=(74+f*28+ck)*k;o[2]=(40+f*16+ck*.5)*k;
-    const w=wet(u,v),wa=sstep(.56,.68,w),rim=gau((w-.69)/.012);mixc(o,40,34,18,wa*.7);o[0]+=rim*14;o[1]+=rim*12;o[2]+=rim*6;
+    const f=fib(u,v)*.7+R()*.5,k=(.84+big(u,v)*.26)*(1-sstep(.55,.75,wear(u,v))*.1);
+    o[0]=(122+f*30)*k;o[1]=(106+f*26)*k;o[2]=(60+f*14)*k;
+    mixc(o,96,82,44,sstep(.45,.6,damp(u,v))*.35);
+    const w=wet(u,v),wa=sstep(.6,.7,w),rim=gau((w-.71)/.012);mixc(o,70,58,30,wa*.6);o[0]+=rim*18;o[1]+=rim*15;o[2]+=rim*7;
     o[3]=f*1.2-wa*.3;
   },1.6);
 }
-// 천장 1536x512: 128px 석고 텍스 타일, 핀홀, T자 철제 틀, 물 먹은 타일
+// 천장 1536x512: 128px 크림색 석고 텍스 타일, 핀홀, T자 철제 틀, 가끔 물 먹은 타일
 function makeCeil(){
-  const R=mulberry(13),fis=FBM(90,72,24,3),st=FBM(91,9,3,5),big=FBM(92,12,4,4),T=128,hr=mulberry(5),stainy=Array.from({length:48},()=>hr()<.28);
+  const R=mulberry(13),fis=FBM(90,72,24,3),st=FBM(91,9,3,5),big=FBM(92,12,4,4),T=128,hr=mulberry(5),stainy=Array.from({length:48},()=>hr()<.18);
   return makeTex(1536,512,(u,v,o)=>{
     const x=u*1536,y=v*512,gx=x%T,gy=y%T,ti=Math.floor(x/T)+Math.floor(y/T)*12;
-    if(gx<5||gy<5){const l=(gx<1.5||gy<1.5)?1.25:(gx>3.5&&gx<5)||(gy>3.5&&gy<5)?.6:1;o[0]=128*l;o[1]=122*l;o[2]=100*l;o[3]=2;return}
-    const f=fis(u,v),k=.86+big(u,v)*.24-sstep(.62,.7,f)*.12;
-    o[0]=198*k;o[1]=188*k;o[2]=152*k;
-    if(R()<.012){o[0]*=.55;o[1]*=.55;o[2]*=.55}
-    const ed=Math.min(gx-5,gy-5,T-gx,T-gy);if(ed<6){const e=.8+ed/30;o[0]*=e;o[1]*=e;o[2]*=e}
-    if(stainy[ti]){const s=st(u,v),sa=sstep(.5,.62,s),ring=gau((s-.625)/.01);mixc(o,140,104,44,sa*.55);o[0]*=1-ring*.35;o[1]*=1-ring*.38;o[2]*=1-ring*.42}
+    if(gx<5||gy<5){const l=(gx<1.5||gy<1.5)?1.15:(gx>3.5&&gx<5)||(gy>3.5&&gy<5)?.65:1;o[0]=168*l;o[1]=160*l;o[2]=128*l;o[3]=2;return}
+    const f=fis(u,v),k=.9+big(u,v)*.16-sstep(.62,.7,f)*.1;
+    o[0]=212*k;o[1]=202*k;o[2]=162*k;
+    if(R()<.012){o[0]*=.6;o[1]*=.6;o[2]*=.6}
+    const ed=Math.min(gx-5,gy-5,T-gx,T-gy);if(ed<6){const e=.84+ed/36;o[0]*=e;o[1]*=e;o[2]*=e}
+    if(stainy[ti]){const s=st(u,v),sa=sstep(.5,.62,s),ring=gau((s-.625)/.01);mixc(o,150,118,60,sa*.45);o[0]*=1-ring*.3;o[1]*=1-ring*.33;o[2]*=1-ring*.37}
     o[3]=f*.8+(R()-.5)*.15;
   },1.8);
 }
