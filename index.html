@@ -215,7 +215,7 @@ body:not([data-mode=game]) #map{display:none!important}
 <script nomodule>window.THREE_ERR='nomodule'</script>
 <script>
 // ===================== 기본 =====================
-const VER='0.8.0'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
+const VER='0.8.1'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
 const $=id=>document.getElementById(id);
 const cv=$('cv'),cx=cv.getContext('2d');
 let W,H,DPR=1;
@@ -1429,7 +1429,9 @@ function build3D(){
   const fl=PLN(2*RX,3.2,floorM,0,0,.2);fl.rotation.x=-Math.PI/2;
   const ce=PLN(2*RX,3.2,ceilM,0,2.6,.2);ce.rotation.x=Math.PI/2;
   const wN=PLN(2*RX,2.6,wallM,0,1.3,-1.4),wS=PLN(2*RX,2.6,wallM.clone(),0,1.3,1.8);wS.rotation.y=Math.PI;
-  const wW=PLN(3.2,2.6,wallM.clone(),-RX,1.3,.2);wW.rotation.y=Math.PI/2;const wE=PLN(3.2,2.6,wallM.clone(),RX,1.3,.2);wE.rotation.y=-Math.PI/2;
+  const wW=PLN(3.2,2.6,wallM.clone(),-RX,1.3,.2);wW.rotation.y=Math.PI/2;
+  {const u0=(1.8-(CAMZ+.52))/3.2,u1=(1.8-(CAMZ-.52))/3.2,a=cvs(320,260,(g,w,h)=>{g.fillStyle='#fff';g.fillRect(0,0,w,h);g.fillStyle='#000';g.fillRect(u0*w,h*(1-2.18/2.6),(u1-u0)*w,h)});const t=new T3.CanvasTexture(a);wW.material.alphaMap=t;wW.material.alphaTest=.5} // 문 자리는 뚫어 둠
+  const wE=PLN(3.2,2.6,wallM.clone(),RX,1.3,.2);wE.rotation.y=-Math.PI/2;
   [wS,wW,wE].forEach((w,k)=>{w.material.map=w.material.map.clone();w.material.map.offset.x=.27+k*.31;w.material.map.needsUpdate=true});
   const bbM=MS({color:0x2a1e10,roughness:.7});BOX(2*RX,.1,.02,bbM,0,.05,-1.39);BOX(2*RX,.1,.02,bbM,0,.05,1.79);BOX(.02,.1,3.2,bbM,-RX+.01,.05,.2);BOX(.02,.1,3.2,bbM,RX-.01,.05,.2); // 걸레받이
   // 노란 방에 볼트로 박은 철판 (W·E·S 벽). 2.2m에서 끝나서 위쪽엔 원래 벽지가 띠처럼 보임
@@ -1524,13 +1526,13 @@ function build3D(){
    const hinge=grp(-.46,0,.03,0,dg),door=grp(.46,0,0,0,hinge);R3.dyn.hinge=hinge;BOX(.92,1.4,.05,dM,0,.7,0,door);BOX(.92,.2,.05,dM,0,1.95,0,door);BOX(.29,.45,.05,dM,-.315,1.625,0,door);BOX(.29,.45,.05,dM,.315,1.625,0,door); // 창문 구멍을 남긴 문짝
    const wc=cvs(128,128,(g,w,h)=>{g.strokeStyle='rgba(180,180,170,.8)';g.lineWidth=1.5;for(let k=-w;k<w*2;k+=10){g.beginPath();g.moveTo(k,0);g.lineTo(k+h,h);g.moveTo(k+h,0);g.lineTo(k,h);g.stroke()}});
    const gl=PLN(.34,.45,MS({map:ctx3(wc),transparent:true,opacity:.5,roughness:.1,metalness:.3}),0,1.625,.02,door);
-   R3.dyn.winC=mk(160,210);R3.dyn.winT=ctx3(R3.dyn.winC);PLN(.34,.45,new T3.MeshBasicMaterial({map:R3.dyn.winT}),0,1.625,-.02,door); // 창 너머 복도 (벽보다 앞에 둠)
+   R3.dyn.winC=mk(160,210);R3.dyn.winT=ctx3(R3.dyn.winC);PLN(.34,.45,new T3.MeshBasicMaterial({map:R3.dyn.winT,transparent:true,depthWrite:false}),0,1.625,-.02,door); // 창에 붙은 얼굴 등만 그림. 복도는 문 너머 진짜 3D
    BOX(.7,.05,.06,greyM,0,1.02,.05,door);[.3,1.0,1.75].forEach(y=>BOX(.03,.12,.03,greyM,-.46,y,.02,door)); // 손잡이 바, 경첩
    const sc2=cvs(512,96,(g,w,h)=>{g.fillStyle='rgba(30,28,24,.85)';g.font=`900 ${h*.62}px 'Nanum Gothic Coding',sans-serif`;g.textAlign='center';g.textBaseline='middle';g.fillText('비상구 아님',w/2,h/2);g.globalCompositeOperation='destination-out';for(let x=w*.08;x<w;x+=w*.105)g.fillRect(x,0,3,h);for(let k=0;k<60;k++){g.globalAlpha=Math.random()*.6;g.fillRect(Math.random()*w,Math.random()*h,2,2)}});PLN(.7,.13,MS({map:ctx3(sc2),transparent:true,roughness:.8}),0,2.3,.012,dg); // 철판에 스프레이로 찍은 글씨
    R3.dyn.bars=[];[1.25,.85,.45].forEach(y=>{const bb=BOX(1.0,.05,.04,MS({color:0x6a6a62,roughness:.35,metalness:.85}),0,y,.08,dg);bb.visible=false;R3.dyn.bars.push(bb)}); // 잠기면 나오는 빗장
    R3.dyn.gapC=mk(128,8);R3.dyn.gapT=ctx3(R3.dyn.gapC);const gp=PLN(.9,.012,new T3.MeshBasicMaterial({map:R3.dyn.gapT,transparent:true}),0,.008,.06,dg);
    {const sp=PLN(.9,.5,new T3.MeshBasicMaterial({map:c3cv('spill',128,64,(q,w,h)=>{const gr=q.createRadialGradient(w/2,0,0,w/2,0,w*.6);gr.addColorStop(0,'rgba(255,224,144,.9)');gr.addColorStop(1,'rgba(255,224,144,0)');q.fillStyle=gr;q.fillRect(0,0,w,h)}),transparent:true,depthWrite:false,blending:T3.AdditiveBlending,opacity:.35}),0,.003,.3,dg);sp.rotation.x=-Math.PI/2;R3.dyn.spillF=sp} // 문틈 빛이 바닥에 번짐
-   R3.dyn.winBg=winBackdrop();R3.dyn.winC.getContext('2d').drawImage(R3.dyn.winBg,0,0);
+   outside3D();
    R3.hot.door=door;
    const kc=cvs(128,160,(g,w,h)=>{g.fillStyle='#24241f';g.fillRect(0,0,w,h);g.fillStyle='#0a120a';g.fillRect(16,12,w-32,26);g.fillStyle='rgba(120,200,120,.6)';g.font='20px VT323';g.fillText('LOCK',30,32);for(let k=0;k<9;k++){g.fillStyle='#5a5a52';g.fillRect(22+(k%3)*30,52+Math.floor(k/3)*28,24,22)}});
    const kp=grp(.68,1.25,.0,0,dg);BOX(.14,.17,.03,MS({map:ctx3(kc),roughness:.6}),0,0,.015,kp);R3.dyn.lockLed=mesh(new T3.SphereGeometry(.007,10,10),new T3.MeshBasicMaterial({color:0x29c23a}),0,-.065,.032,kp,false);R3.hot.lock=kp;
@@ -1624,7 +1626,17 @@ function tally3(mine){
 }
 // 正을 획 순서대로 n획까지
 function tallyStrokes(g,x,y,s,n,r){const L=[[.1,.08,.9,.08],[.5,.08,.5,.92],[.5,.5,.85,.5],[.25,.42,.25,.92],[0,.92,1,.92]];for(let k=0;k<n;k++){const [a,b,c,d]=L[k],j=()=>(r?r()-.5:0)*s*.06;g.beginPath();g.moveTo(x+a*s+j(),y+b*s+j());g.lineTo(x+c*s+j(),y+d*s+j());g.stroke()}}
-// 문 창문 너머: 노란 복도 (한 번만 그려 둠)
+// 문 너머 노란 복도: 진짜 3D라 어느 각도에서 봐도 원근이 맞음. k=밝기(0~1.7), green=비상구 초록빛
+function outside3D(){
+  const T3=R3.T,M=c3mats(),sc=R3.sc,x0=-RX-.07,L=8,w=1.8,z=CAMZ,H=2.6,cx0=x0-L/2;
+  wq(sc,M.carpet,L,w,-PI2,0,cx0,0,z,2.35,.8);wq(sc,M.ceil,L,w,PI2,0,cx0,H,z,7.2,2.4);
+  wq(sc,M.wall,L,H,0,0,cx0,H/2,z-w/2,3.9,2.6);wq(sc,M.wall,L,H,0,Math.PI,cx0,H/2,z+w/2,3.9,2.6);wq(sc,M.wall,w,H,0,PI2,x0-L,H/2,z,3.9,2.6);
+  {const d=mesh(new T3.PlaneGeometry(.9,2.05),M.void,x0-4.2,1.02,z+w/2-.005,sc,false);d.rotation.y=Math.PI} // 옆으로 난 어두운 출입구
+  const pm=new T3.MeshBasicMaterial({color:0xfff3d6,map:M.panelOn.map});R3.outPM=pm;[1.4,4.0,6.6].forEach(d=>{const p=mesh(new T3.PlaneGeometry(1.16,.56),pm,x0-d,H-.004,z,sc,false);p.rotation.x=PI2});
+  const l=new T3.PointLight(0xfff0c8,3,5.5,1.5);l.position.set(x0-1.6,H-.3,z);sc.add(l);R3.outL=l;
+}
+function outLight(k,green){if(!R3.outL)return;const g=green||0;R3.outL.intensity=3*k*(1-g)+2.5*g;R3.outL.color.setHex(g?0x40ff70:0xfff0c8);R3.outPM.color.setHex(g?0x103018:0xfff3d6).multiplyScalar(g?1:Math.min(1.3,Math.max(.06,k)))}
+// (예전) 문 창문 너머: 노란 복도 그림
 function winBackdrop(){return cvs(160,210,(g,w,h)=>{const vx=w*.5,vy=h*.45;g.fillStyle='#2a2412';g.fillRect(0,0,w,h);
   const gw=g.createLinearGradient(0,0,vx,0);gw.addColorStop(0,'#c2ad5c');gw.addColorStop(1,'#5e5226');g.fillStyle=gw;g.beginPath();g.moveTo(0,0);g.lineTo(vx-14,vy-18);g.lineTo(vx-14,vy+18);g.lineTo(0,h);g.fill();
   const gw2=g.createLinearGradient(w,0,vx,0);gw2.addColorStop(0,'#c2ad5c');gw2.addColorStop(1,'#5e5226');g.fillStyle=gw2;g.beginPath();g.moveTo(w,0);g.lineTo(vx+14,vy-18);g.lineTo(vx+14,vy+18);g.lineTo(w,h);g.fill();
@@ -1657,7 +1669,7 @@ function draw3D(){
   D.swT.rotation.x=S.light?-.35:.35;
   {const rv=S.clockRev>0?-T_*1.7:0,hr=(S.t/HOUR)%12,mn=(((S.t/HOUR)%1)*60+rv*60%60+600)%60;D.hh.rotation.z=-hr/12*Math.PI*2;D.mh.rotation.z=-mn/60*Math.PI*2}
   // 문 창문 너머 / 문 아래 틈
-  {const g=D.winC.getContext('2d'),w=D.winC.width,h=D.winC.height;g.drawImage(D.winBg,0,0);if(hf<1){g.fillStyle='rgba(0,0,0,.85)';g.fillRect(0,0,w,h)}
+  outLight(hf<1?.1:1);{const g=D.winC.getContext('2d'),w=D.winC.width,h=D.winC.height;g.clearRect(0,0,w,h);
    if(humAtDoor()&&STK.close){const ih=h*1.7,iw=ih*STK.close.width/STK.close.height;g.globalAlpha=.85;g.drawImage(STK.close,w/2-iw/2,-h*.05,iw,ih);g.globalAlpha=1}
    if(S.peek&&S.peek.type==='window'){const p=S.peek.t/1.6;g.fillStyle='rgba(4,3,2,.95)';g.beginPath();g.ellipse(w*(1.25-p*1.5),h*.6,w*.14,h*.45,0,0,7);g.fill()}D.winT.needsUpdate=true}
   {const g=D.gapC.getContext('2d'),w=D.gapC.width,h=D.gapC.height;g.clearRect(0,0,w,h);g.fillStyle=`rgba(255,232,150,${.85*hf})`;g.fillRect(0,0,w,h);if(humAtDoor()){g.clearRect(w*.3,0,w*.12,h);g.clearRect(w*.58,0,w*.12,h)}D.gapT.needsUpdate=true} // 문 앞에 선 발 그림자
@@ -2001,7 +2013,7 @@ function endCut(){
   if(!CUT.id)return;const d=CUT.done,def=CUT.def;CUT.id=null;CUT.done=null;$('cap').classList.remove('show');$('skip').classList.remove('show');
   if(def.after)def.after();
   if(def.area&&CUT.areas[def.area]){disposeCam3D(CUT.areas[def.area]);delete CUT.areas[def.area]} // 한 번 쓰고 버림
-  if(R3.ok){R3.leak.color.setHex(0xffe49a);R3.hemi.color.setHex(0xf3e6bf);R3.dyn.spillF.material.color.setHex(0xffffff);R3.dyn.hinge.rotation.y=0;tally3(S?S.night-1:0);if(S)night3D()}
+  if(R3.ok){outLight(1);R3.leak.color.setHex(0xffe49a);R3.hemi.color.setHex(0xf3e6bf);R3.dyn.spillF.material.color.setHex(0xffffff);R3.dyn.hinge.rotation.y=0;tally3(S?S.night-1:0);if(S)night3D()}
   if(humG&&!S)humG.gain.setTargetAtTime(0,AC.currentTime,.2);if(d)d();
 }
 function cutScene(n){if(n==='room')return R3.sc;const A=CUT.areas[n];return A?A.sc:null}
@@ -2052,7 +2064,7 @@ function walkPath(pts,y=1.62){const V3=R3.T.Vector3,c=new R3.T.CatmullRomCurve3(
 // 인트로: 기둥 방(R1) → 복도(R2) → 경비실 철문이 있는 방(R3). 엔딩: 불 꺼진 경비실 앞 복도, 서진이 있는 옆방, 비상구 계단
 BP.intro=()=>({Hc:2.6,rooms:[[-5,5,2,-10],[-1.1,1.1,-10,-18.5],[1.1,7.5,-11.5,-17.5]],
   walls:[[-5,2,5,2],[-5,2,-5,-4.5],[-5,-5.5,-5,-10],[-5,-4.5,-5,-5.5,2.1],[5,2,5,-7.5],[5,-8.5,5,-10],[5,-7.5,5,-8.5,2.1],[-5,-10,-.55,-10],[.55,-10,5,-10],[-.55,-10,.55,-10,2.1],
-    [-1.1,-10,-1.1,-18.5],[1.1,-10,1.1,-13.6],[1.1,-14.8,1.1,-18.5],[1.1,-11.5,7.5,-11.5],[1.1,-17.5,7.5,-17.5],[7.5,-11.5,7.5,-17.5]],
+    [-1.1,-10,-1.1,-18.5],[1.1,-10,1.1,-13.6],[1.1,-14.8,1.1,-18.5],[1.1,-11.5,7.5,-11.5],[1.1,-17.5,7.5,-17.5],[7.5,-11.5,7.5,-14.0],[7.5,-15.0,7.5,-17.5],[7.5,-14.0,7.5,-15.0,2.15]],
   pil:[[-2.6,-3.0,.6],[2.6,-3.0,.6],[-2.6,-7.4,.6],[2.6,-7.4,.6]],
   dark:[[-5,-5,1,'L'],[5,-8,1,'R'],[0,-18.5,2.2,'F']],
   panels:[...[-3.6,-1.2,1.2,3.6].flatMap(x=>[.6,-1.8,-4.2,-6.6,-9.0].map(z=>[x,z])),[0,-11.4],[0,-13.8],[0,-16.2],[0,-18.0],[2.4,-12.6],[4.8,-12.6],[6.6,-12.6],[2.4,-15.0],[4.8,-15.0],[2.4,-16.8],[4.8,-16.8],[6.6,-16.8]],dead:.08,
@@ -2065,9 +2077,9 @@ BP.intro=()=>({Hc:2.6,rooms:[[-5,5,2,-10],[-1.1,1.1,-10,-18.5],[1.1,7.5,-11.5,-1
     const cab=MS({color:0x0c0c0c,roughness:.5});mesh(new T3.TubeGeometry(new T3.CatmullRomCurve3([new V3(1.15,2.3,-11.52),new V3(7.4,2.3,-11.52),new V3(7.48,2.3,-11.6),new V3(7.48,2.3,-13.6),new V3(7.48,1.8,-13.75)]),60,.012,5),cab,0,0,0,sc,false);
     {const g=grp(7.3,2.4,-11.7,-2.4,sc);BOX(.03,.1,.03,M.dark,0,.07,-.06,g);const cb=BOX(.08,.07,.16,MS({color:0xd8d4c8,roughness:.5}),0,0,0,g);cb.rotation.x=.4;C.dyn.camLed=mesh(new T3.SphereGeometry(.008,8,8),new T3.MeshBasicMaterial({color:0xee2222,fog:false}),0,-.02,.085,g,false)}
     // 철문: 노란 벽에 콘크리트를 덧바르고 철판 문을 박음
-    {const g=grp(7.48,0,-14.5,-PI2,sc);mesh(new T3.PlaneGeometry(1.8,2.5),MS({map:tx3(T.conc,1,1.3),roughness:.95,color:0x9a9890}),0,1.25,.005,g,false);
+    {const g=grp(7.435,0,-14.5,-PI2,sc),cM=MS({map:tx3(T.conc,.3,1.3),roughness:.95,color:0x9a9890});[[-.7,1.25,.4,2.5],[.7,1.25,.4,2.5],[0,2.33,1.0,.34]].forEach(([x,y,w,h])=>mesh(new T3.PlaneGeometry(w,h),cM,x,y,.003,g,false)); // 출입구 둘레에 덧바른 콘크리트
+     {const rm=mesh(new T3.BoxGeometry(2.4,2.3,1.6),new T3.MeshBasicMaterial({map:c3cv('inside3',64,64,(q,w,h)=>{const gr=q.createLinearGradient(0,0,0,h);gr.addColorStop(0,'#f2f5ff');gr.addColorStop(1,'#9aa2b0');q.fillStyle=gr;q.fillRect(0,0,w,h)}),side:T3.BackSide,fog:false}),0,1.15,-1.3,g,false)} // 문 너머 차가운 흰빛 방
      BOX(.07,2.2,.07,M.dark,-.53,1.1,.03,g);BOX(.07,2.2,.07,M.dark,.53,1.1,.03,g);BOX(1.13,.07,.07,M.dark,0,2.2,.03,g);
-     mesh(new T3.PlaneGeometry(1.0,2.1),new T3.MeshBasicMaterial({map:c3cv('inside2',64,128,(q,w,h)=>{q.fillStyle='#0c0e12';q.fillRect(0,0,w,h);const gr=q.createLinearGradient(0,0,w,0);gr.addColorStop(0,'rgba(230,236,255,0)');gr.addColorStop(.6,'rgba(230,236,255,.75)');gr.addColorStop(1,'rgba(230,236,255,.2)');q.fillStyle=gr;q.fillRect(0,h*.1,w,h*.9)})}),0,1.05,.007,g,false);
      const hg=grp(-.5,0,.03,0,g),dr=grp(.5,0,0,0,hg);BOX(1.0,2.1,.05,M.metal2,0,1.05,0,dr);BOX(.6,.05,.06,M.grey,0,1.0,.04,dr);C.dyn.door=hg;
      mesh(new T3.PlaneGeometry(.6,.13),MS({map:c3cv('stencilG',512,96,stencilDraw),transparent:true,roughness:.8}),0,1.7,.03,dr,false);
      const kp=grp(.68,1.2,.02,0,g);BOX(.12,.15,.03,MS({color:0x24241f,roughness:.6}),0,0,0,kp);C.dyn.kLed=mesh(new T3.SphereGeometry(.007,8,8),new T3.MeshBasicMaterial({color:0x29c23a,fog:false}),0,-.05,.017,kp,false);
@@ -2113,7 +2125,7 @@ function humTo(v,tc=.3){if(humG)humG.gain.setTargetAtTime(v,AC.currentTime,tc)}
 // 경비실 장면 연출값 (컷씬에서 게임 상태 대신)
 const RC={};
 // 6시 소등 컷: 창문 너머 바깥 불빛과 문틈을 직접 그림
-function winCut(k,green){const D=R3.dyn,g=D.winC.getContext('2d'),w=D.winC.width,h=D.winC.height;g.drawImage(D.winBg,0,0);if(k<1){g.fillStyle=`rgba(0,0,0,${1-k})`;g.fillRect(0,0,w,h)}if(k>1){g.fillStyle=`rgba(255,248,215,${Math.min(.8,(k-1))})`;g.fillRect(0,0,w,h)}if(green){g.fillStyle=`rgba(40,255,110,${green*.7})`;g.fillRect(0,0,w,h)}D.winT.needsUpdate=true;
+function winCut(k,green){const D=R3.dyn,g=D.winC.getContext('2d'),w=D.winC.width,h=D.winC.height;g.clearRect(0,0,w,h);outLight(k,green);D.winT.needsUpdate=true;
   const q=D.gapC.getContext('2d');q.clearRect(0,0,D.gapC.width,D.gapC.height);q.fillStyle=green?`rgba(60,255,120,${green})`:`rgba(255,232,150,${.85*Math.min(1,k)})`;q.fillRect(0,0,D.gapC.width,D.gapC.height);D.gapT.needsUpdate=true}
 // 책상 CRT에 구역 지도: 비상구가 들어온 칸이 초록으로 깜빡임
 function crtMap(zone,blink){const g=R3.scrC.getContext('2d'),w=R3.scrC.width,h=R3.scrC.height;g.fillStyle='#160e04';g.fillRect(0,0,w,h);g.strokeStyle='rgba(255,186,90,.5)';g.lineWidth=2;const P=MAPP.map(([x,y])=>[w*(.1+x/100*.8),h*(.08+y/75*.84)]);
