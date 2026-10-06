@@ -92,6 +92,12 @@ body[data-mode=menu] #menu{display:flex}
 #mHard{color:#e09a8a}#mHard small{font-size:.6em;opacity:.7;margin-left:10px;letter-spacing:.05em}
 #menu .foot{position:fixed;left:9vw;right:9vw;bottom:18px;font-size:12px;opacity:.35}
 #menu .foot.warn{opacity:.75;color:#d9b36a}
+#cap{position:fixed;left:50%;bottom:13%;transform:translateX(-50%);width:max-content;max-width:84%;text-align:center;font-family:'Nanum Myeongjo',serif;font-size:clamp(16px,2.6vw,24px);letter-spacing:.06em;line-height:1.6;color:#efe6cc;text-shadow:0 0 10px #000,0 0 3px #000;opacity:0;transition:opacity 1.1s;pointer-events:none;z-index:4;display:none}
+#cap.show{opacity:1}
+body[data-mode=cut] #cap{display:block}
+#skip{position:fixed;right:18px;bottom:16px;z-index:6;display:none;font-size:13px;letter-spacing:.12em;color:#d8d0b8;background:rgba(0,0,0,.45);border:1px solid rgba(220,210,180,.3);padding:6px 16px;opacity:.75}
+body[data-mode=cut] #skip.show{display:block}
+body[data-mode=cut] #camOff,body[data-mode=cut] #camRep{display:none!important}
 .glitch{text-shadow:4px 0 rgba(255,30,30,.55),-4px 0 rgba(30,255,255,.45)!important;transform:translateX(3px) skewX(-4deg)}
 @keyframes flick{0%,100%{opacity:1}41%{opacity:1}42%{opacity:.35}43%{opacity:1}70%{opacity:.9}71%{opacity:.2}72%{opacity:.85}}
 
@@ -107,7 +113,6 @@ body[data-mode=menu] #menu{display:flex}
 #dbg pre{margin:0;font:inherit;white-space:pre-wrap}
 #dbg .row{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
 #dbg button{font-size:11px;padding:4px 7px;min-height:30px;min-width:30px}
-#rot{display:none!important}
 /* 세로 화면이면 body를 90도 돌려서 가로 게임 화면으로 (안의 fixed 요소는 body 기준이 됨) */
 html.rot body{position:fixed;top:0;left:0;transform-origin:0 0;transform:rotate(90deg) translateY(-100%)}
 #map{position:fixed;right:12px;bottom:12px;width:300px;height:225px;z-index:3;display:none;background:rgba(4,10,6,.62);border:1px solid rgba(170,220,170,.35)}
@@ -204,7 +209,7 @@ body:not([data-mode=game]) #map{display:none!important}
 <div class="ov" id="brkp"><div class="cab"><div class="cab-h"><span class="bpt">MAIN BREAKER</span><span class="hv"><span>⚡ 고압 위험</span></span></div><div class="bhint">빨간 불이 켜진 스위치를 모두 올린 뒤, 메인 레버를 끝까지 누르고 있기</div><div id="bsw"></div><div class="mrow"><button id="blever"><span class="knob"></span><span>메인 레버<small>누르고 있기</small></span></button><div class="bbar"><i id="bprog"></i></div></div><button id="bclose">배전반 문 닫기</button></div></div>
 <div class="ov" id="log"><div class="sheet"><div id="logText"></div><button id="logClose">일지 덮기</button></div></div>
 <div class="ov" id="end"><h1 id="endTitle"></h1><pre id="endText"></pre><div style="display:flex;gap:8px"><button id="endBtn"></button><button id="endMenu">메인 메뉴</button></div></div>
-<div id="rot">가로 모드로 플레이하는 걸 권장합니다</div>
+<div id="cap"></div><button id="skip">건너뛰기</button>
 
 <script type="module">import('./lib/three.module.min.js').then(m=>{window.THREE=m},e=>{window.THREE_ERR=String(e&&e.message||e)}).then(()=>dispatchEvent(new Event('three')))</script>
 <script nomodule>window.THREE_ERR='nomodule'</script>
@@ -1651,7 +1656,7 @@ function c3mats(){
     dark:k({color:0x141210,roughness:.8}),black:k({color:0x040404,roughness:.9}),grey:k({color:0x6a685f,roughness:.5,metalness:.4}),
     base:k({color:0x2a1e10,roughness:.7}),pipe:k({color:0x3e3c34,roughness:.5,metalness:.6}),
     water:k({color:0x0e0d09,roughness:.06,metalness:.2}),paper:k({color:0xcfc8b0,roughness:.9,side:T3.DoubleSide}),
-    housing:k({color:0x1c1b17,roughness:.6}),tubeOn:Object.assign(new T3.MeshBasicMaterial({color:0xfff6dc}),{userData:{keep:true}}),tubeOff:Object.assign(new T3.MeshBasicMaterial({color:0x34322a}),{userData:{keep:true}})};
+    housing:k({color:0x1c1b17,roughness:.6}),panelOn:Object.assign(new T3.MeshBasicMaterial({color:0xfff4d6}),{userData:{keep:true}}),tubeOn:Object.assign(new T3.MeshBasicMaterial({color:0xfff6dc}),{userData:{keep:true}}),tubeOff:Object.assign(new T3.MeshBasicMaterial({color:0x34322a}),{userData:{keep:true}})};
   C3.unit=new T3.PlaneGeometry(1,1);return C3.M;
 }
 // 의자 (사무실 책상, 쓰러진 의자, 복도 한가운데 놓인 의자)
@@ -1785,6 +1790,78 @@ function drawCam3D(g,C,i,menu,t){
   if(hum===2)drawSpot(g,{spots:[0,0,{pose:'close'}]},2,1,t);
   if(!menu&&S.night>=2&&S.gaze.cam===i)drawGazer(g,eye3(C),S.gaze.p,t);
 }
+
+// ===================== 백룸 미로 도우미 =====================
+// 벽 조각을 하나의 도형으로 합쳐 그리기 호출을 줄임 (벽 수십 개 → 1번)
+function mergeGeo(list){
+  const T3=R3.T;let nv=0,ni=0;list.forEach(g=>{nv+=g.attributes.position.count;ni+=g.index?g.index.count:g.attributes.position.count});
+  const P=new Float32Array(nv*3),N=new Float32Array(nv*3),U=new Float32Array(nv*2),I=new (nv>65535?Uint32Array:Uint16Array)(ni);let ov=0,oi=0;
+  list.forEach(g=>{const p=g.attributes.position;P.set(p.array,ov*3);N.set(g.attributes.normal.array,ov*3);U.set(g.attributes.uv.array,ov*2);
+    if(g.index){const a=g.index.array;for(let k=0;k<a.length;k++)I[oi+k]=a[k]+ov;oi+=a.length}else{for(let k=0;k<p.count;k++)I[oi+k]=ov+k;oi+=p.count}ov+=p.count;g.dispose()});
+  const m=new T3.BufferGeometry();m.setAttribute('position',new T3.BufferAttribute(P,3));m.setAttribute('normal',new T3.BufferAttribute(N,3));m.setAttribute('uv',new T3.BufferAttribute(U,2));m.setIndex(new T3.BufferAttribute(I,1));m.computeBoundingSphere();return m;
+}
+// (x0,z0)→(x1,z1) 사이에 선 벽 (축 방향만). 세계 좌표 UV라 벽지 무늬가 이어짐
+function wallGeo(x0,z0,x1,z1,h,th=.14,y0=0){const g=new R3.T.BoxGeometry(Math.hypot(x1-x0,z1-z0)+th,h,th);g.rotateY(-Math.atan2(z1-z0,x1-x0));g.translate((x0+x1)/2,y0+h/2,(z0+z1)/2);return wUV(g,3.9,2.6)}
+// 천장 매입 형광등 패널 (천장 타일 격자 0.6m에 맞춤). 켜진 것/꺼진 것 두 묶음으로 한 번에 그림
+function panels3(par,pts,Hc){
+  const T3=R3.T,M=C3.M,g=new T3.BoxGeometry(.56,.02,1.16),o=new T3.Object3D(),out={};
+  [['on',M.panelOn],['off',M.tubeOff]].forEach(([k,mat])=>{const P=pts.filter(p=>(k==='on')===p.on);if(!P.length)return;const im=new T3.InstancedMesh(g,mat,P.length);
+    P.forEach((p,i)=>{o.position.set(p.x,Hc-.012,p.z);o.rotation.y=p.r||0;o.updateMatrix();im.setMatrixAt(i,o.matrix)});par.add(im);out[k]=im});
+  return out;
+}
+
+// ===================== 컷씬 =====================
+// 샷 목록을 시간 순서대로 재생. 샷 = {d:길이(초), scene:'maze'|'room'|null, cam(u,t,C):카메라 배치, cap:자막, at:{초:함수} 소리·연출, fi/fo:페이드}
+// 3D가 안 되면 검은 화면에 자막만 나옴. 화면을 누르면 건너뛰기 버튼이 잠깐 나타남
+const CUT={id:null};
+function playCut(id,done){
+  const def=CUTS[id];if(!def){if(done)done();return}
+  initAudio();if(staticG)staticG.gain.setTargetAtTime(0,AC.currentTime,.1);
+  Object.assign(CUT,{id,def,done,t:0,i:-1,fired:{},cap:null});
+  if(R3.ok){if(!CUT.cam){CUT.cam=new R3.T.PerspectiveCamera(62,W/H,.03,120);CUT.cam.rotation.order='YXZ'}if(def.prep)def.prep()}
+  $('cap').textContent='';$('cap').classList.remove('show');setMode('cut');
+}
+function endCut(){
+  if(!CUT.id)return;const d=CUT.done,def=CUT.def;CUT.id=null;CUT.done=null;$('cap').classList.remove('show');$('skip').classList.remove('show');
+  if(def.after)def.after();if(humG&&!S)humG.gain.setTargetAtTime(0,AC.currentTime,.2);if(d)d();
+}
+function cutScene(n){if(n==='room')return R3.sc;if(n==='maze'){if(!CUT.maze)CUT.maze=buildCutMaze();return CUT.maze.sc}return null}
+function renderCut(dt){
+  const def=CUT.def;CUT.t+=dt;let t=CUT.t,i=0;
+  while(i<def.shots.length&&t>=def.shots[i].d){t-=def.shots[i].d;i++}
+  if(i>=def.shots.length){endCut();return}
+  const sh=def.shots[i],u=t/sh.d;
+  if(CUT.i!==i){CUT.i=i;CUT.fired={};if(sh.cap!==undefined&&sh.cap!==CUT.cap){CUT.cap=sh.cap;const c=$('cap');c.classList.remove('show');if(sh.cap)setTimeout(()=>{if(CUT.cap===sh.cap){c.textContent=sh.cap;c.classList.add('show')}},sh.capDelay??350)}}
+  if(sh.at)for(const k in sh.at)if(t>=+k&&!CUT.fired[k]){CUT.fired[k]=1;sh.at[k]()}
+  cx.fillStyle='#000';cx.fillRect(0,0,W,H);
+  const sc=R3.ok?cutScene(sh.scene):null;
+  if(sc&&sh.cam){const C=CUT.cam;C.aspect=W/H;C.fov=W/H<1.5?72:62;C.updateProjectionMatrix();sh.cam(u,t,C);if(sh.scene==='room')roomCut(sh.room||{},u,t);else if(CUT.maze&&CUT.maze.tick)CUT.maze.tick(t,sh);
+    R3.rd.setViewport(0,0,W,H);R3.rd.render(sc,C);cx.drawImage(R3.rd.domElement,0,0,W,H)}
+  // 필름 질감: 노이즈, 비네트, 위아래 검은 띠, 페이드
+  cx.save();cx.globalAlpha=.07;cx.translate(rnd(-128,0),rnd(-128,0));cx.fillStyle=NPm[ri(4)];cx.fillRect(0,0,W+128,H+128);cx.restore();
+  cx.drawImage(VIG,0,0,W,H);
+  const bar=H*.09;cx.fillStyle='#000';cx.fillRect(0,0,W,bar);cx.fillRect(0,H-bar,W,bar);
+  let a=0;if(sh.fi)a=Math.max(a,1-t/sh.fi);if(sh.fo)a=Math.max(a,1-(sh.d-t)/sh.fo);if(sh.black)a=1;
+  if(a>0){cx.fillStyle=`rgba(0,0,0,${Math.min(1,a)})`;cx.fillRect(0,0,W,H)}
+}
+// 경비실 장면을 컷씬에서 쓸 때: 조명·모니터를 게임 상태 대신 샷 설정으로
+function roomCut(o,u,t){
+  const on=typeof o.light==='function'?o.light(u,t):o.light??true;
+  R3.spot.intensity=on?52:0;R3.fill.intensity=on?1.1:0;R3.tube.material.color.setHex(on?0xfff6dc:0x1a1a16);R3.hemi.intensity=on?.26:.05;
+  R3.monL.intensity=o.mon?.12:0;const g=R3.scrC.getContext('2d'),w=R3.scrC.width,h=R3.scrC.height;g.fillStyle=o.mon?'#08160c':'#020302';g.fillRect(0,0,w,h);
+  if(o.mon){g.fillStyle='rgba(120,220,140,.8)';g.font=`${h*.085}px VT323,monospace`;g.textAlign='left';g.textBaseline='top';const L=o.monText||[];L.forEach((s,k)=>{if(u*L.length*1.4>k)g.fillText(s,w*.07,h*(.1+k*.12))})}
+  R3.scrT.needsUpdate=true;R3.dyn.shadow.visible=false;R3.dyn.bars.forEach(b=>b.visible=false);
+}
+// 컷씬 카메라 도우미: 점 목록을 부드럽게 잇는 경로를 걸어감 (걸음에 맞춰 머리가 흔들림)
+function walkPath(pts,y=1.62){const V3=R3.T.Vector3,c=new R3.T.CatmullRomCurve3(pts.map(p=>new V3(p[0],y,p[1])));return c}
+function camWalk(C,curve,u,o={}){
+  const T3=R3.T,e=o.ease?ease(u):u,p=curve.getPointAt(Math.min(1,e)),q=curve.getPointAt(Math.min(1,e+.02));
+  const step=e*curve.getLength()/.75,bob=o.still?0:Math.sin(step*Math.PI)*.025,sway=o.still?0:Math.sin(step*Math.PI/2)*.012;
+  C.position.set(p.x+sway,p.y+bob,p.z);const yaw=Math.atan2(-(q.x-p.x),-(q.z-p.z))+(o.yaw||0);C.rotation.set((o.pitch||-.03)+bob*.3,yaw,sway*.6);
+}
+
+const CUTS={};
+function buildCutMaze(){return null}
 
 // ===================== 게임 화면 그리기 =====================
 const SPOTS=[[.8,.95],[.06,.98],[.88,.96]]; // 그림자가 서는 자리 (방향별)
@@ -2103,6 +2180,9 @@ resize();
 
 // ===================== 입력 =====================
 $('logClose').onclick=closeLog;
+$('skip').onclick=e=>{e.stopPropagation();endCut()};
+addEventListener('pointerdown',()=>{if(mode==='cut'){const b=$('skip');b.classList.add('show');clearTimeout(b._t);b._t=setTimeout(()=>b.classList.remove('show'),3000)}});
+addEventListener('keydown',e=>{if(mode==='cut'&&(e.key==='Escape'||e.key===' '))endCut()});
 $('log').addEventListener('click',e=>{if(e.target.id==='log')closeLog()}); // 종이 바깥을 눌러도 덮힘
 $('camOff').onclick=e=>{e.stopPropagation();if(S&&S.mon)toggleMon()};
 $('camRep').onclick=e=>{e.stopPropagation();reportCam()};
@@ -2210,7 +2290,8 @@ function loop(ts){
     if(S&&mode==='game')drawEKG(dt);
     if(S&&DEV.on&&DEV.info)updDbg();
     if(S&&S.mon)updMapDot();
-  }else renderStatic();
+  }else if(mode==='cut'&&CUT.id)renderCut(dt);
+  else renderStatic();
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
