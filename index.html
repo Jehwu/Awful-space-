@@ -527,8 +527,7 @@ function buildCam(l){
   const mid=I.op?{pose:'peek',side:I.op.side,ex:I.op.a.x,x:I.op.a.x,y:I.op.a.bot,hh:(I.op.a.bot-I.op.a.top)*.88}:{pose:'stand',x:fm.x,y:fm.y,hh:fm.hh*.95};
   I.spots=[{pose:'stand',x:far.x,y:far.y,hh:far.hh*.95},mid,{pose:'close'}];
   I.seat=floorAt(G,.3,.68);I.fakeA=floorAt(G,.55,.32);
-  I.eye={x:bx+bw*.5,y:by+bh*(open?.12:.42),s:bh};
-  I.eyeOff=[[0,0],[-.35,-.08],[.33,.12],[-.18,.3]];
+  I.eye={x:bx+bw*.5,y:by+bh*(open?.5:.42),s:bh};
   return{c,info:I};
 }
 function buildCams(){if(S)CAMB=S.layout.map(l=>buildCam(l))}
@@ -566,7 +565,7 @@ function drawStalker(g,x,y,h,a,t,pose){
   g.restore();
 }
 // 응시자·그림자·복제자 AI 이미지
-const PIC={};[['gz1','gazer_1'],['gz2','gazer_2'],['gz3','gazer_3'],['sh1','shadow_1'],['sh2','shadow_2'],['sh3','shadow_3'],['cseat','clone_seat'],['cstand','clone_stand'],['cface','clone_face']].forEach(([k,f])=>{const im=new Image();im.onload=()=>{PIC[k]=im};im.src='img/'+f+'.png'});
+const PIC={};[['sh1','shadow_1'],['sh2','shadow_2'],['sh3','shadow_3'],['cseat','clone_seat'],['cstand','clone_stand'],['cface','clone_face']].forEach(([k,f])=>{const im=new Image();im.onload=()=>{PIC[k]=im};im.src='img/'+f+'.png'});
 // 교대자 AI 이미지 (img 폴더). 못 불러오면 코드로 그린 버전 사용
 const STK={},PEEK_EDGE=.2985; // peek 이미지에서 벽 모서리 위치(가로 비율)
 ['full','peek','close'].forEach(k=>{const im=new Image();im.onload=()=>{STK[k]=im};im.src='img/stalker_'+k+'.png'});
@@ -598,6 +597,27 @@ function drawEye(g,x,y,s,a,p,t,k){
   g.restore();
   g.strokeStyle='#160b05';g.lineWidth=s*.09;g.beginPath();g.ellipse(0,0,ew,eh,0,0,7);g.stroke();
   g.restore();
+}
+// 응시자: 눈 이미지 1장을 계속 키우고 눈꺼풀을 벌림. img/gazer.png 가 없으면 점프스케어 눈을 씀
+// px,py,pr = 이미지 안에서 동공 중심과 반지름(비율). 동공이 점점 커지는 효과에 사용
+const GZ={};
+function gzPrep(im,px,py,pr){const c=mk(im.width,im.height),g=c.getContext('2d'),w=im.width,h=im.height,r=Math.min(w,h)/2;g.filter='brightness(1.9) contrast(1.4)';g.drawImage(im,0,0);g.filter='none'; // CCTV 흑백 처리 후에도 흰자가 잘 보이게
+  g.globalCompositeOperation='destination-in';const gr=g.createRadialGradient(w/2,h/2,r*.6,w/2,h/2,r);gr.addColorStop(0,'#000');gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(0,0,w,h); // 가장자리를 어둠 속으로 흐리게
+  return{c,px,py,pr}}
+[['a','img/gazer.png',.5,.5,.1],['b','jumpscare/gazer.png',.556,.478,.105]].forEach(([k,f,px,py,pr])=>{const im=new Image();im.onload=()=>{GZ[k]=gzPrep(im,px,py,pr)};im.src=f});
+function drawGazer(g,e,p,t){
+  const q=Math.min(1,p/100),E=GZ.a||GZ.b;
+  const h=e.s*.75+(CH*1.7-e.s*.75)*Math.pow(q,1.7)*(1+Math.sin(t*2.6)*.015); // 바라볼수록 계속 커짐
+  const sh=q*q*h*.012,x=lerp(e.x,CW/2,q*q)+Math.sin(t*23)*sh+(q>.7?rnd(-1,1)*sh:0),y=lerp(e.y,CH*.45,q*q)+Math.cos(t*19)*sh;
+  const bl=p<60&&(t*.37+e.x)%5<.12?.06:1,open=Math.min(1,.55+q*1.1)*bl; // 가끔 깜빡임, 점점 크게 뜸
+  g.save();
+  const hole=g.createRadialGradient(x,y,0,x,y,h*.62);hole.addColorStop(0,'rgba(0,0,0,.95)');hole.addColorStop(.7,'rgba(0,0,0,.7)');hole.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=hole;g.fillRect(x-h*.62,y-h*.62,h*1.24,h*1.24); // 눈 주위 어둠
+  g.beginPath();g.ellipse(x,y,h*.5,Math.max(1,h*.34*open),0,0,7);g.clip();
+  if(E){const w=h*E.c.width/E.c.height;g.drawImage(E.c,x-w/2,y-h/2,w,h);
+    const ux=x-w/2+w*E.px,uy=y-h/2+h*E.py,ur=w*E.pr*(1+q*.4),pg=g.createRadialGradient(ux,uy,0,ux,uy,ur);pg.addColorStop(0,'rgba(0,0,0,.95)');pg.addColorStop(.8,'rgba(0,0,0,.85)');pg.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=pg;g.beginPath();g.arc(ux,uy,ur,0,7);g.fill()} // 동공이 넓어짐
+  else drawEye(g,x,y,h*.45,1,p,t,0);
+  g.restore();
+  g.save();g.globalCompositeOperation='lighter';const gl=g.createRadialGradient(x,y,0,x,y,h*.55);gl.addColorStop(0,`rgba(230,240,220,${.06+q*.08})`);gl.addColorStop(1,'rgba(230,240,220,0)');g.fillStyle=gl;g.fillRect(x-h*.55,y-h*.55,h*1.1,h*1.1);g.restore(); // CCTV에서 잘 보이도록 은은한 빛
 }
 function drawShadowFig(g,x,y,h,a){
   g.save();g.globalAlpha=a;g.fillStyle='#000';g.strokeStyle='#000';g.shadowColor='#000';g.shadowBlur=h*.06;
@@ -1115,11 +1135,9 @@ function renderCam(i,menu){
   g.globalCompositeOperation='source-over';g.globalAlpha=1;g.drawImage(B.c,0,0);
   if(!menu){
     if(S.hum.node===i)drawSpot(g,I,S.hum.spot,1,t);
-    if(S.night>=2&&S.gaze.cam===i){const e=I.eye,gp=S.gaze.p,im=gp<40?PIC.gz1:gp<75?PIC.gz2:PIC.gz3;
-      if(im){const h=e.s*(gp<40?.5:gp<75?.8:1.15)*(1+gp/500),w=h*im.width/im.height;g.save();g.globalAlpha=Math.min(1,.6+gp/100);g.drawImage(im,e.x-w/2+Math.sin(t*11)*gp/50,e.y-h/2,w,h);g.restore()}
-      else{const n=1+Math.floor(gp/30);for(let k=0;k<n&&k<4;k++){const o=I.eyeOff[k];drawEye(g,e.x+o[0]*e.s,e.y+o[1]*e.s,e.s*.11*(k?.6:1),1,gp,t,k)}}}
-    if(S.night>=4&&S.clone.cam===i){const a=I.seat;if(PIC.cseat){const h=a.hh*.78,w=h*PIC.cseat.width/PIC.cseat.height;g.drawImage(PIC.cseat,a.x-w/2,a.y-h,w,h)}else drawCloneFig(g,a.x,a.y,a.hh*.8,1,t)}
-    if(S.fake.cam===i){const a=I.fakeA;g.save();g.translate(rnd(-3,3),0);S.fake.type==='hum'?stalkerFull(g,a.x,a.y,a.hh*.95,.7,t):(PIC.cstand?(()=>{const h=a.hh*.85,w=h*PIC.cstand.width/PIC.cstand.height;g.globalAlpha=.7;g.drawImage(PIC.cstand,a.x-w/2,a.y-h,w,h);g.globalAlpha=1})():drawCloneFig(g,a.x,a.y,a.hh*.8,.7,t));g.restore()}
+    if(S.night>=2&&S.gaze.cam===i)drawGazer(g,I.eye,S.gaze.p,t);
+    if(S.night>=4&&S.clone.cam===i){const a=I.seat;if(PIC.cseat){const h=a.hh*.66,w=h*PIC.cseat.width/PIC.cseat.height;g.drawImage(PIC.cseat,a.x-w/2,a.y-h,w,h)}else drawCloneFig(g,a.x,a.y,a.hh*.8,1,t)}
+    if(S.fake.cam===i){const a=I.fakeA;g.save();g.translate(rnd(-3,3),0);S.fake.type==='hum'?stalkerFull(g,a.x,a.y,a.hh*.95,.7,t):(PIC.cstand?(()=>{const h=a.hh*.9,w=h*PIC.cstand.width/PIC.cstand.height;g.globalAlpha=.7;g.drawImage(PIC.cstand,a.x-w/2,a.y-h,w,h);g.globalAlpha=1})():drawCloneFig(g,a.x,a.y,a.hh*.8,.7,t));g.restore()}
   }else{
     const cyc=menuT%13;
     if(cyc>8&&cyc<10&&Math.random()>.12){const a=I.far;stalkerFull(g,a.x,a.y,a.hh*.95,1,t)}
