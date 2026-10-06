@@ -601,10 +601,10 @@ function drawEye(g,x,y,s,a,p,t,k){
 // 응시자: 눈 이미지 1장을 계속 키우고 눈꺼풀을 벌림. img/gazer.png 가 없으면 점프스케어 눈을 씀
 // px,py,pr = 이미지 안에서 동공 중심과 반지름(비율). 동공이 점점 커지는 효과에 사용
 const GZ={};
-function gzPrep(im,px,py,pr){const c=mk(im.width,im.height),g=c.getContext('2d'),w=im.width,h=im.height,r=Math.min(w,h)/2;g.filter='brightness(1.9) contrast(1.4)';g.drawImage(im,0,0);g.filter='none'; // CCTV 흑백 처리 후에도 흰자가 잘 보이게
-  g.globalCompositeOperation='destination-in';const gr=g.createRadialGradient(w/2,h/2,r*.6,w/2,h/2,r);gr.addColorStop(0,'#000');gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(0,0,w,h); // 가장자리를 어둠 속으로 흐리게
+function gzPrep(im,px,py,pr,fl){const c=mk(im.width,im.height),g=c.getContext('2d'),w=im.width,h=im.height,r=Math.min(w,h)/2;g.filter=fl;g.drawImage(im,0,0);g.filter='none'; // CCTV 흑백 처리 후에도 흰자가 잘 보이게
+  g.globalCompositeOperation='destination-in';const gr=g.createRadialGradient(w/2,h/2,r*.75,w/2,h/2,r);gr.addColorStop(0,'#000');gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(0,0,w,h); // 가장자리를 어둠 속으로 흐리게
   return{c,px,py,pr}}
-[['a','img/gazer.png',.5,.5,.1],['b','jumpscare/gazer.png',.556,.478,.105]].forEach(([k,f,px,py,pr])=>{const im=new Image();im.onload=()=>{GZ[k]=gzPrep(im,px,py,pr)};im.src=f});
+[['a','img/gazer.png',.496,.484,.08,'contrast(1.15)'],['b','jumpscare/gazer.png',.556,.478,.105,'brightness(1.9) contrast(1.4)']].forEach(([k,f,px,py,pr,fl])=>{const im=new Image();im.onload=()=>{GZ[k]=gzPrep(im,px,py,pr,fl)};im.src=f});
 function drawGazer(g,e,p,t){
   const q=Math.min(1,p/100),E=GZ.a||GZ.b;
   const h=e.s*.75+(CH*1.7-e.s*.75)*Math.pow(q,1.7)*(1+Math.sin(t*2.6)*.015); // 바라볼수록 계속 커짐
@@ -628,6 +628,7 @@ function drawShadowFig(g,x,y,h,a){
   g.restore();
 }
 function shadowEyes(g,x,y,h,a){g.fillStyle=`rgba(225,225,205,${a})`;g.shadowColor='#fff';g.shadowBlur=6;[-1,1].forEach(s=>{g.beginPath();g.arc(x+h*.01+s*h*.024,y-h*.95,h*.006,0,7);g.fill()});g.shadowBlur=0}
+function footShadow(g,x,y,w,a){g.save();g.globalAlpha=a;g.translate(x,y);g.scale(1,.18);const sg=g.createRadialGradient(0,0,0,0,0,w*.6);sg.addColorStop(0,'rgba(0,0,0,.6)');sg.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=sg;g.beginPath();g.arc(0,0,w*.6,0,7);g.fill();g.restore()} // 바닥에 붙어 보이게
 function drawCloneFig(g,x,y,h,a,t){
   g.save();g.translate(x,y);g.globalAlpha=a;
   g.fillStyle='#0b0a08';g.fillRect(-h*.17,-h*.76,h*.34,h*.46);
@@ -1136,8 +1137,8 @@ function renderCam(i,menu){
   if(!menu){
     if(S.hum.node===i)drawSpot(g,I,S.hum.spot,1,t);
     if(S.night>=2&&S.gaze.cam===i)drawGazer(g,I.eye,S.gaze.p,t);
-    if(S.night>=4&&S.clone.cam===i){const a=I.seat;if(PIC.cseat){const h=a.hh*.66,w=h*PIC.cseat.width/PIC.cseat.height;g.drawImage(PIC.cseat,a.x-w/2,a.y-h,w,h)}else drawCloneFig(g,a.x,a.y,a.hh*.8,1,t)}
-    if(S.fake.cam===i){const a=I.fakeA;g.save();g.translate(rnd(-3,3),0);S.fake.type==='hum'?stalkerFull(g,a.x,a.y,a.hh*.95,.7,t):(PIC.cstand?(()=>{const h=a.hh*.9,w=h*PIC.cstand.width/PIC.cstand.height;g.globalAlpha=.7;g.drawImage(PIC.cstand,a.x-w/2,a.y-h,w,h);g.globalAlpha=1})():drawCloneFig(g,a.x,a.y,a.hh*.8,.7,t));g.restore()}
+    if(S.night>=4&&S.clone.cam===i){const a=I.seat;if(PIC.cseat){const h=a.hh*.5,w=h*PIC.cseat.width/PIC.cseat.height;footShadow(g,a.x,a.y,w,1);g.drawImage(PIC.cseat,a.x-w/2,a.y-h,w,h)}else drawCloneFig(g,a.x,a.y,a.hh*.8,1,t)}
+    if(S.fake.cam===i){const a=I.fakeA;g.save();g.translate(rnd(-3,3),0);S.fake.type==='hum'?stalkerFull(g,a.x,a.y,a.hh*.95,.7,t):(PIC.cstand?(()=>{const h=a.hh*.68,w=h*PIC.cstand.width/PIC.cstand.height;footShadow(g,a.x,a.y,w,.7);g.globalAlpha=.7;g.drawImage(PIC.cstand,a.x-w/2,a.y-h,w,h);g.globalAlpha=1})():drawCloneFig(g,a.x,a.y,a.hh*.8,.7,t));g.restore()}
   }else{
     const cyc=menuT%13;
     if(cyc>8&&cyc<10&&Math.random()>.12){const a=I.far;stalkerFull(g,a.x,a.y,a.hh*.95,1,t)}
