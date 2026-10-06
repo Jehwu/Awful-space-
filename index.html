@@ -418,9 +418,7 @@ function deskBase(g,G,I){
   {const x=bx+bw*.3,y=by+bh*.06,ww=bw*.1,hh=bh*.18;
    g.strokeStyle='#2a2418';g.lineWidth=1;g.beginPath();g.moveTo(x+ww*.35,y);g.lineTo(x+ww*.5,y-U*3);g.lineTo(x+ww*.65,y);g.stroke();screw(g,x+ww*.5,y-U*3,U*.7);
    wallShadow(g,x,y,ww,hh,.7);paper(g,x,y,ww,hh,'#dcd5bf',2);
-   g.fillStyle='#7a1612';g.fillRect(x,y,ww,hh*.2);g.fillStyle='#f0e8d8';g.font=`bold ${hh*.13}px 'Nanum Gothic Coding',monospace`;g.textBaseline='middle';g.textAlign='center';g.fillText('10월',x+ww/2,y+hh*.1);g.textAlign='left';
-   g.strokeStyle='rgba(0,0,0,.18)';g.lineWidth=.6;for(let k=1;k<7;k++){g.beginPath();g.moveTo(x+ww*k/7,y+hh*.24);g.lineTo(x+ww*k/7,y+hh*.95);g.stroke()}for(let k=0;k<5;k++){g.beginPath();g.moveTo(x,y+hh*(.24+k*.14));g.lineTo(x+ww,y+hh*(.24+k*.14));g.stroke()}
-   g.strokeStyle='rgba(160,20,15,.8)';g.lineWidth=U*.45;for(let i=0;i<Math.min(30,20+(S?S.night:1));i++){const cx3=x+ww*((i%7)+.5)/7,cy3=y+hh*(.31+Math.floor(i/7)*.14),s3=ww*.04;g.beginPath();g.moveTo(cx3-s3,cy3-s3);g.lineTo(cx3+s3,cy3+s3);g.moveTo(cx3+s3,cy3-s3);g.lineTo(cx3-s3,cy3+s3);g.stroke()}
+   g.strokeStyle='#2a2a2a';g.lineWidth=U*.5;g.lineCap='round';{const r=mulberry(77),n=S?S.night-1:0;[3,2,4,1,4,n].forEach((c,k)=>tallyStrokes(g,x+ww*.12,y+hh*(.04+k*.16),hh*.13,Math.min(5,c),r))} // 2D: 달력 대신 正 표시
    const cu=g.createLinearGradient(0,y+hh*.85,0,y+hh);cu.addColorStop(0,'rgba(0,0,0,0)');cu.addColorStop(1,'rgba(0,0,0,.25)');g.fillStyle=cu;g.fillRect(x,y+hh*.85,ww,hh*.15)} // 아래가 살짝 말림
 
   // 시계
@@ -489,7 +487,7 @@ function deskBase(g,G,I){
    const ins=lin(0,my+mh*.05,0,my+mh*.88,['#3e3828','#8a836c']);g.fillStyle=ins;rr(g,mx+mw*.05,my+mh*.06,mw*.9,mh*.8,mw*.05);g.fill();
    g.fillStyle='#050505';rr(g,mx+mw*.065,my+mh*.075,mw*.87,mh*.77,mw*.06);g.fill();
    g.fillStyle='rgba(50,45,32,.65)';for(let k=0;k<7;k++)g.fillRect(mx+mw*(.12+k*.025),my+mh*.9,mw*.012,mh*.05);
-   g.fillStyle='#3a3628';g.fillRect(mx+mw*.42,my+mh*.9,mw*.16,mh*.045);g.fillStyle='#9a9070';g.font=`${mh*.035}px 'Nanum Gothic Coding',monospace`;g.textAlign='center';g.textBaseline='middle';g.fillText('OBS-14',mx+mw*.5,my+mh*.923);g.textAlign='left';
+   g.fillStyle='#3a3628';g.fillRect(mx+mw*.42,my+mh*.9,mw*.16,mh*.045);g.fillStyle='#9a9070';g.font=`${mh*.035}px 'Nanum Gothic Coding',monospace`;g.textAlign='center';g.textBaseline='middle';g.textAlign='left';
    g.fillStyle='#2a261c';g.beginPath();g.arc(mx+mw*.83,my+mh*.925,mh*.02,0,7);g.fill();
    {g.save();g.translate(mx+mw*.08,my+mh*.9);g.rotate(-.05);paper(g,0,0,mw*.12,mh*.06,'#d8d0b4',2);txt(g,'자산 0147',mw*.01,mh*.012,mh*.03,'#3a3428',mw*.1);g.restore()} // 자산 스티커
    dust(mx,my-mh*.09,mw,mh*.1,40);
@@ -543,7 +541,7 @@ function deskBase(g,G,I){
    g.save();g.filter=`blur(${U*.8}px)`;g.fillStyle='rgba(0,0,0,.62)';g.beginPath();g.ellipse(x+rx*.25,y+U*.2,rx*1.3,ry*1.3,0,0,7);g.fill();g.restore();
    g.strokeStyle='#8a8270';g.lineWidth=U*1.1;g.beginPath();g.ellipse(x+rx*1.05,y-hh*.5,rx*.42,hh*.28,0,-1.5,1.5);g.stroke();g.strokeStyle='rgba(255,255,240,.25)';g.lineWidth=U*.3;g.beginPath();g.ellipse(x+rx*1.05,y-hh*.5,rx*.42,hh*.28,0,-1.3,.2);g.stroke();
    g.fillStyle=lin(x-rx,0,x+rx,0,['#7e776a','#e2dac6','#c8c0aa','#575245']);g.beginPath();g.moveTo(x-rx,y-hh);g.lineTo(x+rx,y-hh);g.lineTo(x+rx,y);g.ellipse(x,y,rx,ry,0,0,Math.PI);g.closePath();g.fill();
-   g.fillStyle='#2a1a6a';g.globalAlpha=.55;g.fillRect(x-rx*.5,y-hh*.62,rx*.9,hh*.24);g.globalAlpha=1;txt(g,'OBS',x-rx*.42,y-hh*.6,hh*.17,'rgba(230,225,210,.8)',rx*.8); // 로고
+   
    g.fillStyle='rgba(70,36,10,.45)';g.beginPath();g.moveTo(x+rx*.25,y-hh);g.quadraticCurveTo(x+rx*.35,y-hh*.6,x+rx*.28,y-hh*.35);g.lineTo(x+rx*.18,y-hh*.38);g.quadraticCurveTo(x+rx*.2,y-hh*.7,x+rx*.12,y-hh);g.fill(); // 흘러내린 커피
    g.fillStyle='#d6cebb';g.beginPath();g.ellipse(x,y-hh,rx,ry,0,0,7);g.fill();g.fillStyle='#1c0e04';g.beginPath();g.ellipse(x,y-hh+U*.2,rx*.86,ry*.78,0,0,7);g.fill();g.fillStyle='rgba(255,230,190,.18)';g.beginPath();g.ellipse(x-rx*.3,y-hh,rx*.3,ry*.25,0,0,7);g.fill();
    g.strokeStyle='rgba(60,30,8,.35)';g.lineWidth=U*.3;g.beginPath();g.ellipse(x,y-hh+U*.5,rx*.78,ry*.66,0,0,7);g.stroke()}} // 말라붙은 커피 띠
@@ -691,7 +689,7 @@ function panelBase(g,G,I){
   {const x=bx+bw*.04,y=by+bh*.2,ww=bw*.2,hh=bh*.8;wallShadow(g,x,y,ww,hh,.25);texRect(g,T.metal,x,y,ww,hh,.45);grain(g,x,y,ww,hh,.25,2);topLight(g,x,y,ww,hh,.35);g.fillStyle='rgba(0,0,0,.25)';g.fillRect(x,y,ww,hh);
    [0,1].forEach(k=>{const dx2=x+k*ww/2;g.strokeStyle='#111';g.lineWidth=2;g.strokeRect(dx2+2,y+2,ww/2-4,hh-4);g.fillStyle='#0c0c0b';for(let j=0;j<5;j++)g.fillRect(dx2+ww*.12,y+hh*(.06+j*.025),ww*.26,hh*.008);g.fillStyle='#8a8a80';g.fillRect(dx2+ww*.4,y+hh*.45,ww*.04,hh*.08)});
    g.fillStyle='#050505';g.save();g.translate(x+ww*.98,y);g.transform(1,0,-.05,1,0,0);g.fillRect(0,0,ww*.06,hh);g.restore(); // 살짝 열린 틈
-   txt(g,'경비 01',x+ww*.08,y+hh*.13,hh*.035,'#d8d2c0',ww*.3);txt(g,'경비 02',x+ww*.58,y+hh*.13,hh*.035,'#d8d2c0',ww*.3)}
+   txt(g,'강서진',x+ww*.08,y+hh*.13,hh*.035,'#d8d2c0',ww*.3);txt(g,'물',x+ww*.58,y+hh*.13,hh*.035,'#d8d2c0',ww*.3)}
   // 선반과 상자 (테이프·라벨·찌그러짐)
   {const x=bx+bw*.62,y=by+bh*.18,ww=bw*.2,U=bh/100;wallShadow(g,x,y,ww,bh*.015,.5);g.fillStyle='#3a3a34';g.fillRect(x,y,ww,bh*.015);g.fillStyle='rgba(255,255,240,.15)';g.fillRect(x,y,ww,1);
    [.05,.9].forEach(f=>{g.fillStyle='#2a2a26';polyG(g,[[x+ww*f,y+bh*.015],[x+ww*f+bw*.006,y+bh*.015],[x+ww*f+bw*.006,y+bh*.05],[x+ww*f,y+bh*.03]])});
@@ -964,7 +962,7 @@ function buildJumps(){
 // 5일 차 일지 줄은 서진이 쓴 게 아님 (서진이 신고하지 않은 복사본이 씀)
 const EXIT_CAM=[7,6,3,1,0];
 const ANOM_TXT=['여기 아까 왔음','왼쪽 말고','불 켜 줘','문 열어','나 여기 있어','6시','서진','→']; // 밤마다 비상구가 보이는 구역
-const BASE_RULES='여기 들어왔으면 이것부터 읽어.\n6시까지 버틸 것.\n비상구가 하루에 한 칸씩 온다. 닷새째 6시면 문 앞이다.\n그 전엔 문 열지 말 것.\n전기 아낄 것. 차단기 떨어지면 바로 올릴 것.';
+const BASE_RULES='여기 들어왔으면 이것부터 읽어.\n6시까지 버틸 것.\n비상구가 하루에 한 칸씩 온다. 닷새째 6시면 문 앞이다.\n그 전엔 밖으로 나가지 말 것.\n전기 아낄 것. 차단기 떨어지면 바로 올릴 것.';
 const ANOM_RULE='화면에 없던 게 생기면 신고할 것. 헛신고 하지 말 것.';
 // 하드 모드: 서진이 그런 밤을 겪고 일지 맨 위에 남긴 메모
 const MODS={cold:['추위','난로 틀어 둠. 전기 빨리 닳음.'],wire:['낡은 배선','배선에서 탄내 남. 차단기 자주 떨어짐.'],fog:['습기','렌즈에 김 서림. 화면 자주 끊김.'],
@@ -976,7 +974,7 @@ const CALLS=[
   ['"살았네. 6시에 불 다 나가는 거 봤지?"','"초록 불 한 칸 왔지? 하루에 한 칸씩 와."','"벽 얼룩은 오래 보지 마. 눈 떠."','"화면에 없던 게 생기면 신고해. 헛신고는 하지 말고."','"나? 밖이야. 여기도 다 노란 방이야."'],
   ['"불 끄지 마."','"불 나간 칸에 뭐가 서 있어. 어두우면 그게 와."','"차단기 내려가면 바로 올려. 바로."','"...잠깐. 여기 형광등 소리가 멈췄어."','','"......갔다. 괜찮아."'],
   ['"오늘은 화면에 네가 앉아 있을 거야."','"보이면 바로 신고해. 그거 너 아니야."','"난 신고 안 했어. 나랑 똑같이 앉아 있길래."','"...거기 옷걸이에 내 점퍼 아직 있어?"','"없으면 누가 입고 나간 거야."'],
-  ['"오늘 마지막이야. 초록 불 문 앞 복도까지 왔지?"','"일지 마지막 줄 봤지. 그거 내 글씨 맞아."','"근데 내가 쓴 거 아니야. 나도 그거 보고 열었어."','"6시 되면 문 알아서 열려. 그 전엔 열지 마."','"...문 열어. 나야."']];
+  ['"오늘 마지막이야. 초록 불 문 앞 복도까지 왔지?"','"일지 마지막 줄 봤지. 그거 내 글씨 맞아."','"근데 내가 쓴 거 아니야. 나도 그거 보고 열었어."','"6시 되면 문 알아서 열려. 그 전엔 나오지 마."','"...문 열어. 나야."']];
 const RULES=[
   '형광등 소리가 끊기면 바로 문 잠글 것. 소리 돌아오면 열 것.',
   '화면 속 얼룩이 커지면 바로 다른 화면으로 넘길 것.',
@@ -1013,7 +1011,7 @@ function newNight(n){
   const go2=()=>{if(!S||S.night!==n)return;setMode('game');buildUI();updHUD();
     {const tx=n+'일 차',el=$('introSmall');el.textContent='';let k=0;const iv=setInterval(()=>{k++;el.textContent=tx.slice(0,k);if(k>=tx.length)clearInterval(iv)},40)} // 한 글자씩
     const it=$('intro');it.classList.remove('show');void it.offsetWidth;it.classList.add('show');
-    setTimeout(()=>{it.classList.remove('show');if(S&&S.night===n&&!S.over)openLog()},DEV.on?700:2400)};
+    setTimeout(()=>{it.classList.remove('show');if(S&&S.night===n&&!S.over){S.view=S.camX=1;openLog()}},DEV.on?700:2400)};
   if(n>=2&&!DEV.on&&R3.ok)playCut(n===5?'night5_open':'night_start',go2,n);else go2();
 }
 function pickMods(n){const k=n<4?1:2,ids=Object.keys(MODS),out=[];while(out.length<k){const m=ids[ri(ids.length)];if(!out.includes(m))out.push(m)}return out}
@@ -1105,7 +1103,7 @@ function update(dt){
   if(S.blackT>0&&S.t>=S.blackT){S.blackT=-1;S.outT=9;S.mon=false;buildUI();say('불이 다 나갔다.','bad');sfx(45,1.6,'sawtooth',.2);thump(40,.8,.4,0)}
   if(S.outT>0){S.outT-=dt;if(S.outT<=0){say('불이 들어왔다.');buzzClick()}}
   if(hasMod('fog')&&monOn()&&Math.random()<dt*.22)S.camSw=Math.max(S.camSw,.35);
-  if(S.call){S.call.t+=dt;if(S.call.t>=3.8){S.call.t=0;S.call.i++;const c=S.call,ln=c.lines[c.i];if(c.i<c.lines.length){if(ln)say(ln,'voice',4.2);if(c.lines===CALLS[4]&&c.i===c.lines.length-1&&S.hum.node!==DOOR){const h=S.hum,prev=h.node;h.node=DOOR;h.wait=0;h.lock=0;humMoved(prev)}}else{S.call=null;sfx(420,.08,'square',.05)}}} // 5일 차 마지막 줄은 문 앞에서 건 것
+  if(S.call){S.call.t+=dt;if(S.call.t>=3.8){S.call.t=0;S.call.i++;const c=S.call,ln=c.lines[c.i];if(c.i<c.lines.length){if(ln)say(ln,'voice',4.2);if(c.door&&c.i===c.lines.length-1&&S.hum.node!==DOOR){const h=S.hum,prev=h.node;h.node=DOOR;h.wait=0;h.lock=0;humMoved(prev)}}else{S.call=null;sfx(420,.08,'square',.05)}}} // 5일 차 마지막 줄은 문 앞에서 건 것
   // 정신력
   if(!lightOn())S.san-=dt*1.2;
   else if(S.log)S.san+=dt*4;
@@ -1157,10 +1155,10 @@ function phoneTick(dt){
   if(S.night<2)return;
   S.ringT-=dt;if(S.ringT<=0){S.ringT=hasMod('calls')?rnd(35,70):rnd(70,160);S.ring=11;S.rgB=0;say('전화가 울린다.')}
 }
-function startCall(lines){S.call={lines,i:0,t:0};say(lines[0],'voice',4.2);sfx(420,.05,'square',.05)}
+function startCall(lines,door){S.call={lines,i:0,t:0,door};say(lines[0],'voice',4.2);sfx(420,.05,'square',.05)}
 function answerCall(){
   S.ring=0;S.rUI=0;buildUI();
-  if(S.storyRing){S.storyRing=false;S.storyDone=true;startCall(CALLS[S.night-1]);return}const L=['(숨소리)','"...여보세요? 거기 불 켜져 있어요?"','"거기 시계 가요? 지금 몇 시예요?"','"아까부터 계속 같은 방이에요."','"여기도 경비실 있어요. 근데 불이 꺼져 있어요."','"아, 잘못 걸었네."','"뒤에 누가 서 있어요."','"문 열어. 나야."','(수화기 너머에서도 전화벨이 울린다)','(수화기 너머로 내 목소리가 들린다)'];
+  if(S.storyRing){S.storyRing=false;S.storyDone=true;startCall(CALLS[S.night-1],S.night===5);return}const L=['(숨소리)','"...여보세요? 거기 불 켜져 있어요?"','"거기 시계 가요? 지금 몇 시예요?"','"아까부터 계속 같은 방이에요."','"여기도 경비실 있어요. 근데 불이 꺼져 있어요."','"아, 잘못 걸었네."','"뒤에 누가 서 있어요."','"문 열어. 나야."','(수화기 너머에서도 전화벨이 울린다)','(수화기 너머로 내 목소리가 들린다)'];
   say(L[ri(L.length)]);S.san-=6;setTimeout(()=>{if(S&&!S.over){breathe(0,.28);if(Math.random()<.5)giggle(0,.06)}},300);
 }
 // 교대자가 문 앞에서 손잡이를 흔듦
@@ -1199,7 +1197,7 @@ function animate(dt){
 
 // ===================== 행동 =====================
 function turn(d){
-  if(!S||S.over||S.mon||S.log||S.bp)return;
+  if(!S||S.over||S.mon||S.log||S.bp||S.paused||mode!=='game')return;
   const v=Math.max(0,Math.min(2,S.view+d));
   if(v!==S.view){S.view=v;whoosh();buildUI()}
 }
@@ -1225,7 +1223,7 @@ function renderBrk(){const box=$('bsw');box.innerHTML='';S.sw.forEach((on,i)=>{c
 function report(){
   if(S.ring>0){answerCall();return}
   if(S.call){S.call=null;say('딸깍. 전화를 끊었다.');sfx(300,.06,'square',.06);return}
-  if(S.missed){S.missed=false;startCall(['(음성 메시지 1건)'].concat(CALLS[S.night-1]));return}
+  if(S.missed){S.missed=false;const L=CALLS[S.night-1].slice();if(S.night===1)L[0]='"안 받네. 벨 울린 거 나야."';startCall(['(음성 메시지 1통)'].concat(L),S.night===5);return}
   if(!powered()){say('수화기 너머로 아무 소리도 없다');return}
   sfx(700,.08,'square',.1);
   const r=Math.random();if(S.night>=3&&r<.25){say('뚜. 뚜. 신호음 사이로 숨소리가 들린다.','bad');S.san-=3;setTimeout(()=>{if(S&&!S.over)breathe(.4,.2)},500)}else say('뚜. 뚜. 아무도 안 받는다.');
@@ -1295,7 +1293,7 @@ function win(){
   if(!last&&!DEV.on){try{if(hard){savedHard=Math.max(savedHard,n+1);localStorage.setItem('obs_night_hard',savedHard)}else{savedNight=Math.max(savedNight,n+1);localStorage.setItem('obs_night',savedNight)}}catch(e){}}
   const fin=()=>{setMode('end');if(!last)showEnd('6:00 AM',`${n}일 차 끝.\n비상구가 한 칸 가까워졌다.`,`${n+1}일 차`,()=>newNight(n+1));
     else showEnd('비상구',hard?'5일 차 끝.\n계단 끝에 철문이 있었다.\n안에서 전화가 울리고 있었다.':'5일 차 끝.\n계단은 위로 이어졌다.','처음부터',()=>newNight(1))};
-  if(R3.ok&&!DEV.on)playCut(last?(hard?'ending_hard':'ending'):'reset',fin,n);else{sfx(880,.6,'sine',.2);fin()}
+  if(R3.ok&&!DEV.on)playCut(last?(hard?'ending_hard':'ending'):'reset',fin,n);else if(!DEV.on)playCut('reset2d',fin,n);else{sfx(880,.6,'sine',.2);fin()}
 }
 function showEnd(title,text,label,fn){
   $('endTitle').textContent=title;$('endText').textContent=text;
@@ -1440,7 +1438,7 @@ function build3D(){
    [[-1.56,.66],[-.88,.66],[.92,.76]].forEach(([u,pw],k)=>{const m=P(-RX+.0125,CAMZ-u,Math.PI/2,pw);if(k===2)R3.dyn.fallP=m});
    [-.9,-.1,.7,1.5].forEach(u=>P(RX-.0125,CAMZ+u,-Math.PI/2,.78));[-1.6,-.8,0,.8,1.6].forEach(x=>P(x,1.8-.0125,Math.PI,.78));
    const bm=new T3.InstancedMesh(new T3.SphereGeometry(.008,6,4),greyM,bolts.length),o=new T3.Object3D();bolts.forEach((b,i)=>{o.position.set(b[0],b[1],b[2]);o.updateMatrix();bm.setMatrixAt(i,o.matrix)});sc.add(bm);
-   const fp=BOX(.76,.025,2.2,sM,-RX+.5,.02,CAMZ-1.5);fp.rotation.y=.12;R3.dyn.fallen=[fp];for(let k=0;k<5;k++)R3.dyn.fallen.push(CYL(.008,.008,.03,greyM,-RX+.3+Math.random()*.6,.008,CAMZ-.9-Math.random()*.9)); // 5일 차: 떨어진 철판과 굴러다니는 볼트
+   const fp=BOX(.76,.025,1.9,sM,-1.6,.02,-.4);fp.rotation.y=.08;R3.dyn.fallen=[fp];for(let k=0;k<5;k++)R3.dyn.fallen.push(CYL(.008,.008,.03,greyM,-1.95+Math.random()*.8,.008,-1.3+Math.random()*.6)); // 5일 차: 떨어진 철판과 굴러다니는 볼트
   }
   // 천장 형광등
   const frM=MS({color:0xd8d2c0,roughness:.6}),panT=c3mats().panelOn.map;
@@ -1468,7 +1466,7 @@ function build3D(){
    const glass=PLN(.36,.275,MS({color:0x101010,transparent:true,opacity:.18,roughness:.05,metalness:.2}),0,.275,.163,m);glass.receiveShadow=false;
    BOX(.06,.012,.004,MS({color:0x3a3628}),0,.112,.161,m);R3.dyn.monLed=mesh(new T3.SphereGeometry(.005,8,8),new T3.MeshBasicMaterial({color:0x33cc33}),.17,.11,.162,m,false);
    // 포스트잇
-   const pc=cvs(128,110,(g,w,h)=>{g.fillStyle='#d6c24e';g.fillRect(0,0,w,h);g.fillStyle='rgba(0,0,0,.1)';g.fillRect(0,0,w,12);g.fillStyle='#5a1010';g.font=`${h*.2}px ${PEN}`;g.fillText('문 절대',10,h*.42);g.fillText('열지 마',10,h*.72)});
+   const pc=cvs(128,110,(g,w,h)=>{g.fillStyle='#d6c24e';g.fillRect(0,0,w,h);g.fillStyle='rgba(0,0,0,.1)';g.fillRect(0,0,w,12);g.fillStyle='#5a1010';g.font=`${h*.2}px ${PEN}`;g.fillText('밖에',10,h*.42);g.fillText('나가지 마',10,h*.72)});
    const pi=PLN(.07,.06,MS({map:ctx3(pc),roughness:.9}),.19,.14,.164,m);pi.rotation.z=-.08;
    const cord=new T3.CatmullRomCurve3([new V3(.15,.2,-.3),new V3(.25,.05,-.35),new V3(.4,.005,-.2),new V3(.6,.005,-.25)]);mesh(new T3.TubeGeometry(cord,30,.006,6),blackM,0,0,0,m)}
   // 키보드 (기계식, 키 하나하나)
@@ -1506,7 +1504,7 @@ function build3D(){
    const sh=mesh(new T3.ConeGeometry(.07,.1,24,1,true),MS({color:0x24302a,roughness:.4,metalness:.5,side:T3.DoubleSide}),.27,.42,.02,lp);sh.rotation.z=.9}
   {const rd2=grp(.95,.75,-1.2);BOX(.09,.03,.07,darkM,0,.015,0,rd2);BOX(.055,.16,.035,MS({color:0x1c1c1a,roughness:.7}),0,.11,0,rd2);CYL(.005,.005,.09,blackM,.015,.235,0,rd2);R3.dyn.radioLed=mesh(new T3.SphereGeometry(.004,8,8),new T3.MeshBasicMaterial({color:0x33cc33}),.035,.02,.036,rd2,false)}
   {const at=grp(.86,.75,-.8);const a=mesh(new T3.CylinderGeometry(.05,.045,.018,24,1,true),MS({color:0x8a8a82,roughness:.3,metalness:.8,side:T3.DoubleSide}),0,.009,0,at);const ab=mesh(new T3.CircleGeometry(.045,20),MS({color:0x2a2826}),0,.003,0,at,false);ab.rotation.x=-Math.PI/2;
-   R3.dyn.butts=[[-.012,.4],[.015,-.7],[.0,1.6],[-.02,-2.2]].map(([x,r])=>{const c=CYL(.004,.004,.035,MS({color:0xd8d2c0}),x,.009,0,at);c.rotation.z=Math.PI/2;c.rotation.y=r;return c})} // 꽁초가 밤마다 늘어남 (플레이어는 담배를 안 피움)
+   R3.dyn.butts=[[-.012,.4],[.015,-.7],[.0,1.6],[-.02,-2.2],[.018,2.6],[-.006,-1.3]].map(([x,r])=>{const c=CYL(.004,.004,.035,MS({color:0xd8d2c0}),x,.009,0,at);c.rotation.z=Math.PI/2;c.rotation.y=r;return c})} // 꽁초가 밤마다 늘어남 (플레이어는 담배를 안 피움)
   {const fl2=CYL(.016,.016,.15,MS({color:0x6a6a62,roughness:.3,metalness:.8}),.42,.766,-.69);fl2.rotation.z=Math.PI/2;fl2.rotation.y=.5;const hd2=CYL(.024,.017,.04,fl2.material,0,.09,0,fl2)}
   {const pc=cvs(256,330,(g,w,h)=>{g.fillStyle='#d6cfb4';g.fillRect(0,0,w,h);g.strokeStyle='rgba(40,40,60,.5)';for(let j=0;j<12;j++){g.beginPath();g.moveTo(w*.08,h*.12+j*h*.065);g.lineTo(w*.92,h*.12+j*h*.065);g.stroke()}g.strokeStyle='rgba(150,20,15,.8)';g.lineWidth=3;for(let j=0;j<6;j++){const x=w*.6,y=h*.15+j*h*.13;g.beginPath();g.moveTo(x,y);g.lineTo(x+8,y+8);g.lineTo(x+22,y-10);g.stroke()}g.fillStyle='#222';g.font='16px Nanum Gothic Coding';g.fillText('CCTV 점검표',w*.08,h*.07)});
    const pp=PLN(.2,.26,MS({map:ctx3(pc),roughness:.9}),.3,.752,-.96);pp.rotation.x=-Math.PI/2;pp.rotation.z=.2}
@@ -1514,7 +1512,7 @@ function build3D(){
    const bd=PLN(.05,.066,MS({map:ctx3(bc),roughness:.7}),-.08,.752,-.69);bd.rotation.x=-Math.PI/2;bd.rotation.z=-.3}
   // ---- 정면 벽 (책상 쪽): 교대표, 달력, 시계, 코르크판, 열쇠함, 감시카메라 ----
   {const g=onWall('N',-.85,1.62,.012);R3.dyn.wbC=mk(512,370);R3.dyn.wbT=ctx3(R3.dyn.wbC);BOX(.74,.53,.02,greyM,0,0,-.005,g);PLN(.7,.5,MS({map:R3.dyn.wbT,roughness:.35}),0,0,.007,g);BOX(.6,.02,.04,greyM,0,-.28,.02,g)}
-  {const g=onWall('N',-.32,1.98,.004);R3.dyn.calC=mk(400,256);R3.dyn.calT=ctx3(R3.dyn.calC);PLN(.56,.36,MS({map:R3.dyn.calT,transparent:true,roughness:.9,depthWrite:false}),0,0,0,g)} // 벽지에 여러 사람이 그은 正
+  {const g=onWall('N',-.85,2.2,.004);R3.dyn.calC=mk(400,256);R3.dyn.calT=ctx3(R3.dyn.calC);PLN(.56,.36,MS({map:R3.dyn.calT,transparent:true,roughness:.9,depthWrite:false}),0,0,0,g)} // 벽지에 여러 사람이 그은 正
   {const g=onWall('N',.06,2.18,.03),cl=CYL(.13,.13,.04,MS({color:0x1a1a18,roughness:.5}),0,0,0,g);cl.rotation.x=Math.PI/2;const fc=cvs(256,256,(q,w,h)=>{const gr=q.createRadialGradient(w/2,h*.4,0,w/2,h/2,w/2);gr.addColorStop(0,'#e6e0cc');gr.addColorStop(1,'#b0aa92');q.fillStyle=gr;q.beginPath();q.arc(w/2,h/2,w/2,0,7);q.fill();q.fillStyle='#111';for(let k=0;k<12;k++){q.save();q.translate(w/2,h/2);q.rotate(k/12*Math.PI*2);q.fillRect(-3,-w*.44,6,w*.08);q.restore()}});
    const face=mesh(new T3.CircleGeometry(.118,32),MS({map:ctx3(fc),roughness:.6}),0,0,.021,g,false);const hM=MS({color:0x111111});const hh=BOX(.008,.06,.004,hM,0,0,.025,g),mh=BOX(.006,.09,.004,hM,0,0,.028,g);hh.geometry.translate(0,.03,0);mh.geometry.translate(0,.045,0);R3.dyn.hh=hh;R3.dyn.mh=mh}
   {const g=onWall('N',.78,1.72,.012);R3.dyn.cbC=mk(512,360);R3.dyn.cbT=ctx3(R3.dyn.cbC);BOX(.6,.44,.025,MS({color:0x4a3018,roughness:.8}),0,0,-.005,g);PLN(.56,.4,MS({map:R3.dyn.cbT,roughness:.95}),0,0,.009,g)}
@@ -1614,14 +1612,14 @@ function night3D(){
    D.cbT.needsUpdate=true}
   const kn=n>=3;D.mug.rotation.set(0,0,kn?Math.PI/2:0);D.mug.position.y=kn?.75+.036:.75;D.coffee.visible=!kn;D.spill.visible=kn;
   D.jacket.visible=n<4;D.writ1.visible=n>=3;D.writ2.visible=n>=4;
-  D.butts.forEach((b,k)=>b.visible=k<(n>=2?4:3));D.tileHole.visible=n>=2;D.damp.visible=n>=2;D.wstain.visible=n>=3;D.feet.forEach(f=>f.visible=n>=4);
+  D.butts.forEach((b,k)=>b.visible=k<Math.min(6,n+2));D.tileHole.visible=n>=2;D.damp.visible=n>=2;D.wstain.visible=n>=3;D.feet.forEach(f=>f.visible=n>=4);
   D.fallP.visible=n<5;D.fallen.forEach(f=>f.visible=n>=5);D.marker.visible=n>=5;
 }
 // 벽지의 正 표시. mine = 내 줄에 그을 획 수 (0~5)
 function tally3(mine){
   const D=R3.dyn;if(!D.calC)return;const g=D.calC.getContext('2d'),w=D.calC.width,h=D.calC.height,r=mulberry(77);g.clearRect(0,0,w,h);
-  const rows=[[3,'#2a2a6a'],[2,'#3a2a1a'],[4,'#5a1a1a'],[1,'#1a3a2a'],[4,'#1a1a1a','서진'],[mine,'#2a2a2a']],ch=h/rows.length*.78;
-  rows.forEach(([cnt,col,nm],k)=>{const y=h*.06+k*(h/rows.length),x0=w*.06+r()*w*.05;g.strokeStyle=col;g.lineWidth=k===5?4:3;g.lineCap='round';tallyStrokes(g,x0,y,ch,Math.min(5,cnt),r);if(nm){g.fillStyle=col;g.font=`${ch*.8}px ${PEN}`;g.textBaseline='top';g.fillText(nm,x0+ch*1.4,y)}});
+  const rows=[[3,'#2a2a6a'],[2,'#3a2a1a'],[4,'#5a1a1a'],[1,'#1a3a2a'],[4,'#1a1a1a','서진'],[mine,'#2a2a2a']],ch=h/rows.length*.7;
+  rows.forEach(([cnt,col,nm],k)=>{const y=h*.04+k*(h/rows.length),x0=w*.06+r()*w*.05;g.strokeStyle=col;g.lineWidth=k===5?4:3;g.lineCap='round';tallyStrokes(g,x0,y,ch,Math.min(5,cnt),r);if(nm){g.fillStyle=col;g.font=`${ch*.8}px ${PEN}`;g.textBaseline='top';g.fillText(nm,x0+ch*1.4,y)}});
   D.calT.needsUpdate=true;
 }
 // 正을 획 순서대로 n획까지
@@ -1714,7 +1712,7 @@ function c3mats(){
     base:k({color:0x2a1e10,roughness:.7}),pipe:k({color:0x3e3c34,roughness:.5,metalness:.6}),
     water:k({color:0x0e0d09,roughness:.06,metalness:.2}),paper:k({color:0xcfc8b0,roughness:.9,side:T3.DoubleSide}),
     housing:k({color:0x1c1b17,roughness:.6}),panelOn:Object.assign(new T3.MeshBasicMaterial({color:0xfff3d6,map:c3cv('panel',128,256,(q,w,h)=>{q.fillStyle='#fffaf0';q.fillRect(0,0,w,h);q.strokeStyle='rgba(170,160,130,.35)';q.lineWidth=1;for(let x=0;x<w;x+=4){q.beginPath();q.moveTo(x,0);q.lineTo(x,h);q.stroke()}for(let y=0;y<h;y+=4){q.beginPath();q.moveTo(0,y);q.lineTo(w,y);q.stroke()}q.strokeStyle='rgba(150,140,110,.5)';q.lineWidth=6;q.strokeRect(6,6,w-12,h-12);q.strokeStyle='#d8d2c0';q.lineWidth=4;q.strokeRect(0,0,w,h)})}),{userData:{keep:true}}),
-    void:Object.assign(new T3.MeshBasicMaterial({color:0x000000,fog:false}),{userData:{keep:true}}),halo:Object.assign(new T3.MeshBasicMaterial({map:c3cv('halo',128,128,(q,w,h)=>{const gr=q.createRadialGradient(w/2,h/2,0,w/2,h/2,w/2);gr.addColorStop(0,'rgba(255,240,200,.55)');gr.addColorStop(.5,'rgba(255,240,200,.2)');gr.addColorStop(1,'rgba(255,240,200,0)');q.fillStyle=gr;q.fillRect(0,0,w,h)}),transparent:true,depthWrite:false,blending:T3.AdditiveBlending,opacity:.6}),{userData:{keep:true}}),fall:Object.assign(new T3.MeshBasicMaterial({map:c3cv('darkfall',64,256,(q,w,h)=>{const gr=q.createLinearGradient(0,0,0,h);gr.addColorStop(0,'rgba(0,0,0,1)');gr.addColorStop(1,'rgba(0,0,0,0)');q.fillStyle=gr;q.fillRect(0,0,w,h)}),transparent:true,depthWrite:false,fog:false}),{userData:{keep:true}}),tubeOn:Object.assign(new T3.MeshBasicMaterial({color:0xfff6dc}),{userData:{keep:true}}),tubeOff:Object.assign(new T3.MeshBasicMaterial({color:0x34322a}),{userData:{keep:true}})};
+    void:Object.assign(new T3.MeshBasicMaterial({color:0x000000,fog:false}),{userData:{keep:true}}),voidB:Object.assign(new T3.MeshBasicMaterial({color:0x000000,fog:false,side:T3.BackSide}),{userData:{keep:true}}),halo:Object.assign(new T3.MeshBasicMaterial({map:c3cv('halo',128,128,(q,w,h)=>{const gr=q.createRadialGradient(w/2,h/2,0,w/2,h/2,w/2);gr.addColorStop(0,'rgba(255,240,200,.55)');gr.addColorStop(.5,'rgba(255,240,200,.2)');gr.addColorStop(1,'rgba(255,240,200,0)');q.fillStyle=gr;q.fillRect(0,0,w,h)}),transparent:true,depthWrite:false,blending:T3.AdditiveBlending,opacity:.6}),{userData:{keep:true}}),fall:Object.assign(new T3.MeshBasicMaterial({map:c3cv('darkfall',64,256,(q,w,h)=>{const gr=q.createLinearGradient(0,0,0,h);gr.addColorStop(0,'rgba(0,0,0,1)');gr.addColorStop(1,'rgba(0,0,0,0)');q.fillStyle=gr;q.fillRect(0,0,w,h)}),transparent:true,depthWrite:false,fog:false}),{userData:{keep:true}}),tubeOn:Object.assign(new T3.MeshBasicMaterial({color:0xfff6dc}),{userData:{keep:true}}),tubeOff:Object.assign(new T3.MeshBasicMaterial({color:0x34322a}),{userData:{keep:true}})};
   C3.unit=new T3.PlaneGeometry(1,1);return C3.M;
 }
 // 의자 (사무실 책상, 쓰러진 의자, 복도 한가운데 놓인 의자)
@@ -1757,26 +1755,26 @@ const BP={
     panels:[[0,-1.8],[0,-4.2],[0,-6.6],[0,-9.0],[-3.6,-8.5]],dead:.2,
     fog:[0x40361a,6,22],hemi:.48,spec:{c:0xfff0c8,i:3,d:5,p:[-3.6,2.3,-8.5]},
     spots:{far:[-.5,-9.0],peek:{cx:-1.24,z:-7.37,side:0},seat:[.55,-4.4],fake:[-.45,-5.6],eye:[.65,1.05,-9.6]},
-    anom:{chair:[0,-3.6,0],door:[-1.24,-4.4,PI2],blood:[-.2,-2.4,-.9,-9.0],fig:[-.7,-6.6],writ:[1.24,1.5,-6.2,-PI2,1.3]},exit:[.65,2.25,-9.54,0],
+    anom:{chair:[0,-3.6,0],door:[-1.24,-4.4,PI2],blood:[-.2,-2.4,-.9,-9.0],fig:[-.7,-6.6],writ:[1.23,1.5,-6.2,-PI2,1.3]},exit:[.65,2.25,-9.54,0],
     props(sc,M,X){puddle(sc,X(-1.0),-8.5,1.1,.5);outlet(sc,X(1.24),-6.8,-PI2)}}),
   wet:()=>({Hc:2.55,rooms:[[-3.2,3.2,.6,-9.6]],
     walls:[[-3.2,.6,3.2,.6],[-3.2,.6,-3.2,-5.0],[-3.2,-6.2,-3.2,-9.6],[-3.2,-5.0,-3.2,-6.2,2.1],[3.2,.6,3.2,-9.6],[-3.2,-9.6,-.9,-9.6],[.2,-9.6,1.4,-9.6],[3.0,-9.6,3.2,-9.6],[-.9,-9.6,.2,-9.6,2.1],[-3.2,-4.4,-1.0,-4.4]],
     dark:[[-3.2,-5.6,1.2,'L'],[-.35,-9.6,1.1,'F']],lit:[[2.2,-9.6,1.6,'F',2.4]],holes:[[1.5,-3.0],[-.9,-6.6]],
     panels:[[-2.4,-1.8],[0,-1.8],[2.4,-1.8],[0,-4.2],[2.4,-4.2],[-2.4,-6.6],[0,-6.6],[2.4,-6.6],[-2.4,-9.0],[0,-9.0],[2.4,-9.0]],dead:.4,
     fog:[0x3a3118,5,20],hemi:.4,spec:{c:0xfff0c8,i:3,d:5,p:[2.2,2.2,-11.0]},
-    spots:{far:[-2.0,-9.0],peek:{cx:-1.0,z:-4.47,side:0},seat:[1.1,-3.8],fake:[.9,-6.2],eye:[-.35,1.05,-9.6]},
-    anom:{chair:[-.2,-3.6,0],door:[-2.1,-4.33,0],blood:[.6,-2.4,-.35,-9.4],fig:[1.9,-7.4],writ:[-2.05,1.5,-9.53,0,.85]},
-    props(sc,M,X,B){[[.4,-4.2,1.4],[-1.6,-6.8,1.1],[1.8,-7.6,.9]].forEach(([x,z,s])=>{puddle(sc,X(x),z,s,1);stain(sc,X(x),B.Hc-.002,z,s*.9,-PI2)}); // 천장에서 떨어진 물
+    spots:{far:[1.0,-9.0],peek:{cx:-1.0,z:-4.47,side:0},seat:[1.1,-3.8],fake:[.9,-6.2],eye:[-.35,1.05,-9.6]},
+    anom:{chair:[-.2,-3.6,0],door:[-2.1,-4.33,0],blood:[.6,-2.4,-.35,-9.4],fig:[1.9,-7.4],writ:[3.13,1.5,-6.4,-PI2,1.1]},
+    props(sc,M,X,B){[[.4,-4.2,1.4],[-1.6,-6.8,1.1],[1.8,-7.6,.9]].forEach(([x,z,s])=>{puddle(sc,X(x),z,s,1);stain(sc,X(x),B.Hc-.002,z,s*.9,PI2)}); // 천장에서 떨어진 물
       streakOn(sc,X(-2.05),1.6,-9.53,1.6,0);streakOn(sc,X(-2.1),1.5,-4.33,1.8,0);
       const t=wq(sc,M.ceil,.6,.6,PI2,0,0,0,0,7.2,2.4);t.geometry.translate(0,0,.3);t.position.set(X(-.9),B.Hc-.02,-6.9);t.rotation.x=-.6;t.material=M.ceil}}), // 빠져서 매달린 천장 텍스
   pillar:()=>({Hc:3.0,rooms:[[-6.4,6.4,.6,-16]],
-    walls:[[-6.4,.6,6.4,.6],[-6.4,.6,-6.4,-16],[6.4,.6,6.4,-16],[-6.4,-16,-3.0,-16],[-2.0,-16,2.4,-16],[4.4,-16,6.4,-16],[-3.0,-16,-2.0,-16,2.1],[-.6,-12.0,2.6,-12.0]],
-    pil:[-4.8,-1.6,1.6,4.8].flatMap(x=>[-3.6,-7.2,-10.8,-14.4].map(z=>[x,z,.6,!((x===1.6&&z===-7.2)||(x===-1.6&&z===-10.8)||(x===4.8&&z===-7.2))])),maxDrop:3,
-    dark:[[-2.5,-16,1.0,'F']],lit:[[3.4,-16,2.0,'F',2.4]],
+    walls:[[-6.4,.6,6.4,.6],[-6.4,.6,-6.4,-16],[6.4,.6,6.4,-16],[-6.4,-16,-1.3,-16],[-.6,-16,2.4,-16],[4.4,-16,6.4,-16],[-1.3,-16,-.6,-16,2.1],[.6,-12.0,3.0,-12.0]],
+    pil:[-4.8,-1.6,1.6,4.8].flatMap(x=>[-3.6,-7.2,-10.8,-14.4].map(z=>[x,z,.6,!((x===1.6&&z===-7.2)||(x===-1.6&&z===-10.8)||(x===4.8&&z===-7.2))])).filter(p=>!(p[0]===1.6&&p[1]===-10.8)),maxDrop:3, // (1.6,-10.8)은 벽 앞 이상 현상을 가려서 뺌
+    dark:[[-.95,-16,.7,'F']],lit:[[3.4,-16,2.0,'F',2.4]],
     panels:[-4.8,-2.4,0,2.4,4.8].flatMap(x=>[-.6,-3.0,-5.4,-7.8,-10.2,-12.6,-15.0].map(z=>[x,z])),dead:.2,
     fog:[0x463b1c,8,30],hemi:.5,spec:{c:0xdfe6ff,i:0,d:4,p:[4.8,2.8,-12.0]},
-    spots:{far:[-3.2,-13.2],peek:{cx:1.3,z:-7.51,side:1},seat:[.3,-5.0],fake:[-3.0,-8.6],eye:[-2.5,1.1,-16]},
-    anom:{chair:[.5,-5.8,0],door:[1.0,-11.93,0],blood:[-.9,-3.0,-2.5,-15.6],fig:[3.3,-9.4],writ:[1.0,1.6,-11.93,0,1.1]},exit:[-2.5,2.35,-15.94,0],
+    spots:{far:[-.2,-13.6],peek:{cx:1.3,z:-7.51,side:1},seat:[.3,-5.0],fake:[-.8,-8.8],eye:[-.95,1.1,-16]},
+    anom:{chair:[.5,-5.8,0],door:[1.35,-11.93,0],blood:[-.3,-3.0,-.95,-15.6],fig:[.3,-9.6],writ:[1.35,1.6,-11.93,0,.7]},exit:[-.95,2.35,-15.94,0],
     props(sc,M,X){outlet(sc,X(-1.6),-3.29,0);outlet(sc,X(4.8),-10.49,0)}}),
   office:()=>({Hc:2.5,rooms:[[-3.0,3.0,.6,-8.8]],
     walls:[[-3,.6,3,.6],[-3,.6,-3,-5.8],[-3,-7.0,-3,-8.8],[-3,-5.8,-3,-7.0,2.1],[3,.6,3,-8.8],[-3,-8.8,-1.4,-8.8],[-.4,-8.8,3,-8.8],[-1.4,-8.8,-.4,-8.8,2.1],[-3,-5.0,-1.0,-5.0]],
@@ -1822,7 +1820,7 @@ const BP={
       panels:Array.from({length:18},(_,j)=>[0,-1.8-j*2.4]),dead:.25,
       fog:[0x5a4c24,4,30],hemi:.45,spec:{c:0xfff0c8,i:0,d:4,p:[0,2,-8]},
       spots:{far:[0,-14.5],peek:{cx:-.94,z:-3.57,side:0},seat:[.35,-5.0],fake:[-.3,-7.0],eye:[0,1.2,-16]},
-      anom:{chair:[0,-4.2,0],door:[.94,-5.4,-PI2],blood:[-.1,-2.4,0,-16],fig:[.2,-10.5],writ:[-.99,1.5,-7.3,PI2,1.2]},exit:[0,2.3,-30,0],
+      anom:{chair:[0,-4.2,0],door:[.94,-5.4,-PI2],blood:[-.1,-2.4,0,-16],fig:[.2,-10.5],writ:[-.93,1.5,-7.3,PI2,1.2]},exit:[0,2.3,-30,0],
       props(sc,M,X){outlet(sc,X(.94),-9.5,-PI2);outlet(sc,X(-.94),-12.7,PI2)}}},
   void:r=>({Hc:2.4,dim:true,rooms:[[-4,4,.6,-14]],
     walls:[[-4,.6,4,.6],[-4,.6,-4,-14],[4,.6,4,-14],[-4,-4.8,-1.4,-4.8],[.8,-9.0,4,-9.0],[-4,-14,-1.5,-14],[-.5,-14,4,-14],[-1.5,-14,-.5,-14,2.1]],
@@ -1879,7 +1877,8 @@ function buildArea(B,r,mir){
   (B.dark||[]).forEach(([x,z,w,d0])=>{const d=DIR(d0),[ox,oz]=out(d),cx0=X(x)+ox*.45,cz=z+oz*.45,ry=d==='F'?0:d==='L'?PI2:-PI2;
     const cd=mesh(new T3.PlaneGeometry(w+.4,2.2),M.void,X(x)+ox*.95,1.1,z+oz*.95,sc,false);cd.rotation.y=ry;
     const f=mesh(new T3.PlaneGeometry(w+.2,.95),M.fall,cx0,.003,cz,sc,false);f.rotation.set(-PI2,0,d==='F'?0:d==='L'?PI2:-PI2);
-    const c=mesh(new T3.PlaneGeometry(w+.2,.95),M.void,cx0,2.1,cz,sc,false);c.rotation.set(PI2,0,d==='F'?0:PI2)});
+    const c=mesh(new T3.PlaneGeometry(w+.2,.95),M.void,cx0,2.1,cz,sc,false);c.rotation.set(PI2,0,d==='F'?0:PI2);
+    const bx=d==='F'?[w+1.6,2.2,2.6]:[2.6,2.2,w+1.6],vb=mesh(new T3.BoxGeometry(...bx),M.voidB,X(x)+ox*1.37,1.1,z+oz*1.37,sc,false)});
   // 불 켜진 옆방: 노란 방이 끝없이 이어지는 느낌
   const extra=[];
   (B.lit||[]).forEach(([x,z,w,d0,dep])=>{const d=DIR(d0),[ox,oz]=out(d),ax=X(x),cxm=ax+ox*dep/2,czm=z+oz*dep/2,sw=d==='F'?w:dep,sd=d==='F'?dep:w,lw=[];
@@ -1994,6 +1993,7 @@ function playCut(id,done,n){
   initAudio();if(staticG)staticG.gain.setTargetAtTime(0,AC.currentTime,.1);
   Object.assign(CUT,{id,def,done,n:n||(S?S.night:1),t:0,i:-1,fired:{},cap:null,lastN:-1});
   if(R3.ok){if(!CUT.cam){CUT.cam=new R3.T.PerspectiveCamera(62,W/H,.03,120);CUT.cam.rotation.order='YXZ'}if(def.area&&!CUT.areas[def.area])CUT.areas[def.area]=buildCutArea(def.area)}
+  ['log','brkp','intro'].forEach(k=>$(k).classList.remove('show'));if(S){S.log=false;S.bp=false;S.holding=false}else if(R3.ok)night3D(); // 일지·배전반이 컷씬을 가리지 않게, 인트로는 첫날 경비실로
   if(def.prep)def.prep();
   $('cap').textContent='';$('cap').classList.remove('show');setMode('cut');
 }
@@ -2069,7 +2069,7 @@ BP.intro=()=>({Hc:2.6,rooms:[[-5,5,2,-10],[-1.1,1.1,-10,-18.5],[1.1,7.5,-11.5,-1
      BOX(.07,2.2,.07,M.dark,-.53,1.1,.03,g);BOX(.07,2.2,.07,M.dark,.53,1.1,.03,g);BOX(1.13,.07,.07,M.dark,0,2.2,.03,g);
      mesh(new T3.PlaneGeometry(1.0,2.1),new T3.MeshBasicMaterial({map:c3cv('inside2',64,128,(q,w,h)=>{q.fillStyle='#0c0e12';q.fillRect(0,0,w,h);const gr=q.createLinearGradient(0,0,w,0);gr.addColorStop(0,'rgba(230,236,255,0)');gr.addColorStop(.6,'rgba(230,236,255,.75)');gr.addColorStop(1,'rgba(230,236,255,.2)');q.fillStyle=gr;q.fillRect(0,h*.1,w,h*.9)})}),0,1.05,.007,g,false);
      const hg=grp(-.5,0,.03,0,g),dr=grp(.5,0,0,0,hg);BOX(1.0,2.1,.05,M.metal2,0,1.05,0,dr);BOX(.6,.05,.06,M.grey,0,1.0,.04,dr);C.dyn.door=hg;
-     mesh(new T3.PlaneGeometry(.6,.13),MS({map:c3cv('stencilG',512,96,(q,w,h)=>{q.fillStyle='rgba(30,28,24,.85)';q.font=`900 ${h*.62}px 'Nanum Gothic Coding',sans-serif`;q.textAlign='center';q.textBaseline='middle';q.fillText('경비실',w/2,h/2);q.globalCompositeOperation='destination-out';for(let x=w*.3;x<w*.75;x+=w*.09)q.fillRect(x,0,3,h)}),transparent:true,roughness:.8}),0,1.7,.03,dr,false);
+     mesh(new T3.PlaneGeometry(.6,.13),MS({map:c3cv('stencilG',512,96,stencilDraw),transparent:true,roughness:.8}),0,1.7,.03,dr,false);
      const kp=grp(.68,1.2,.02,0,g);BOX(.12,.15,.03,MS({color:0x24241f,roughness:.6}),0,0,0,kp);C.dyn.kLed=mesh(new T3.SphereGeometry(.007,8,8),new T3.MeshBasicMaterial({color:0x29c23a,fog:false}),0,-.05,.017,kp,false);
      mesh(new T3.SphereGeometry(.07,12,8),new T3.MeshBasicMaterial({color:0xffc070}),0,2.38,.12,g,false);const cg=mesh(new T3.TorusGeometry(.085,.006,6,16),M.dark,0,2.38,.12,g,false);cg.rotation.x=PI2;
      C.dyn.under=mesh(new T3.PlaneGeometry(1.0,.012),new T3.MeshBasicMaterial({color:0xeef2ff}),0,.008,.06,g,false);
@@ -2095,7 +2095,7 @@ BP.outro=()=>({Hc:2.6,rooms:[[-1.2,1.2,.6,-5.4],[-3.6,3.0,-5.4,-11.4],[-4.2,-1.2
     const g=grp(-1.4,0,-11.38,0,sc);const hg=grp(-.45,0,0,0,g),dr=grp(.45,0,0,0,hg);BOX(.9,2.05,.05,M.metal2,0,1.03,0,dr);BOX(.7,.05,.06,M.grey,0,1.0,.04,dr);C.dyn.exDoor=hg;
     // 하드 모드: 계단 끝 층계참의 또 다른 경비실 철문
     const lg=grp(-1.4,2.88,-16.6,0,sc);mesh(new T3.PlaneGeometry(1.8,2.6),MS({map:tx3(T.conc,1,1.3),roughness:.95,color:0x9a9890}),0,1.3,0,lg,false);BOX(1.0,2.1,.05,M.metal2,0,1.05,.03,lg);
-    mesh(new T3.PlaneGeometry(.6,.13),MS({map:c3cv('stencilG',512,96,()=>{}),transparent:true,roughness:.8}),0,1.75,.06,lg,false);mesh(new T3.SphereGeometry(.07,12,8),new T3.MeshBasicMaterial({color:0xffc070}),0,2.4,.12,lg,false);
+    mesh(new T3.PlaneGeometry(.6,.13),MS({map:c3cv('stencilG',512,96,stencilDraw),transparent:true,roughness:.8}),0,1.75,.06,lg,false);mesh(new T3.SphereGeometry(.07,12,8),new T3.MeshBasicMaterial({color:0xffc070}),0,2.4,.12,lg,false);
     mesh(new T3.PlaneGeometry(.3,.38),new T3.MeshBasicMaterial({map:c3cv('inside',128,160,(q,w,h)=>{q.fillStyle='#1a1006';q.fillRect(0,0,w,h);const gr=q.createRadialGradient(w*.6,h*.4,0,w*.6,h*.4,w*.7);gr.addColorStop(0,'rgba(255,170,80,.5)');gr.addColorStop(1,'rgba(255,170,80,0)');q.fillStyle=gr;q.fillRect(0,0,w,h);q.fillStyle='#3a2410';q.fillRect(0,h*.62,w,h*.4);q.fillStyle='#a01810';q.fillRect(w*.3,h*.55,w*.3,h*.1);q.fillRect(w*.32,h*.5,w*.26,h*.06);q.strokeStyle='rgba(180,180,170,.6)';for(let k=-w;k<w*2;k+=10){q.beginPath();q.moveTo(k,0);q.lineTo(k+h,h);q.moveTo(k+h,0);q.lineTo(k,h);q.stroke()}})}),0,1.5,.06,lg,false);C.dyn.landing=lg;C.dyn.topWhite=mesh(new T3.PlaneGeometry(1.2,3),new T3.MeshBasicMaterial({color:0xf8faff,fog:false}),-1.4,4.4,-16.5,sc,false)}}); // 일반 엔딩: 계단 끝은 흰빛
 // 컷씬 공간: 설계도로 만들고, 걷는 동안 가까운 켜진 등 4개로 실제 광원을 옮김
 function buildCutArea(k){const B=BP[k](),C=buildArea(B,mulberry(k==='intro'?31:57),1);C.tick=cam=>followLights(C,cam);if(C.dyn.fig)bbImg(C.dyn.fig,STK.full);if(C.exit)C.exit.visible=true;return C}
@@ -2121,8 +2121,9 @@ function crtMap(zone,blink){const g=R3.scrC.getContext('2d'),w=R3.scrC.width,h=R
   P.forEach(([x,y],k)=>{const ex=k===zone&&blink;g.fillStyle=ex?'#3f6':'#160e04';g.fillRect(x-w*.05,y-h*.05,w*.1,h*.1);g.strokeStyle=ex?'#3f6':'rgba(255,186,90,.8)';g.strokeRect(x-w*.05,y-h*.05,w*.1,h*.1);g.fillStyle=ex?'#061':'rgba(255,186,90,.9)';g.fillText(CAMS[k],x,y+1)});
   g.fillStyle='rgba(0,0,0,.3)';for(let y=0;y<h;y+=3)g.fillRect(0,y,w,1);R3.scrT.needsUpdate=true}
 // 6시 컷에서 正 한 획이 그어짐
-function tallyGrow(mine,f){const D=R3.dyn;tally3(mine);if(f<=0||mine>=5)return;const g=D.calC.getContext('2d'),w=D.calC.width,h=D.calC.height,rows=6,ch=h/rows*.78,y=h*.06+5*(h/rows),x0=w*.06+mulberry(77)()*0,L=[[.1,.08,.9,.08],[.5,.08,.5,.92],[.5,.5,.85,.5],[.25,.42,.25,.92],[0,.92,1,.92]][mine];
+function tallyGrow(mine,f){const D=R3.dyn;tally3(mine);if(f<=0||mine>=5)return;const g=D.calC.getContext('2d'),w=D.calC.width,h=D.calC.height,rows=6,ch=h/rows*.7,y=h*.04+5*(h/rows),x0=w*.06+mulberry(77)()*0,L=[[.1,.08,.9,.08],[.5,.08,.5,.92],[.5,.5,.85,.5],[.25,.42,.25,.92],[0,.92,1,.92]][mine];
   const r=mulberry(77);for(let k=0;k<rows*2;k++)r();const xs=w*.06+mulberry(77)()*w*.05;g.strokeStyle='#2a2a2a';g.lineWidth=4;g.lineCap='round';g.beginPath();g.moveTo(xs+L[0]*ch,y+L[1]*ch);g.lineTo(xs+lerp(L[0],L[2],f)*ch,y+lerp(L[1],L[3],f)*ch);g.stroke();D.calT.needsUpdate=true}
+function stencilDraw(q,w,h){q.fillStyle='rgba(30,28,24,.85)';q.font=`900 ${h*.62}px 'Nanum Gothic Coding',sans-serif`;q.textAlign='center';q.textBaseline='middle';q.fillText('경비실',w/2,h/2);q.globalCompositeOperation='destination-out';for(let x=w*.3;x<w*.75;x+=w*.09)q.fillRect(x,0,3,h)}
 function stairLight(k=1){const L=CUT.areas.outro.lights[0];L.position.set(-1.4,5.6,-14.2);L.color.setHex(0xf2f6ff);L.distance=12;L.intensity=14*k}
 function landLight(){const L=CUT.areas.outro.lights[0];L.position.set(-1.4,5.3,-16.2);L.color.setHex(0xffc27a);L.distance=5;L.intensity=3}
 // ---- 컷씬 목록 ----
@@ -2146,7 +2147,7 @@ const CUTS={
     {d:2.5,scene:'room',fi:.5,room:{light:u=>!(u>.4&&u<.5),win:u=>u<.4?1:.45},cam:(u,t,C)=>shotCam(C,V(-.7,1.5,CAMZ+.05),V(-.85,1.5,CAMZ+.05),V(-RX,1.6,CAMZ),V(-RX,1.6,CAMZ),u),at:{.3:()=>sfx(1200,.02,'square',.05),1.0:()=>{relay();humTo(0,.05)}}},
     {d:2.6,scene:'room',fo:.7,room:{light:true,win:()=>.45},cam:(u,t,C)=>{const n=CUT.n;if(n===2)shotCam(C,V(-.6,1.45,CAMZ+.7),V(-.75,1.4,CAMZ+.6),V(-RX+.6,2.6,CAMZ),V(-RX+.45,0,CAMZ+.2),u);else if(n===3)shotCam(C,V(.1,1.25,-.25),V(0,1.2,-.4),V(-.25,.78,-1.05),V(.55,1.3,-1.4),u);else shotCam(C,V(-.5,1.5,.35),V(-.65,1.45,.25),V(-RX,1.85,CAMZ+1.25),V(-1.0,0,-.2),u)},at:{.2:()=>{if(CUT.n===4)drip(-.4)}}}]},
   night5_open:{shots:[
-    {d:2.5,scene:'room',fi:.5,room:{light:true,win:u=>u<.35?1:.45},cam:(u,t,C)=>shotCam(C,V(-.7,1.5,CAMZ+.05),V(-.85,1.45,CAMZ-.1),V(-RX,1.6,CAMZ),V(-RX+.5,0,CAMZ-1.5),u,{te:true,ts:.5,tf:1}),at:{.3:()=>sfx(1200,.02,'square',.05),.9:()=>{relay();humTo(0,.05)},1.8:()=>thump(300,.05,.12,-.3)}},
+    {d:2.5,scene:'room',fi:.5,room:{light:true,win:u=>u<.35?1:.45},cam:(u,t,C)=>shotCam(C,V(-.7,1.5,CAMZ+.05),V(-.85,1.45,CAMZ-.1),V(-RX,1.6,CAMZ),V(-1.6,0,-.6),u,{te:true,ts:.5,tf:1}),at:{.3:()=>sfx(1200,.02,'square',.05),.9:()=>{relay();humTo(0,.05)},1.8:()=>thump(300,.05,.12,-.3)}},
     {d:3,scene:'room',room:{light:true,win:()=>.45},cam:(u,t,C)=>shotCam(C,V(-.5,1.25,-.62),V(-.5,1.12,-.74),V(-.5,.75,-.86),V(-.48,.75,-.86),u),at:{.2:()=>whoosh()}},
     {d:2.5,scene:'room',fo:.6,room:{light:true,win:()=>.45,shoulder:true},cam:(u,t,C)=>shotCam(C,V(-.8,1.55,CAMZ),V(-.95,1.58,CAMZ),V(-RX,1.62,CAMZ),V(-RX,1.62,CAMZ),u),at:{.8:()=>footsteps(-.6,1,.2)}}]},
   reset:{shots:[
@@ -2154,13 +2155,13 @@ const CUTS={
     {d:2,scene:'room',room:{light:u=>u<.85,mon:true,monText:['CAM A-H 연결됨'],win:u=>Math.max(0,1-u*1.4),clock6:true},cam:(u,t,C)=>{C.position.set(0,1.3,-.2);const a=V(0,1.8,-1.4),b=V(-RX,1.5,CAMZ);C.lookAt(a.lerp(b,ease(Math.min(1,u*2.2))))},at:{0:()=>relay(),.4:()=>relay(),.7:()=>relay(),.95:()=>relay(),1.15:()=>relay(),1.3:()=>{relay();humTo(0,.02)},1.7:()=>thump(50,.4,.4,0)}},
     {d:2,black:true,at:{1.2:()=>drag(0,.25)}},
     {d:1.5,scene:'room',room:{light:u=>u>.15&&!(u>.35&&u<.45)&&!(u>.55&&u<.62),win:u=>u>.15?1.7:0,clock6:true},cam:(u,t,C)=>{C.position.set(0,1.3,-.2);C.lookAt(-RX,1.5,CAMZ)},at:{.2:()=>{buzzClick();humTo(.5,.4)},.6:()=>buzzClick(),.9:()=>buzzClick()}},
-    {d:1.5,scene:'room',room:{light:true,clock6:true,tally:u=>u},cam:(u,t,C)=>shotCam(C,V(-.32,1.92,-.75),V(-.32,1.92,-.8),V(-.32,1.9,-1.4),V(-.32,1.9,-1.4),u),at:{.2:()=>nburst(3200,6,.25,.06,0)}},
+    {d:1.5,scene:'room',room:{light:true,clock6:true,tally:u=>u},cam:(u,t,C)=>shotCam(C,V(-.85,2.12,-.8),V(-.85,2.12,-.85),V(-.85,2.2,-1.4),V(-.85,2.2,-1.4),u),at:{.2:()=>nburst(3200,6,.25,.06,0)}},
     {d:1.6,scene:'room',fo:.5,room:{light:true,clock6:true,map:u=>EXIT_CAM[Math.min(4,CUT.n)],tally:()=>1},cam:(u,t,C)=>shotCam(C,V(0,1.08,-.62),V(0,1.06,-.66),V(0,1.03,-.95),V(0,1.03,-.95),u),at:{.2:()=>sfx(990,.05,'sine',.06),.65:()=>sfx(990,.05,'sine',.06),1.1:()=>sfx(990,.05,'sine',.06)}}]},
   ending:{area:'outro',prep(){const D=CUT.areas.outro.dyn;D.landing.visible=false;D.topWhite.visible=true},shots:[
     {d:2,scene:'room',fi:.3,room:{light:true,mon:true,monText:['CAM A-H 연결됨'],clock6:true},cam:(u,t,C)=>shotCam(C,V(0,1.3,-.2),V(0,1.3,-.25),V(0,1.75,-1.4),V(0,1.8,-1.4),u),at:{.8:()=>sfx(1200,.03,'square',.08)}},
     {d:2.5,scene:'room',room:{light:u=>u<.8,mon:true,win:u=>Math.max(0,1-u*1.3),clock6:true},cam:(u,t,C)=>{C.position.set(0,1.3,-.2);const a=V(0,1.8,-1.4),b=V(-RX,1.5,CAMZ);C.lookAt(a.lerp(b,ease(Math.min(1,u*2))))},at:{0:()=>relay(),.5:()=>relay(),.9:()=>relay(),1.2:()=>relay(),1.5:()=>relay(),1.8:()=>{relay();humTo(0,.02)}}},
     {d:3,scene:'room',room:{light:false,win:()=>0,green:u=>u,clock6:true},cam:(u,t,C)=>{C.position.set(0,1.3,-.2);C.lookAt(-RX,1.5,CAMZ)},at:{1:()=>sfx(2400,2.2,'sine',.015)}},
-    {d:2,scene:'room',room:{light:false,green:()=>1,tally:u=>u,clock6:true},cam:(u,t,C)=>shotCam(C,V(-.32,1.92,-.75),V(-.32,1.92,-.8),V(-.32,1.9,-1.4),V(-.32,1.9,-1.4),u),at:{.3:()=>nburst(3200,6,.25,.06,0)}},
+    {d:2,scene:'room',room:{light:false,green:()=>1,tally:u=>u,clock6:true},cam:(u,t,C)=>shotCam(C,V(-.85,2.12,-.8),V(-.85,2.12,-.85),V(-.85,2.2,-1.4),V(-.85,2.2,-1.4),u),at:{.3:()=>nburst(3200,6,.25,.06,0)}},
     {d:3,scene:'room',room:{light:false,green:()=>1,tally:()=>1,keyGreen:u=>u>.2,hinge:u=>u>.45?-.16*ease(Math.min(1,(u-.45)/.5)):0,clock6:true},cam:(u,t,C)=>shotCam(C,V(-1.2,1.35,CAMZ-.35),V(-1.3,1.3,CAMZ-.4),V(-RX,1.25,CAMZ-.68),V(-RX,1.1,CAMZ-.3),u),at:{.6:()=>sfx(880,.08,'square',.06),1.1:()=>thump(80,.2,.3,-.4),1.5:()=>creak()}},
     {d:5,scene:'outro',fi:.6,cam:(u,t,C)=>shotCam(C,V(0,1.62,.3),V(-.1,1.62,-3.0),V(-1.2,1.9,-11.3),V(-1.2,1.9,-11.3),u,{walk:true,lin:true}),at:{0:()=>steps(7,.6,.14)}},
     {d:6,scene:'outro',cap:'...받아. 받아 봐.',cam:(u,t,C)=>{const p=V(-.1,1.62,-3.0).lerp(V(-.4,1.62,-3.9),ease(Math.min(1,u*1.5)));C.position.copy(p);const a=V(-1.2,1.9,-11.3),b=V(-2.9,1.0,-4.3);C.lookAt(u<.8?a.lerp(b,ease(Math.min(1,u/.35))):b.lerp(a,ease((u-.8)/.2)))},at:{1.2:()=>whisper(),3.4:()=>whisper()}},
@@ -2169,6 +2170,7 @@ const CUTS={
     {d:5,scene:'outro',white:u=>Math.max(0,(u-.45)/.55),fx:()=>stairLight(),cam:(u,t,C)=>{const e=u,z=-11.2-e*4.2,y=1.62+Math.max(0,(-11.6-z)/.3)*.18;C.position.set(-1.4,y+Math.sin(e*28)*.02,z);C.lookAt(-1.4,y+1.4,z-2.4)},at:{0:()=>{for(let k=0;k<8;k++)thump(90,.08,.18,0,k*.55)}}},
     {d:2,white:u=>1-u,black:false,scene:null}]},
 };
+CUTS.reset2d={shots:[{d:1.4,black:true,at:{0:()=>{relay();humTo(0,.05)},.35:()=>relay(),.65:()=>relay()}},{d:1.6,black:true,at:{.4:()=>drag(0,.25),1.3:()=>buzzClick()}}]}; // 3D가 안 될 때 6시 소등은 소리로만
 CUTS.ending_hard={area:'outro',prep(){const D=CUT.areas.outro.dyn;D.landing.visible=true;D.topWhite.visible=false},shots:CUTS.ending.shots.slice(0,-1).concat([
   {d:3.5,scene:'outro',white:u=>1-Math.min(1,u*2),fx:()=>landLight(),cam:(u,t,C)=>shotCam(C,V(-1.4,4.5,-14.2),V(-1.4,4.5,-14.6),V(-1.4,4.4,-16.6),V(-1.4,4.4,-16.6),u),at:{.6:()=>ringTone(),2.6:()=>ringTone()}},
   {d:2.5,scene:'outro',fx:()=>landLight(),cam:(u,t,C)=>shotCam(C,V(-1.4,4.4,-15.1),V(-1.4,4.38,-16.1),V(-1.4,4.38,-16.6),V(-1.4,4.38,-16.6),u),at:{.5:()=>ringTone()},cutAt:2.2}])};
@@ -2280,7 +2282,7 @@ function emitView(i,ox){
     cx.restore();
     {cx.save();rr(cx,m.x,m.y,m.w,m.h,10);cx.clip();const gl3=cx.createLinearGradient(m.x,m.y,m.x+m.w*.6,m.y+m.h);gl3.addColorStop(0,'rgba(255,255,240,.09)');gl3.addColorStop(.4,'rgba(255,255,240,0)');cx.fillStyle=gl3;cx.fillRect(m.x,m.y,m.w,m.h);const vg2=cx.createRadialGradient(m.x+m.w/2,m.y+m.h/2,m.h*.3,m.x+m.w/2,m.y+m.h/2,m.w*.65);vg2.addColorStop(0,'rgba(0,0,0,0)');vg2.addColorStop(1,'rgba(0,0,0,.45)');cx.fillStyle=vg2;cx.fillRect(m.x,m.y,m.w,m.h);cx.restore()} // 볼록한 브라운관 유리
     {const nw=m.w*.24,nh=m.w*.2;cx.save();cx.translate(m.x+m.w*.86,m.y+m.h*.74);cx.rotate(-.07);cx.shadowColor='rgba(0,0,0,.6)';cx.shadowBlur=6;cx.shadowOffsetY=2;cx.fillStyle='#cdbb4c';cx.fillRect(0,0,nw,nh);cx.shadowColor='transparent';
-     cx.fillStyle='rgba(0,0,0,.12)';cx.fillRect(0,0,nw,nh*.12);txt(cx,'문 절대',nw*.08,nh*.22,nh*.2,'#5a1010',nw*.84);txt(cx,'열지 마',nw*.08,nh*.52,nh*.2,'#5a1010',nw*.84);
+     cx.fillStyle='rgba(0,0,0,.12)';cx.fillRect(0,0,nw,nh*.12);txt(cx,'밖에',nw*.08,nh*.22,nh*.2,'#5a1010',nw*.84);txt(cx,'나가지 마',nw*.08,nh*.52,nh*.2,'#5a1010',nw*.84);
      cx.fillStyle=`rgba(0,0,0,${lightVis()?.3:.85})`;cx.fillRect(0,0,nw,nh);cx.restore()} // 모니터 오른쪽 아래 모서리에 붙은 포스트잇
     if(powered()){cx.globalCompositeOperation='lighter';const gr=cx.createRadialGradient(m.x+m.w/2,m.y+m.h/2,0,m.x+m.w/2,m.y+m.h/2,m.w);gr.addColorStop(0,'rgba(60,140,80,.12)');gr.addColorStop(1,'rgba(60,140,80,0)');cx.fillStyle=gr;cx.fillRect(m.x-m.w/2,m.y-m.h/2,m.w*2,m.h*2);cx.globalCompositeOperation='source-over';if(I.monLed)led(I.monLed.x,I.monLed.y,2,'#3c3')}
     if(powered()&&T_%2<1&&I.camLed)led(I.camLed.x,I.camLed.y,2,'#e22');if(powered()&&I.radioLed)led(I.radioLed.x,I.radioLed.y,1.5,'#3c3');
