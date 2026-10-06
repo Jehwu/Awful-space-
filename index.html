@@ -1644,7 +1644,7 @@ function build3D(){
   {const g=onWall('E',.75,1.25,.0);const pc=cvs(96,160,(q,w,h)=>{const gr=q.createRadialGradient(w/2,h*.55,0,w/2,h*.55,w*.7);gr.addColorStop(0,'#bdb59c');gr.addColorStop(1,'#e2dcc8');q.fillStyle=gr;q.fillRect(0,0,w,h);q.fillStyle='#4a4436';q.fillRect(w*.3,h*.2,w*.4,h*.6)});
    BOX(.08,.13,.012,MS({map:ctx3(pc),roughness:.6}),0,0,.006,g);R3.dyn.swT=BOX(.025,.05,.02,MS({color:0xeee8d6,roughness:.5}),0,0,.02,g);R3.hot.sw=g}
   {const g=onWall('E',.02,.3,.0),v={};R3.dyn.vent=v;R3.hot.vent=g; // 잡음이 기어 나오는 바닥 환풍구 + 내리닫이 철판
-   BOX(.58,.4,.05,darkM,0,0,.025,g);PLN(.5,.3,new T3.MeshBasicMaterial({color:0x040302}),0,0,.051,g);
+   BOX(.58,.4,.05,darkM,0,0,.025,g);{const dm=new T3.MeshBasicMaterial({color:0x6a6050});new T3.TextureLoader().load('img/tex/duct.jpg',t=>{t.colorSpace=T3.SRGBColorSpace;dm.map=t;dm.needsUpdate=true});PLN(.5,.3,dm,0,0,.051,g)} // 덕트 안쪽 (Canva로 만든 사진)
    v.face=PLN(.44,.49,new T3.MeshBasicMaterial({transparent:true,alphaTest:.05,color:0xb8b0a0}),0,-.01,.054,g);v.face.visible=false;
    const slM=MS({color:0x2e2e2a,roughness:.6,metalness:.5});for(let k=0;k<6;k++){const sl=BOX(.5,.01,.03,slM,0,-.125+k*.05,.066,g);sl.rotation.x=.7}
    [-.29,.29].forEach(x=>BOX(.02,.82,.025,darkM,x,.2,.075,g));
