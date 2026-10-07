@@ -124,13 +124,13 @@ body[data-mode=cut] #camOff,body[data-mode=cut] #camRep{display:none!important}
 .hb span{position:absolute;left:50%;top:100%;transform:translateX(-50%) rotate(-2deg);margin-top:3px;white-space:nowrap;font:17px/1 'Nanum Pen Script',cursive;color:rgba(226,218,192,.78);text-shadow:0 0 4px #000,0 0 2px #000;pointer-events:none}
 .hb:active{transform:translateY(1px) scale(.96)}
 body.hands .hb{display:none!important} /* 손으로 조작할 땐 버튼 숨김 */
-#flashBtn{right:20px;bottom:30px;width:84px;height:84px;color:#e6eee9;border:none;background:radial-gradient(circle at 40% 34%,rgba(255,255,255,.07),transparent 38%),radial-gradient(circle,#101414 0 61%,transparent 62%),conic-gradient(rgba(214,226,218,.8) calc(var(--c,1)*360deg),rgba(40,46,46,.7) 0);box-shadow:inset 0 0 0 5px rgba(0,0,0,.55),0 0 0 2px rgba(0,0,0,.6),0 6px 18px rgba(0,0,0,.75)}
-#flashBtn svg{width:46%;height:46%;opacity:calc(.3 + var(--c,1)*.7)}
-#flashBtn.ready{animation:hbReady 2.6s infinite}@keyframes hbReady{0%,100%{filter:none}48%{filter:brightness(1.25) drop-shadow(0 0 8px rgba(200,230,220,.35))}50%{filter:brightness(.8)}52%{filter:brightness(1.2)}}
+#flashBtn,#flashLBtn{right:20px;bottom:30px;width:84px;height:84px;color:#e6eee9;border:none;background:radial-gradient(circle at 40% 34%,rgba(255,255,255,.07),transparent 38%),radial-gradient(circle,#101414 0 61%,transparent 62%),conic-gradient(rgba(214,226,218,.8) calc(var(--c,1)*360deg),rgba(40,46,46,.7) 0);box-shadow:inset 0 0 0 5px rgba(0,0,0,.55),0 0 0 2px rgba(0,0,0,.6),0 6px 18px rgba(0,0,0,.75)}
+#flashLBtn{left:20px;right:auto}#flashBtn svg,#flashLBtn svg{width:46%;height:46%;opacity:calc(.3 + var(--c,1)*.7)}
+#flashBtn.ready,#flashLBtn.ready{animation:hbReady 2.6s infinite}@keyframes hbReady{0%,100%{filter:none}48%{filter:brightness(1.25) drop-shadow(0 0 8px rgba(200,230,220,.35))}50%{filter:brightness(.8)}52%{filter:brightness(1.2)}}
 #torchBtn{right:118px;bottom:34px}#torchBtn.off{color:#5c6563}#torchBtn.off svg .ray{display:none}
 #battBtn{right:124px;bottom:116px}#battBtn b{position:absolute;right:-3px;top:-3px;min-width:18px;height:18px;border-radius:9px;font:bold 12px/18px sans-serif;color:#fff;background:#6a1712;box-shadow:0 0 0 2px #000}
-#pnlBtn{left:20px;bottom:34px}
-#eyeBtn{left:96px;bottom:30px;width:70px;height:70px;z-index:4}#eyeBtn.on{color:#8a2420;background:#000;border-color:rgba(140,30,25,.5)}#eyeBtn.on svg .lid{display:none}#eyeBtn:not(.on) svg .shut{display:none}
+#pnlBtn{right:35px;bottom:142px}
+#eyeBtn{left:28px;bottom:142px;width:70px;height:70px;z-index:4}#eyeBtn.on{color:#8a2420;background:#000;border-color:rgba(140,30,25,.5)}#eyeBtn.on svg .lid{display:none}#eyeBtn:not(.on) svg .shut{display:none}
 #pnl{position:fixed;left:12px;top:50%;transform:translateY(-50%);display:none;flex-direction:column;gap:6px;z-index:3}
 
 body:not([data-mode=game]) #eyeBtn,.scare #eyeBtn{display:none!important}
@@ -144,7 +144,7 @@ body:not([data-mode=game]) #bpBack,.scare #bpBack{display:none!important}
 #battPic[data-s="1"] .cap,#battPic[data-s="2"] .cap,#battPic[data-s="3"] .cap{transform:translateX(30px)}#battPic[data-s="2"] .old,#battPic[data-s="3"] .old{transform:translateX(120px);opacity:0}#battPic[data-s="3"] .new{opacity:1}
 #pnl button{font:18px/1 'Nanum Pen Script',cursive;color:#c4cec9;background:radial-gradient(circle at 30% 30%,#232a2c,#0a0d0d 80%);border:1px solid rgba(200,210,205,.18);border-radius:4px;padding:7px 16px;box-shadow:inset 0 0 8px #000,0 4px 10px rgba(0,0,0,.6)}
 #pnl button.on{color:#fff;border-color:rgba(200,220,210,.5);box-shadow:inset 0 0 8px #000,0 0 10px rgba(180,220,210,.18)}#pnl .x{color:#c98a80;border-color:rgba(160,60,50,.4)}
-body:not([data-mode=game]) #flashBtn,body:not([data-mode=game]) #pnl,body:not([data-mode=game]) #pnlBtn,body:not([data-mode=game]) #battBtn,body:not([data-mode=game]) #battOv,.scare #flashBtn,.scare #pnl,.scare #pnlBtn,.scare #battBtn,.scare #battOv{display:none!important}
+body:not([data-mode=game]) #flashLBtn,.scare #flashLBtn,body:not([data-mode=game]) #flashBtn,body:not([data-mode=game]) #pnl,body:not([data-mode=game]) #pnlBtn,body:not([data-mode=game]) #battBtn,body:not([data-mode=game]) #battOv,.scare #flashBtn,.scare #pnl,.scare #pnlBtn,.scare #battBtn,.scare #battOv{display:none!important}
 .glitch{text-shadow:4px 0 rgba(255,30,30,.55),-4px 0 rgba(30,255,255,.45)!important;transform:translateX(3px) skewX(-4deg)}
 @keyframes flick{0%,100%{opacity:1}41%{opacity:1}42%{opacity:.35}43%{opacity:1}70%{opacity:.9}71%{opacity:.2}72%{opacity:.85}}
 
@@ -266,7 +266,7 @@ body[data-mode=game] #pauseBtn{display:flex}
  .meter{width:230px;margin-bottom:14px}.meter .lab{font-size:16px}.meter b{font-size:26px}#pbar{height:12px}#ekg{width:230px;height:44px}
  #camRep{left:50%;bottom:74px;transform:translateX(-50%);font-size:19px;padding:12px 30px;gap:14px}#camRep .rd{width:13px;height:13px}
  #camOff{font-size:17px;padding:10px 34px}#map{width:380px;height:285px}#map .cb{font-size:19px;min-width:38px;min-height:30px}
- #bpBack{font-size:18px;padding:12px 24px}.hb{width:64px;height:64px}.hb span{font-size:20px}#flashBtn{width:104px;height:104px}#torchBtn{right:142px}#battBtn{bottom:136px;right:150px}#eyeBtn{left:110px;width:82px;height:82px}#pnl button{font-size:16px;padding:9px 18px}}
+ #bpBack{font-size:18px;padding:12px 24px}.hb{width:64px;height:64px}.hb span{font-size:20px}#flashBtn,#flashLBtn{width:104px;height:104px}#pnlBtn{right:40px;bottom:166px}#eyeBtn{left:30px;bottom:162px;width:82px;height:82px}#pnl button{font-size:16px;padding:9px 18px}}
 .short #clock{font-size:32px}.short .meter{width:120px;margin-bottom:6px}.short #ekg{width:120px;height:24px}
 </style>
 </head>
@@ -283,9 +283,10 @@ body[data-mode=game] #pauseBtn{display:flex}
 <div id="msg"></div>
 <button id="camOff"><span class="ar">▼</span> 닫기</button>
 <button id="camRep"><span class="rd"></span>복제자 신고</button>
-<button id="flashBtn" class="hb"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/><path d="M17.5 10.5h.01"/></svg><span>플래시</span></button>
+<button id="flashLBtn" class="hb"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/><path d="M17.5 10.5h.01"/></svg><span>왼쪽 플래시</span></button>
+<button id="flashBtn" class="hb"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/><path d="M17.5 10.5h.01"/></svg><span>오른쪽 플래시</span></button>
 <button id="torchBtn" class="hb"><svg viewBox="0 0 24 24"><path d="M9 9h6l-1 4v7h-4v-7z"/><path d="M9 9V6h6v3"/><path class="ray" d="M12 3V1.5M7 4.5 6 3.5M17 4.5l1-1"/></svg><span>손전등 끄기</span></button>
-<button id="eyeBtn" class="hb"><svg viewBox="0 0 24 24"><path class="lid" d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6S2 12 2 12z"/><circle class="lid" cx="12" cy="12" r="2.8"/><path class="shut" d="M2 11c3 3.5 6.5 5 10 5s7-1.5 10-5M6 15l-1.5 2M12 16.5V19M18 15l1.5 2"/></svg><span>눈 감기 (꾹)</span></button>
+<button id="eyeBtn" class="hb"><svg viewBox="0 0 24 24"><path class="lid" d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6S2 12 2 12z"/><circle class="lid" cx="12" cy="12" r="2.8"/><path class="shut" d="M2 11c3 3.5 6.5 5 10 5s7-1.5 10-5M6 15l-1.5 2M12 16.5V19M18 15l1.5 2"/></svg><span>숨기 (꾹)</span></button>
 <div id="pnl"><button data-c="0">왼쪽</button><button data-c="1">가운데</button><button data-c="2">오른쪽</button><button class="x">닫기</button></div>
 <button id="pnlBtn" class="hb"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M7 7h10v8H7z"/><path d="M9 18h6"/></svg><span>패널</span></button>
 <button id="bpBack">← 돌아가기</button>
@@ -339,7 +340,7 @@ body[data-mode=game] #pauseBtn{display:flex}
 <script nomodule>window.THREE_ERR='nomodule'</script>
 <script>
 // ===================== 기본 =====================
-const VER='0.20.0'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
+const VER='0.21.0'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
 const $=id=>document.getElementById(id);
 const cv=$('cv'),cx=cv.getContext('2d');
 let W,H,DPR=1;const MOB=matchMedia('(pointer:coarse)').matches||/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent); // 폰이면 가볍게
@@ -1146,7 +1147,7 @@ function newNight(n){
   const go2=()=>{if(!S||S.night!==n)return;setMode('game');buildUI();updHUD();
     {const tx=n+'일 차',el=$('introSmall');el.textContent='';let k=0;const iv=setInterval(()=>{k++;el.textContent=tx.slice(0,k);if(k>=tx.length)clearInterval(iv)},40)} // 한 글자씩
     const it=$('intro');it.classList.remove('show');void it.offsetWidth;it.classList.add('show');
-    setTimeout(()=>{it.classList.remove('show');if(S&&S.night===n&&!S.over){S.view=S.camX=1;openLog();if(S.ch===2)say(SPOT2[n-1].name+'. 불이 꺼졌다.')}},DEV.on?700:2400)};
+    setTimeout(()=>{it.classList.remove('show');if(S&&S.night===n&&!S.over){S.view=S.camX=1;S.yaw=S.yawT=0;openLog();if(S.ch===2)say(SPOT2[n-1].name+'. 불이 꺼졌다.')}},DEV.on?700:2400)};
   if(n>=2&&!DEV.on&&R3.ok&&CHAP===1)playCut(n===5?'night5_open':'night_start',go2,n);
   else if(!DEV.on&&R3.ok&&CHAP===2){if(n===1&&!INTRO2)INTRO2=1,playCut('intro2',go2,1);else playCut('night2_start',go2,n)}else go2();
 }
@@ -1365,7 +1366,13 @@ function heartbeat(dt){
 // 실제 시간으로 흐르는 연출
 const DUST=Array.from({length:50},()=>({x:rnd(.28,.72),y:rnd(.05,.85),v:rnd(.004,.018),p:rnd(0,6)}));
 function animate(dt){
-  S.camX+=(S.view-S.camX)*Math.min(1,dt*7);
+  if(S.ch===2){ // 수영장: 프레디처럼 자리에서 좌우로 둘러봄 (PC는 화면 가장자리·A/D, 폰은 끌기)
+    if(S.yaw===undefined)S.yaw=S.yawT=0;
+    if(canAct()&&!S.mon){const ez=W*.14;if(!PT.touch&&PT.x>=0&&PT.y<H*.78){if(PT.x<ez)S.yawT-=dt*1.8*(1-PT.x/ez);else if(PT.x>W-ez)S.yawT+=dt*1.8*(1-(W-PT.x)/ez)}
+      if(KEYH.left)S.yawT-=dt*1.9;if(KEYH.right)S.yawT+=dt*1.9}
+    S.yawT=Math.max(-YAWMAX,Math.min(YAWMAX,S.yawT));S.yaw+=(S.yawT-S.yaw)*Math.min(1,dt*7);
+    S.camX=1+S.yaw/PI2;S.view=Math.max(0,Math.min(2,Math.round(S.camX)));
+  }else S.camX+=(S.view-S.camX)*Math.min(1,dt*7);
   const tgt=monOn()?1:0;S.monA+=Math.sign(tgt-S.monA)*Math.min(Math.abs(tgt-S.monA),dt*4.5);
   if(S.camSw>0)S.camSw-=dt;
   if(S.typ&&S.typ.n<S.typ.t.length){const n0=S.typ.n|0;S.typ.n=Math.min(S.typ.t.length,S.typ.n+dt*34);if((S.typ.n|0)!==n0)$('msg').textContent=S.typ.t.slice(0,S.typ.n|0)}
@@ -1386,6 +1393,7 @@ function animate(dt){
 // ===================== 행동 =====================
 function turn(d){
   if(!S||S.over||(S.mon&&S.ch!==2)||S.log||S.bp||S.paused||mode!=='game')return;
+  if(S.ch===2){S.yawT=Math.max(-YAWMAX,Math.min(YAWMAX,(S.yawT||0)+d*.9));return}
   const v=Math.max(0,Math.min(2,S.view+d));
   if(v!==S.view){S.view=v;whoosh();buildUI()}
 }
@@ -1447,7 +1455,7 @@ function reportCam(){
   else{S.san-=10;say('"이상 없습니다. 기록됩니다."','bad')}
 }
 // PC 조작키 안내 (근무 일지·이용 수칙 카드 맨 아래). 폰에서는 안 보임
-function keyGuide(box){if(MOB)return;const kn=a=>keyName(keyOf(a)),K=S.ch===2?[[kn('flash'),'플래시'],[kn('left')+' / '+kn('right'),'고개 돌리기 (패널에선 통로 바꾸기)'],[kn('pnl'),'통로 패널'],[kn('torch'),'손전등 끄기/켜기'],[kn('batt'),'배터리 교체'],...(S.night>=5?[[kn('eyes')+' 꾹','눈 감기']]:[]),['Esc','일시정지 · 설정에서 키 바꾸기']]:[['클릭','물건 누르기 · 양옆 화살표로 고개 돌리기'],['Esc','일시정지 · 창 닫기']];
+function keyGuide(box){if(MOB)return;const kn=a=>keyName(keyOf(a)),K=S.ch===2?[[kn('flashL')+' / '+kn('flashR'),'왼쪽 / 오른쪽 플래시'],[kn('left')+' / '+kn('right'),'둘러보기 (화면 가장자리로 마우스를 가져가도 됨)'],[kn('pnl'),'통로 패널'],[kn('eyes')+' 꾹','숨기'],...(handsOn()?[['클릭','누른 쪽으로 플래시']]:[]),['Esc','일시정지 · 설정에서 키 바꾸기']]:[['클릭','물건 누르기 · 양옆 화살표로 고개 돌리기'],['Esc','일시정지 · 창 닫기']];
   const d=document.createElement('div');d.className='lg-keys';d.innerHTML=K.map(([k,t])=>`<span><kbd>${k}</kbd>${t}</span>`).join('');box.insertBefore(d,box.children[2]||null)} // 제목 바로 아래 (스크롤 안 해도 보이게)
 function openLog(){
   if(S.view!==1||S.mon)return;
@@ -1531,8 +1539,8 @@ function showEnd(title,text,label,fn){
 function buildUI(){
   const cam=S.mon&&!S.over;document.body.classList.toggle('cam',cam);
   const c2=S.ch===2;$('bpBack').style.display=S.bp&&R3.ok&&!S.over?'block':'none';$('map').style.display=cam&&!c2?'block':'none';$('camOff').style.display=cam&&!c2?'flex':'none';$('camRep').style.display=cam&&S.night>=4&&!c2?'flex':'none';
-  $('pnl').style.display=cam&&c2?'flex':'none';$('flashBtn').style.display=c2?'flex':'none';$('pnlBtn').style.display=c2&&!cam?'block':'none';$('torchBtn').style.display=c2&&!S.swap?'block':'none';$('eyeBtn').style.display=c2&&S.night>=5&&!S.dawn?'block':'none';if(c2){$('torchBtn').querySelector('span').textContent=S.torchOff?'손전등 켜기':'손전등 끄기';$('torchBtn').classList.toggle('off',!!S.torchOff)}
-  $('battBtn').style.display=c2&&(S.spare??1)>0&&!S.swap&&!S.dawn?'block':'none';if(c2)$('battN').textContent=S.spare??1;$('pnl').querySelectorAll('[data-c]').forEach(b=>b.classList.toggle('on',+b.dataset.c===S.cam));updMap();
+  $('pnl').style.display=cam&&c2?'flex':'none';$('flashBtn').style.display=$('flashLBtn').style.display=c2?'flex':'none';$('pnlBtn').style.display=c2&&!S.dawn?'block':'none';$('torchBtn').style.display=$('battBtn').style.display='none';$('eyeBtn').style.display=c2&&S.night>=3&&!S.dawn?'block':'none'; // 수영장 버튼: 왼쪽 아래 왼쪽 플래시·숨기 / 오른쪽 아래 오른쪽 플래시·패널
+  $('pnl').querySelectorAll('[data-c]').forEach(b=>b.classList.toggle('on',+b.dataset.c===S.cam));updMap();
 }
 function updHUD(){
   const hr=Math.floor(S.t/HOUR),mn=Math.floor((S.t%HOUR)/HOUR*6)*10;
@@ -1545,7 +1553,7 @@ function updHUD(){
   if(S.san<45&&Math.random()<.02)S.clkG=.18+Math.random()*.25; // 정신이 흔들리면 시계도 흔들림
   if(S.clkG>0){S.clkG-=1/60;const gl=['3:33','--:--','6:66','??:??',`${ri(13)}:${ri(6)}${ri(10)}`];$('clock').innerHTML=`${gl[ri(gl.length)]}<small>AM</small>`;$('clock').classList.add('glt')}else $('clock').classList.remove('glt');
   if(S.msgT<=0)$('msg').style.opacity=0;
-  if(S.ch===2){const fb=$('flashBtn');fb.style.setProperty('--c',(S.fl??1).toFixed(2));fb.classList.toggle('ready',(S.fl??1)>=1)}
+  if(S.ch===2)['flashBtn','flashLBtn'].forEach(id=>{const fb=$(id);fb.style.setProperty('--c',(S.fl??1).toFixed(2));fb.classList.toggle('ready',(S.fl??1)>=1)})
 }
 function say(t,kind='',dur=3.5){if(!S)return;S.msgT=dur+t.length*.03;S.typ={t,n:0};const m=$('msg');m.className=kind;m.textContent='';m.style.opacity=1} // 한 글자씩 타이핑
 
@@ -1571,7 +1579,7 @@ function hots(i){const lock=()=>S.door?'문 잠금 풀기':'문 잠그기',lab={
 }
 const canAct=()=>S&&mode==='game'&&!S.over&&!S.paused&&!PAUSE.on&&!S.log&&!S.bp&&!S.eyes&&(!S.mon||S.ch===2)&&jump<=0; // 챕터 2는 패널을 열어도 둘러볼 수 있음
 const navW=()=>Math.max(52,W*.065);
-function navZone(p){if(p.y<0||!canAct())return 0;if(p.x<navW()&&S.view>0)return -1;if(p.x>W-navW()&&S.view<2)return 1;return 0}
+function navZone(p){if(p.y<0||!canAct()||S.ch===2)return 0;if(p.x<navW()&&S.view>0)return -1;if(p.x>W-navW()&&S.view<2)return 1;return 0}
 function toView(p){const t=S.tf||[1,0,0];return{x:(p.x-W/2)/t[0]+W/2-t[1],y:(p.y-H/2)/t[0]+H/2-t[2]}}
 function hotAt(p){
   if(p.x<0||!canAct()||Math.abs(S.view-S.camX)>.15||navZone(p))return null;const v=toView(p);
@@ -1598,6 +1606,7 @@ function drawHints(ox){
 }
 // 화면 양옆: 누르면 고개를 돌림
 function drawNav(){
+  if(S.ch===2)return; // 수영장은 화살표 대신 둘러보기
   if(!canAct()){if(cv.style.cursor!=='default'&&!(S&&S.mon))cv.style.cursor='default';return}
   const zw=navW();
   [-1,1].forEach(d=>{const to=S.view+d;if(to<0||to>2)return;const hov=!PT.touch&&navZone(PT)===d,a=hov?1:PT.touch?.6:.4,x0=d<0?0:W-zw;
@@ -2519,72 +2528,71 @@ function setChapter(c){if(EYEF)EYEF.frequency.setTargetAtTime(20000,AC.currentTi
 // 안내판 (공공시설 말투)
 const POOL_RULES=[
   [1,'야간에는 조명이 꺼집니다. 오전 6시에 다시 켜집니다.'],
-  [1,'좌우 통로 위 비상등이 빨갛게 깜빡이면, 그 통로로 누가 오고 있습니다.'],
-  [1,'비상등이 꺼지면 그 아치에 서 있는 것입니다. 그쪽을 보고 플래시를 터뜨리십시오.'],
-  [1,'가운데 수로는 물입니다. 걸어서 오는 사람은 없습니다.'],
+  [1,'좌우 통로 위 비상등이 빨갛게 깜빡이면, 그 통로로 누가 오고 있습니다. 통로 패널로 확인할 수 있습니다.'],
+  [1,'비상등이 꺼지면 그 아치에 서 있는 것입니다. 그쪽으로 플래시를 터뜨리십시오.'],
+  [1,'손전등 배터리는 하나뿐입니다. 손전등·패널·플래시가 모두 씁니다. 숨어 있는 동안에는 조금씩 찹니다.'],
   [1,'수로 끝 초록 비상구 불빛은 매일 아침 조금씩 가까워집니다.'],
   [2,'가운데 수로 바닥을 패널로 자주 확인하십시오. 오래 안 보면 떠오릅니다.'],
-  [3,'물 위로 머리가 올라오면 손전등을 끄고 가만히 계십시오. 빛을 쫓아옵니다. 플래시 금지.'],
-  [4,'미끄럼틀에서 긁히는 소리가 나면, 끝에 손이 보일 때 앞을 보고 플래시를 터뜨리십시오.'],
-  [5,'흥얼거리는 소리가 가까이 오면 눈을 감으십시오. 노래가 완전히 멀어질 때까지 뜨지 마십시오.'],
-  [1,'플래시는 충전되는 동안 쓸 수 없습니다.'],
-  [1,'조명이 켜지면 다음 구역으로 이동하십시오.']];
+  [3,'수로에 물살이 일면 곧 머리가 올라옵니다. 숨으십시오. 빛을 쫓아옵니다. 앞쪽으로 플래시 금지.'],
+  [4,'미끄럼틀에서 긁히는 소리가 나면, 끝에 손이 보일 때 오른쪽으로 플래시를 터뜨리십시오.'],
+  [5,'흥얼거리는 소리가 가까이 오면 숨으십시오. 노래가 완전히 멀어질 때까지 나오지 마십시오.'],
+  [1,'플래시는 충전되는 동안 쓸 수 없습니다.']];
 const DEATH2={'흥얼이':'눈을 뜨자, 바로 앞에서 웃고 있었다.','교대자':'어둠 속에서 젖은 손이 얼굴을 덮었다.','익사자':'물 밑에서 올라온 손이 발목을 잡았다.','잠수부':'불빛을 따라 물 밖으로 뛰어올랐다.','미끄럼틀':'미끄럼틀 끝에서 무언가 쏟아져 나왔다.'};
 // 챕터 2는 한 자리(안전요원석)에서 버팀. 가운데 수로 끝 초록 비상구 불빛이 매일 아침 다가옴
 const SPOT1={name:'안전요원석',eye:2.05,R:7,plat:true,slide:true,pool:[-4.6,4.6,-1.8]},SPOT2=[SPOT1,SPOT1,SPOT1,SPOT1,SPOT1];
 const EXIT2=[18,14.5,11,7.5,4]; // 수로 입구에서 비상구 불빛까지 거리 (밤마다)
 const SLIDE_EXIT=[1.6,.5,-3.7],POOL_D=1.7,WATER_Y=-.14; // 미끄럼틀 끝 (앞을 보면 오른쪽에 보임)
 const DIRX=[-.8,0,.8]; // 왼쪽·앞·오른쪽 소리 방향
-function humInit2(h){h.dir=-1;h.st=0;h.node=-5;h.spot=0;h.timer=rnd(14,22)}
+function humInit2(h){h.dir=-1;h.st=0;h.node=-5;h.spot=0;h.timer=rnd(16,24)}
 const humStep2=()=>Math.max(3.5,rnd(6,9)-S.night*.6)*(S.hard?.75:1)*(hasMod('fast')?.8:1);
 const humArch2=()=>(S.hard?3.5:4.5)-S.night*.25; // 아치에 서 있는 시간
 const humNear2=()=>(S.hard?2.2:3.2)-S.night*.1;  // 바로 앞까지 온 뒤 덮치기까지
-const torchOn=()=>S.power>0&&!S.swap&&!S.torchOff; // 손전등: 평소엔 약하게 켜져 있음 (끌 수 있음)
+const torchOn=()=>S.power>0&&!S.eyes; // 손전등: 늘 켜져 있고, 숨는 동안(눈 감고 웅크림)만 꺼짐
+const YAWMAX=1.25; // 둘러볼 수 있는 범위 (라디안, 양옆 아치가 화면에 들어옴)
+const flashZone=a=>a<-.5?'L':a>.17?'R':'F'; // 플래시 방향 → 왼쪽 아치 / 오른쪽(아치·미끄럼틀) / 앞(수로·풀)
 const SWAP=[['뚜껑 돌려서 열기',.9],['빈 배터리 빼기',0],['새 배터리 끼우기',0],['뚜껑 돌려서 닫기',.7]]; // [할 일, 꾹 누르는 시간(0이면 한 번 누르기)]
 function update2(dt){
   if(S.dawn){S.dawn+=dt;if(S.dawn>3.2)win();return} // 6시: 불이 켜지는 중
   S.t+=dt;
   if(S.t>=HOUR*6){S.dawn=.01;setHum(true);if(S.swap)endSwap(true);for(let k=0;k<6;k++)setTimeout(()=>relay(),400+k*260);setTimeout(()=>{thump(50,.4,.4,0);humTo(.7,.3)},2100);return}
   const h=S.hum;if(h.dir===undefined){humInit2(h);S.fl=1;S.spare=1;S.drn={p:0,said:0};S.dv={st:0,timer:rnd(40,55)-S.night*3,off:0};S.sl={st:0,timer:rnd(35,50),sT:0};S.hm={st:0,timer:rnd(30,45),nT:0,ni:0,side:0,said:0}}
-  // 배터리: 손전등이 켜져 있으면 닳음 (한 밤에 한 번은 갈아야 함), 패널, 플래시는 한 번에
-  if(torchOn())S.power=Math.max(0,S.power-dt*((S.hard?.4:.34)+(S.mon?.05:0)));
-  if(S.power<=0&&!S.outSaid){S.outSaid=true;say(S.spare>0?'손전등이 꺼졌다. 배터리를 갈아야 한다.':'손전등이 꺼졌다. 남은 배터리가 없다.','bad');sfx(50,1.5,'sawtooth',.2);buildUI()}
-  if(S.power<20&&!S.lowSaid&&S.power>0){S.lowSaid=true;say('손전등 불빛이 깜빡인다.')}
-  // 배터리 교체: 꾹 누르는 단계는 누르고 있는 동안만 진행
-  if(S.swap){const sw=S.swap,need=SWAP[sw.step][1];if(need&&sw.hold){sw.p+=dt/need;if(Math.random()<dt*8)nburst(3000,4,.03,.05,0);if(sw.p>=1)swapNext()}updSwap()}
+  // 배터리 하나로 한 밤: 손전등은 켜져 있기만 해도, 패널은 더, 플래시는 한 번에. 숨어 있으면 조금씩 참 (프레디의 전력처럼)
+  if(S.eyes)S.power=Math.min(100,S.power+dt*.25);else S.power=Math.max(0,S.power-dt*(.15+(S.mon?.1:0))*(S.hard?1.2:1));
+  if(S.power<=0&&!S.outSaid){S.outSaid=true;sfx(50,1.5,'sawtooth',.2);if(S.mon)toggleMon();buildUI()}if(S.power>3)S.outSaid=false;
+  if(S.eyes&&S.mon)toggleMon(); // 숨으면 패널도 내림
   const f0=S.fl;S.fl=Math.min(1,S.fl+dt/(S.hard?4.2:3));if(f0<1&&S.fl>=1)sfx(2600,.08,'sine',.04); // 충전 끝: 삑
   if(S.flashT>0)S.flashT-=dt;
   // 교대자: 세 통로 중 하나로 걸어옴 (먼 통로 → 통로 중간 → 아치 → 바로 앞). 그 아치 위 비상등이 깜빡이다 꺼짐
-  const FZ=!!(S.hm&&S.hm.st===2),DVU=!!(S.dv&&S.dv.st===3); // 동시에 막을 수 없는 경우만 멈춤
-  if(S.t>=10&&!FZ&&!(DVU&&h.dir>=0))h.timer-=dt; // 처음 10초는 아무것도 안 옴
-  const SIDE=['왼쪽','','오른쪽'];
+  // 쏴야 하는 것(교대자·미끄럼틀)과 숨어야 하는 것(잠수부·흥얼이)은 절대 같이 오지 않음: 숨을 일이 진행 중이면 쏠 일은 멈춰 있음
+  const HIDE=!!((S.dv&&S.dv.st>=1)||(S.hm&&S.hm.st>=1)),SHOOT=h.dir>=0&&h.st>=1||!!(S.sl&&S.sl.st===1),FZ=HIDE;
+  if(S.t>=10&&!HIDE&&!(S.sl&&S.sl.st===1&&h.st>=1))h.timer-=dt; // 처음 10초는 아무것도 안 옴. 미끄럼틀이 내려오는 동안 교대자는 통로에서 기다림 (쏠 일도 한 번에 하나)
   if(h.dir<0){if(h.timer<=0){h.dir=[0,2][ri(2)];h.st=0;h.timer=humStep2();footsteps(DIRX[h.dir],2,.04)}}
   else if(h.timer<=0){
     h.st++;
-    if(h.st===1){h.timer=humStep2();footsteps(DIRX[h.dir],3,.08);buzzClick();say(SIDE[h.dir]+' 통로 비상등이 빨갛게 깜빡인다.')}
-    else if(h.st===2){h.timer=humArch2();footsteps(DIRX[h.dir],3,.16);relay();say(SIDE[h.dir]+' 아치 불이 꺼졌다. 뭔가 서 있다.','bad');if(monOn()&&S.cam===h.dir)S.camSw=.6}
+    if(h.st===1){h.timer=humStep2();footsteps(DIRX[h.dir],3,.08);buzzClick()}
+    else if(h.st===2){h.timer=humArch2();footsteps(DIRX[h.dir],3,.16);relay();if(monOn()&&S.cam===h.dir)S.camSw=.6}
     else if(h.st===3){h.timer=humNear2();breathe(DIRX[h.dir],.3);drip(DIRX[h.dir])}
     else return die('교대자');
   }
   h.node=h.dir<0?-5:h.st>=2?DOOR:h.dir;h.spot=Math.min(1,h.st);
-  if(S.t>=10&&!FZ){ // 처음 10초는 아무것도 안 옴
+  if(S.t>=10&&!(S.hm&&S.hm.st===2)){ // 처음 10초는 아무것도 안 옴. 흥얼이가 의자를 도는 동안은 다 멈춤
   // 익사자 (2일 차~): 수로 바닥에 누워 있음. 패널 가운데 화면으로 안 보면 떠오름
-  if(S.night>=2){const d=S.drn,watch=monOn()&&S.cam===1;d.p=Math.max(0,d.p+(watch?-8:(S.hard?1.5:1.05)+S.night*.15)*dt);
-    if(d.p>50&&Math.random()<dt*(d.p/60))bubbles(0,.05+d.p/900);if(d.p>72&&!d.said){d.said=1;say('풀 밑에서 하얀 게 떠오른다. 가운데 수로를 확인해야 한다.','bad')}if(d.p<40)d.said=0;if(d.p>=100)return die('익사자')}
+  if(S.night>=2){const d=S.drn,watch=monOn()&&S.cam===1;d.p=Math.max(0,d.p+(watch?-8:(S.hard?1:.7)+S.night*.1)*dt);
+    if(d.p>50&&Math.random()<dt*(d.p/60))bubbles(0,.05+d.p/900);if(d.p>=100)return die('익사자')}
   // 잠수부 (3일 차~): 가운데 수로 → 풀 → 물 위로 머리. 빛을 쫓아옴 → 손전등을 끄고 버티면 가라앉음, 플래시를 터뜨리면 덮침
   if(S.night>=3){const v=S.dv;v.timer-=dt*(v.st===2&&torchOn()?1.6:1);
-    if(v.st===0&&v.timer<=0){v.st=1;v.timer=rnd(6,8);nburst(700,1,.6,.08,0);say('가운데 수로에서 물살이 인다.')}
+    if(v.st===0&&v.timer<=0){if(SHOOT||(S.hm&&S.hm.st>=1))v.timer=rnd(3,6);else{v.st=1;v.timer=rnd(6,8);nburst(700,1,.6,.08,0)}} // 쏠 일이 끝날 때까지 기다림
     else if(v.st===1&&v.timer<=0){v.st=2;v.timer=rnd(5,6.5);bubbles(0,.12)}
-    else if(v.st===2&&v.timer<=0){v.st=3;v.off=0;v.timer=S.hard?2.2:3.2;nburst(900,1,.5,.25,0);thump(70,.3,.3,0);say('물 위로 머리가 올라왔다. 불빛을 보고 있다. 손전등을 꺼.','bad')}
-    else if(v.st===3){if(torchOn()){if(v.timer<=0)return die('잠수부')}else{v.timer+=dt;v.off+=dt;if(v.off>=3){v.st=0;v.timer=Math.max(14,rnd(26,40)-S.night*2);bubbles(0,.15);say('천천히 가라앉았다.')}}}}
+    else if(v.st===2&&v.timer<=0){v.st=3;v.off=0;v.timer=S.hard?2.2:3.2;nburst(900,1,.5,.25,0);thump(70,.3,.3,0)}
+    else if(v.st===3){if(torchOn()){if(v.timer<=0)return die('잠수부')}else{v.timer+=dt;v.off+=dt;if(v.off>=3){v.st=0;v.timer=Math.max(16,rnd(28,42)-S.night*2);bubbles(0,.15)}}}}
   // 미끄럼틀 (4일 차~): 긁히며 내려오는 소리 → 끝에 손이 보일 때 앞을 보고 플래시
-  if(S.night>=4&&!DVU){const l=S.sl;l.timer-=dt;
-    if(l.st===0&&l.timer<=0){l.st=1;l.timer=8;say('미끄럼틀 안에서 뭔가 긁히며 내려온다.')}
+  if(S.night>=4&&!HIDE){const l=S.sl;l.timer-=dt;
+    if(l.st===0&&l.timer<=0){if(h.st>=2||(S.dv&&S.dv.st>=1)||(S.hm&&S.hm.st>=1))l.timer=rnd(3,6);else{l.st=1;l.timer=8}}
     else if(l.st===1){l.sT-=dt;if(l.sT<=0){l.sT=.22;const k=1-l.timer/8;nburst(lerp(500,1400,Math.random()),3,.18,.03+k*.12,lerp(.9,.4,k),0)}if(l.timer<=3&&!l.saw){l.saw=1;thump(90,.2,.25,.4)}if(l.timer<=0)return die('미끄럼틀')}}
   }
   // 흥얼이 (5일 차~): 흥얼거리며 좌우 아치에서 옴 → 가까워지면 눈을 감음 → 의자 주위를 한 바퀴 돌고 감. 도는 동안 눈 뜨면 죽음
   if(S.night>=5&&S.t>=10){const m=S.hm,SD=['왼쪽','','오른쪽'],sp=m.side===0?-1:1;
-    if(m.st===0){m.timer-=dt;if(m.timer<=0){m.st=1;m.side=[0,2][ri(2)];m.timer=9;m.ni=0;m.nT=0;say(m.said++?`${SD[m.side]}에서 흥얼거림.`:`${SD[m.side]}에서 흥얼거리는 소리가 다가온다. 가까워지면 눈을 감아.`,'bad')}}
+    if(m.st===0){m.timer-=dt;if(m.timer<=0){if(SHOOT||(S.dv&&S.dv.st>=1))m.timer=rnd(3,6);else{m.st=1;m.side=[0,2][ri(2)];m.timer=9;m.ni=0;m.nT=0}}}
     else{m.timer-=dt;m.nT-=dt;
       if(m.st===1&&m.timer<=0){m.st=2;m.timer=7.5;m.grace=.8}
       else if(m.st===2){if(m.timer<=0){m.st=3;m.timer=3}else{m.grace-=dt;if(m.grace<=0&&!S.eyes)return die('흥얼이');if(m.timer<3.6&&!m.br){m.br=1;breathe(-sp*.2,.35)}}}
@@ -2593,7 +2601,7 @@ function update2(dt){
         let pan,v;if(m.st===1){const k=1-m.timer/9;pan=sp*lerp(1,.7,k);v=lerp(.07,.32,k)}else if(m.st===2){const k=1-m.timer/7.5;pan=sp*Math.cos(k*Math.PI);v=.4}else{const k=1-m.timer/3;pan=-sp*lerp(.7,1,k);v=lerp(.3,0,k)}
         if(n!==null&&v>.01)hmNote(220*Math.pow(2,n/12)*(m.st===2?.97:1),dur,pan,v)}}}
   // 정신력: 어둠 속에선 천천히, 손전등이 꺼지면 빠르게
-  if(S.log)S.san+=dt*4;else S.san-=dt*(.12+(h.st>=2?.5:0)+(torchOn()?0:.6));
+  if(S.log)S.san+=dt*4;else S.san-=dt*(.12+(h.st>=2?.5:0)+(S.eyes?.15:torchOn()?0:.6)); // 숨는 건 덜 깎임
   S.san=Math.min(100,S.san);if(S.san<=0)return die('정신');
   setHum(!(h.dir>=0&&h.st>=2));
   if(S.msgT>0)S.msgT-=dt;if(S.shake>0)S.shake-=dt;
@@ -2602,14 +2610,16 @@ function update2(dt){
   updHUD();
 }
 // 플래시: 카메라 플래시처럼 팍. 지금 보는 쪽 아치에 서 있거나 바로 앞까지 온 것은 도망감
-function flash(){
+// z: 'L'(왼쪽 아치) 'R'(오른쪽 아치·미끄럼틀) 'F'(앞) 또는 방향 각도(라디안, +가 오른쪽). 비우면 지금 보는 방향
+function flash(z){
   if(!S||S.ch!==2||S.over||S.dawn||S.log||S.eyes||S.paused||PAUSE.on||mode!=='game'||jump>0)return;
   if(S.fl<1||!torchOn()){sfx(240,.05,'square',.05);return}
-  S.fl=0;S.power=Math.max(0,S.power-2);S.flashT=.45;S.shake=.08;nburst(5200,1,.06,.28,0);thump(220,.04,.25,0);
+  const a=typeof z==='number'?z:z==='L'?-1.45:z==='R'?(S.sl&&S.sl.st===1?.37:1.45):z==='F'?0:S.yaw||0,zone=typeof z==='string'?z:flashZone(a);
+  S.fl=0;S.power=Math.max(0,S.power-2);S.flashT=.45;S.flashYaw=a;S.shake=.08;nburst(5200,1,.06,.28,zone==='L'?-.6:zone==='R'?.6:0);thump(220,.04,.25,0);
   const h=S.hum;
-  if(S.view===1&&S.dv&&S.dv.st===3)return die('잠수부'); // 빛을 보고 덮침
-  if(S.view===1&&S.sl&&S.sl.st===1&&S.sl.timer<=3){const l=S.sl;l.st=0;l.saw=0;l.timer=Math.max(16,rnd(28,40)-S.night*2);for(let k=0;k<5;k++)nburst(900,3,.2,.12-k*.02,.5+k*.08,k*.18);say('긁히는 소리가 위로 멀어졌다.')}
-  if(h.dir>=0&&h.st>=2&&h.dir===S.view){const d=h.dir;humInit2(h);h.timer=Math.max(7,rnd(10,18)-S.night*1.2);setTimeout(()=>{if(S&&!S.over){footsteps(DIRX[d],5,.12);say('물을 튀기며 어둠 속으로 달아났다.')}},300)}
+  if(zone==='F'&&S.dv&&S.dv.st===3)return die('잠수부'); // 빛을 보고 덮침
+  if(zone==='R'&&S.sl&&S.sl.st===1&&S.sl.timer<=3){const l=S.sl;l.st=0;l.saw=0;l.timer=Math.max(16,rnd(28,40)-S.night*2);for(let k=0;k<5;k++)nburst(900,3,.2,.12-k*.02,.5+k*.08,k*.18)}
+  if(h.dir>=0&&h.st>=2&&((h.dir===0&&zone==='L')||(h.dir===2&&zone==='R'))){const d=h.dir;humInit2(h);h.timer=Math.max(9,rnd(14,22)-S.night*1.2);setTimeout(()=>{if(S&&!S.over)footsteps(DIRX[d],5,.12)},300)}
   buildUI();
 }
 // 배터리 교체: 뚜껑 열기(꾹) → 빈 배터리 빼기 → 새 배터리 끼우기 → 뚜껑 닫기(꾹). 그동안 손전등은 꺼짐
@@ -2743,7 +2753,7 @@ function build3D2(n){
   {const wk=ctx3(cvs(256,256,(q,w,h)=>{q.strokeStyle='rgba(220,250,255,.55)';q.lineWidth=5;for(let k=0;k<4;k++){q.beginPath();q.moveTo(w*.5,h*.15+k*18);q.lineTo(w*(.1+k*.04),h*.95);q.moveTo(w*.5,h*.15+k*18);q.lineTo(w*(.9-k*.04),h*.95);q.stroke()}}));
    const m=mesh(new T3.PlaneGeometry(1.6,1.6),new T3.MeshBasicMaterial({map:wk,transparent:true,depthWrite:false,opacity:.8}),0,WATER_Y+.02,-6,sc,false);m.rotation.x=-PI2;m.visible=false;P.wake=m;
    const ht=PIC.diver?imgTex(PIC.diver):ctx3(cvs(256,256,(q,w,h)=>{q.fillStyle='#07090a';q.beginPath();q.ellipse(w*.5,h*.55,w*.34,h*.45,0,0,7);q.fill();[-1,1].forEach(sd=>{const gx=w*(.5+sd*.15),gy=h*.48;q.fillStyle='#1a2a2e';q.beginPath();q.arc(gx,gy,w*.12,0,7);q.fill();q.fillStyle='rgba(190,240,250,.85)';q.beginPath();q.arc(gx-w*.03,gy-h*.03,w*.035,0,7);q.fill()});q.fillStyle='#b8c8c2';q.beginPath();q.ellipse(w*.5,h*.78,w*.14,h*.1,0,0,7);q.fill();q.fillStyle='#120606';q.beginPath();q.ellipse(w*.5,h*.8,w*.07,h*.06,0,0,7);q.fill()}));
-   const dI=PIC.diver,dW=dI?2.1:1.1,dH=dI?dW*dI.height/dI.width:1.1,hd=mesh(new T3.PlaneGeometry(dW,dH),new T3.MeshBasicMaterial({map:ht,transparent:true,alphaTest:.05,side:T3.DoubleSide,color:0x7f9492}),0,.22,-2.1,sc,false);hd.visible=false;P.dvHead=hd;P.dvH=dH}
+   const dI=PIC.diver,dW=dI?1.0:1.1,dH=dI?dW*dI.height/dI.width:1.1,hd=mesh(new T3.PlaneGeometry(dW,dH),new T3.MeshBasicMaterial({map:ht,transparent:true,alphaTest:.05,side:T3.DoubleSide,color:0x7f9492}),0,.22,-2.1,sc,false);hd.visible=false;P.dvHead=hd;P.dvH=dH}
   // 미끄럼틀 끝에 걸친 손
   {const ht=PIC.slider?imgTex(PIC.slider):ctx3(cvs(256,256,(q,w,h)=>{q.fillStyle='#d4d8cc';for(let k=0;k<4;k++){q.save();q.translate(w*(.3+k*.13),h*.15);q.rotate(.1-k*.05);q.fillRect(-7,0,14,h*(.42+(k%2)*.08));q.fillStyle='#8a2a20';q.fillRect(-7,h*.4,14,10);q.fillStyle='#d4d8cc';q.restore()}q.fillRect(w*.24,h*.5,w*.5,h*.3)}));
    const V3=T3.Vector3,E=new V3(...SLIDE_EXIT),d=E.clone().sub(new V3(2.6,1.5,-4.7)).normalize(),dn=new V3(0,-1,0).addScaledVector(d,d.y).normalize(), // 출구 방향 d, 그에 수직인 아래 방향 dn
@@ -2767,7 +2777,7 @@ const Z1C=P=>-P.R; // 가운데 수로 입구 z
 const handsOn=()=>SET.ctrl!=='buttons';
 const HND={sc:null};
 function buildHands(){const T3=R3.T,sc=new T3.Scene(),cam=new T3.PerspectiveCamera(50,1,.01,5);HND.sc=sc;HND.cam=cam;
-  const skin=new T3.MeshStandardMaterial({color:0xc4b8a8,roughness:.42,metalness:0}),nail=new T3.MeshStandardMaterial({color:0xb09a90,roughness:.3}),
+  const skin=new T3.MeshStandardMaterial({color:0xb09a8c,roughness:.55,metalness:0}),nail=new T3.MeshStandardMaterial({color:0xb09a90,roughness:.3}),
     cloth=new T3.MeshStandardMaterial({color:0x1b2326,roughness:.9}),metal=new T3.MeshStandardMaterial({color:0x2c3134,roughness:.35,metalness:.7}),rub=new T3.MeshStandardMaterial({color:0x111416,roughness:.8}),
     hid=new T3.MeshBasicMaterial({visible:false}),M=(g,m,p,par)=>{const o=new T3.Mesh(g,m);if(p)o.position.set(...p);par.add(o);return o},
     cap=(r,l)=>new T3.CapsuleGeometry(r,l,6,14),sph=r=>new T3.SphereGeometry(r,28,20),G=()=>new T3.Group();
@@ -2781,27 +2791,45 @@ function buildHands(){const T3=R3.T,sc=new T3.Scene(),cam=new T3.PerspectiveCame
   for(let k=0;k<6;k++){const r=M(new T3.TorusGeometry(.018,.0018,6,20),rub,[0,0,.07+k*.006],fl)}                 // 손잡이 홈
   HND.tail=M(new T3.CylinderGeometry(.019,.019,.022,20),rub,[0,0,.115],fl);HND.tail.rotation.x=PI2;                // 꼬리 뚜껑 (배터리)
   HND.sw=M(new T3.BoxGeometry(.011,.006,.016),rub,[0,.019,-.045],fl);                                                // 스위치
-  const fing=[];[[-.03,3.5,.0098],[-.007,3.6,.0102],[.017,3.5,.0098],[.039,3.2,.0088]].forEach(([z,arc,t])=>{const rr=.0175+t;
-    const a=M(new T3.TorusGeometry(rr,t,8,22,arc),skin,[0,0,z],fl);a.rotation.z=-arc;fing.push(a);                     // 손전등을 감싼 손가락 (오른쪽→아래→왼쪽 위)
-    const tip=M(sph(t*1.02),skin,[Math.cos(-arc)*rr,Math.sin(-arc)*rr,z],fl);const n=M(sph(t*.7),nail,[Math.cos(-arc)*(rr+t*.45),Math.sin(-arc)*(rr+t*.45),z],fl);n.scale.set(1,1,.6)});
-  {const p=M(sph(1),skin,[.03,-.004,.012],fl);p.scale.set(.016,.034,.05)}                                           // 손바닥·손등
-  [-.03,-.007,.017,.039].forEach(z=>M(sph(.0105),skin,[.028,-.005,z],fl));                                            // 손가락 뿌리 마디
-  HND.th=G();HND.th.position.set(.024,.016,.03);fl.add(HND.th);{const t=M(cap(.0095,.05),skin,[0,0,-.03],HND.th);t.rotation.x=PI2;t.rotation.z=.15;M(sph(.0075),nail,[-.004,.008,-.058],HND.th).scale.set(1,.5,1.3)}HND.th.rotation.y=.42; // 엄지 → 스위치
-  sleeve(fl,[.03,-.006,.075],[.05,-.2,.24],.029);
+  // ---- 사람 손 만들기: 손바닥 판 + 마디 3개짜리 손가락(굵기가 끝으로 갈수록 가늘어짐) + 엄지 ----
+  // 손 로컬: x = 손가락 뿌리 줄, +y = 손가락 방향, +z = 손등. 손가락은 x축으로 -각도만큼 돌리면 손바닥 쪽으로 굽음
+  const seg=(par,len,r0,r1)=>{const g=new T3.CylinderGeometry(r1,r0,len,16,1,true);g.translate(0,len/2,0);const o=new T3.Mesh(g,skin);o.scale.set(1.1,1,.9);par.add(o);
+    const jn=new T3.Mesh(new T3.SphereGeometry(r0,16,12),skin);jn.scale.set(1.1,1,.9);par.add(jn);const nx=G();nx.position.y=len;par.add(nx);return nx};
+  const hand=(ts)=>{ // ts: 엄지가 있는 쪽 (+1/-1)
+    const g=G(),W=.084,L=.092,T=.026;
+    {const ge=new T3.SphereGeometry(1,40,28),pa=ge.attributes.position; // 손바닥: 모서리가 둥근 납작한 판 (초타원체)
+     for(let i=0;i<pa.count;i++){const f=v=>Math.sign(v)*Math.pow(Math.abs(v),.42);let x=f(pa.getX(i))*W/2,y=f(pa.getY(i))*L/2,z=Math.sign(pa.getZ(i))*Math.pow(Math.abs(pa.getZ(i)),.7)*T/2;const k=(y+L/2)/L;x*=lerp(.84,1,k);if(z>0)z+=.003*Math.cos(x/W*Math.PI);else z-=.004*Math.cos(x/W*Math.PI)*(1-k);pa.setXYZ(i,x,y,z)}
+     ge.computeVertexNormals();g.add(new T3.Mesh(ge,skin))}
+    const F=[];[[-1.5,.9,.0088],[-.5,1,.0092],[.5,.95,.009],[1.5,.76,.0082]].forEach(([i,k,r])=>{const x=-ts*i*W*.235,root=G();root.position.set(x,L/2-.004,0);g.add(root);
+      M(new T3.SphereGeometry(r*1.15,16,12),skin,[0,0,T*.18],root).scale.set(1,.8,.8); // 손등 쪽 너클
+      const j1=G();root.add(j1);const a=seg(j1,.044*k,r,r*.92),j2=G();a.add(j2);const b=seg(j2,.027*k,r*.9,r*.82),j3=G();b.add(j3);const c=seg(j3,.02*k,r*.8,r*.7);
+      M(new T3.SphereGeometry(r*.72,16,12),skin,null,c).scale.set(1.1,1,.9);const n=M(new T3.SphereGeometry(r*.62,14,10),nail,[0,-.004,r*.42],c);n.scale.set(1.05,1.5,.38); // 손끝·손톱
+      F.push({root,j:[j1,j2,j3]})});
+    // 엄지: 엄지두덩 + 마디 둘
+    M(new T3.SphereGeometry(1,20,16),skin,[ts*W*.3,-L*.2,-T*.18],g).scale.set(.022,.03,.016);
+    const th=G();th.position.set(ts*W*.4,-L*.2,-.006);g.add(th);const t1=G();th.add(t1);const ta=seg(t1,.026,.0118,.0108),t2=G();ta.add(t2);const tb=seg(t2,.022,.0104,.0094),t3=G();tb.add(t3);const tc=seg(t3,.018,.0094,.0086);
+    M(new T3.SphereGeometry(.0087,14,10),skin,null,tc);M(new T3.SphereGeometry(.0072,12,10),nail,[0,-.004,.0055],tc).scale.set(1.1,1.5,.38);
+    th.rotation.set(-.55,0,-ts*.5);
+    // 손목
+    {const w=M(new T3.CylinderGeometry(W*.38,W*.36,.05,18),skin,[0,-L/2-.02,0],g);w.scale.set(1,1,.6)}
+    return{g,F,th:[t1,t2,t3],W,L,T}};
+  const pose=(H,c)=>{H.F.forEach((f,i)=>f.j.forEach((j,k)=>{j.rotation.x=-c[k]*(1+(i===3?.15:0)-(i===0?.1:0))}))};
+  // ---- 오른손: 손전등을 위에서 감싸 쥠 (손바닥은 몸통 오른쪽 위, 손가락은 오른쪽으로 내려와 아래로 감김, 엄지는 위에서 스위치 쪽) ----
+  {const H=hand(1),pv=G();fl.add(pv);pv.rotation.z=-.55;pv.position.z=.035;pv.add(H.g);H.g.scale.setScalar(.9); // 주먹 쥐기: 손바닥은 몸통 오른쪽, 손가락이 위로 넘어가 왼쪽으로 감김
+   H.g.quaternion.setFromRotationMatrix(new T3.Matrix4().makeBasis(new T3.Vector3(0,0,-1),new T3.Vector3(0,1,0),new T3.Vector3(1,0,0))); // 로컬 x(너클 줄)→앞, y(손가락)→위, z(손등)→오른쪽
+   H.g.position.set(.031,-.03,0);
+   H.F.forEach((f,i)=>{f.j[0].rotation.x=-1.25;f.j[1].rotation.x=-1.45;f.j[2].rotation.x=-1.05});
+   H.th[0].parent.rotation.set(.5,0,-1.5);H.th[0].rotation.x=-.35;H.th[1].rotation.x=-.25;H.th[2].rotation.x=-.15;
+   HND.th=H.th[0].parent;HND.RH=H}
+  sleeve(fl,[.055,-.07,.05],[.1,-.3,.2],.033);
   HND.pTorch=M(new T3.BoxGeometry(.09,.08,.22),hid,[.01,0,-.02],fl);
-  // 여분 배터리: 오른손 옆 팔걸이 위에 놓여 있음 (누르면 교체)
-  {const b=G();sc.add(b);const bc=M(new T3.CylinderGeometry(.012,.012,.05,18),new T3.MeshStandardMaterial({color:0x2a5a3a,roughness:.4,metalness:.3}),null,b);bc.rotation.z=PI2;
-   M(new T3.CylinderGeometry(.0122,.0122,.012,18),new T3.MeshStandardMaterial({color:0x9a9488,roughness:.3,metalness:.8}),[.022,0,0],b).rotation.z=PI2;M(new T3.CylinderGeometry(.004,.004,.006,10),metal,[.03,0,0],b).rotation.z=PI2;
-   HND.pBatt=M(new T3.BoxGeometry(.11,.07,.08),hid,null,b);HND.bat=b}
+  HND.bat=G();HND.pBatt=M(new T3.BoxGeometry(.01,.01,.01),hid,null,HND.bat);sc.add(HND.bat);
   HND.R=R;HND.fl=fl;
-  // ---- 왼손 ----
-  const Lh=G();Lh.rotation.order='YXZ';sc.add(Lh);const lp=G();Lh.add(lp);
-  {const p=M(sph(1),skin,[0,0,0],lp);p.scale.set(.044,.013,.05)}
-  HND.lf=[];[[-.03,.92],[-.01,1],[.01,.96],[.03,.82]].forEach(([x,k])=>{const f=G();f.position.set(x,-.002,-.045);lp.add(f);M(cap(.0086,.034*k),skin,[0,0,-.02*k],f).rotation.x=PI2; // 손가락은 손바닥 앞(-z)으로 뻗음, x 회전 음수 = 아래로 굽힘
-    const j=G();j.position.set(0,0,-.04*k);f.add(j);M(cap(.0078,.024*k),skin,[0,0,-.014*k],j).rotation.x=PI2;M(sph(.0068),nail,[0,.004,-.028*k],j).scale.set(1,.5,1.3);f.userData.j=j;HND.lf.push(f)});
-  {const t=G();t.position.set(.042,0,-.005);lp.add(t);M(cap(.0105,.035),skin,[0,-.022,0],t);t.rotation.set(-1.2,0,-.9);HND.lth=t}
-  sleeve(lp,[0,.002,.045],[-.01,-.03,.33],.029);
-  HND.pEye=M(new T3.BoxGeometry(.13,.06,.16),hid,[0,0,-.01],lp);HND.L=Lh;HND.lp=lp;
+  // ---- 왼손: 무릎(팔걸이) 위에 손등이 보이게 → 꾹 누르면 손바닥으로 눈앞을 덮음 ----
+  const Lh=G();sc.add(Lh);const LH=hand(-1);Lh.add(LH.g);const lp=LH.g;HND.LH=LH;
+  sleeve(lp,[0,-LH.L/2-.03,0],[0,-.34,.02],.034);
+  HND.qRest=new T3.Quaternion().setFromEuler(new T3.Euler(-1.3,.3,.2,'XYZ'));HND.qCov=new T3.Quaternion().setFromEuler(new T3.Euler(0,Math.PI,.05,'XYZ'));
+  HND.pEye=M(new T3.BoxGeometry(.13,.16,.06),hid,[0,.02,0],lp);HND.L=Lh;HND.lp=lp;
   // ---- 팔걸이 모니터 ----
   const mo=G();sc.add(mo);M(new T3.BoxGeometry(.15,.1,.016),rub,null,mo);
   {const c=mk(128,84),q=c.getContext('2d');q.fillStyle='#071012';q.fillRect(0,0,128,84);for(let y=0;y<84;y+=3){q.fillStyle=`rgba(90,200,210,${.05+Math.random()*.06})`;q.fillRect(0,y,128,1)}q.fillStyle='rgba(160,230,235,.5)';q.font='11px monospace';q.fillText('CAM',8,16);
@@ -2818,13 +2846,14 @@ function drawHands(fk,lit,warn){if(!HND.sc)buildHands();const T3=R3.T,cam=HND.ca
   const hw=Math.tan(25*Math.PI/180)*A*.45,t=T_,lag=(S.view-S.camX)*.06,br=Math.sin(t*1.3)*.003;
   HND.cov+=((S.eyes?1:0)-HND.cov)*(S.eyes?.3:.18);HND.aim=Math.max(0,HND.aim-1/60*2.2);HND.thP=Math.max(0,HND.thP-1/60*5);
   // 오른손 + 손전등 (클릭한 쪽으로 잠깐 겨눔)
-  const xr=Math.min(hw*.62,.34),ak=ease(Math.min(1,HND.aim));HND.R.position.set(xr+lag,-.112+br,-.4);HND.bat.position.set(xr*.62+lag,-.15,-.44);HND.bat.rotation.set(.3,.5,.05);HND.bat.visible=(S.spare??1)>0&&!S.swap&&!S.dawn;
+  const xr=Math.min(hw*.62,.34),ak=ease(Math.min(1,HND.aim));HND.R.position.set(xr+lag,-.098+br,-.4);HND.bat.position.set(xr*.62+lag,-.15,-.44);HND.bat.rotation.set(.3,.5,.05);HND.bat.visible=false;
   HND.fl.rotation.set(.06+ak*HND.aimY*.35+Math.sin(t*.9)*.01,.16-ak*HND.aimX*.45,-.05);
-  HND.th.position.y=.016-HND.thP*.004;HND.lens.material.color.setHex(torchOn()&&!lit?0xfff2d0:0x2a2a26);
+HND.lens.material.color.setHex(torchOn()&&!lit?0xfff2d0:0x2a2a26);
   // 왼손: 무릎 위 → 눈앞
   const c=ease(Math.min(1,HND.cov)),xl=-Math.min(hw*.36,.21);
-  HND.L.position.set(lerp(xl-lag,.015,c),lerp(-.125+br*.8,-.075,c),lerp(-.42,-.15,c));HND.L.rotation.set(lerp(.45,PI2-.05,c),lerp(-.35,Math.PI,c),lerp(.2,.05,c)); // 가릴 땐 손바닥이 얼굴 쪽
-  HND.lf.forEach((f,i)=>{f.rotation.x=lerp(-.85,-.08,c);f.rotation.z=lerp((i-1.5)*.03,(i-1.5)*.2,c);f.userData.j.rotation.x=lerp(-.9,-.05,c)}); // 가릴 땐 손가락을 펴고 살짝 벌림 (틈으로 빛이 샘)
+  HND.L.position.set(lerp(xl-lag,.012,c),lerp(-.16+br*.8,-.04,c),lerp(-.46,-.155,c));HND.L.quaternion.copy(HND.qRest).slerp(HND.qCov,c);
+  HND.LH.F.forEach((f,i)=>{f.root.rotation.z=lerp(0,(i-1.5)*.1,c);f.j[0].rotation.x=-lerp(.45,.04,c);f.j[1].rotation.x=-lerp(.6,.04,c);f.j[2].rotation.x=-lerp(.4,.03,c)}); // 가릴 땐 손가락을 펴고 살짝 벌림 (틈으로 빛이 샘)
+  HND.LH.th[0].rotation.x=-lerp(.2,.05,c);HND.LH.th[0].parent.rotation.set(lerp(-.55,-.2,c),0,lerp(-.5,-.15,c));
   HND.mo.position.set(-Math.min(hw*.95,.56),-.17,-.62);HND.mo.rotation.set(-.55,.5,.08);HND.mo.visible=c<.5;
   HND.led.material.color.setHex(S.mon||T_%1.4<.7?0xff2a20:0x300604);
   // 빛
@@ -2834,14 +2863,16 @@ function drawHands(fk,lit,warn){if(!HND.sc)buildHands();const T3=R3.T,cam=HND.ca
   const rd=R3.rd;rd.autoClear=false;rd.clearDepth();rd.render(HND.sc,cam);rd.autoClear=true}
 // 누른 곳의 손 물건: 'torch'|'batt'|'eye'|'mon'|null
 function handHit(p){if(!HND.sc||!handsOn())return null;const T3=R3.T,rc=new T3.Raycaster();rc.setFromCamera(new T3.Vector2(p.x/W*2-1,-(p.y/H*2-1)),HND.cam);
-  const L=[...(HND.bat.visible?[[HND.pBatt,'batt']]:[]),[HND.pTorch,'torch'],[HND.pEye,'eye'],[HND.pMon,'mon']].filter(([o,k])=>k!=='mon'||HND.mo.visible);let best=null,bd=1e9;
+  const L=[[HND.pEye,'eye'],[HND.pMon,'mon']].filter(([o,k])=>k!=='mon'||HND.mo.visible);let best=null,bd=1e9;
   L.forEach(([o,k])=>{const h=rc.intersectObject(o,false)[0];if(h&&h.distance<bd){bd=h.distance;best=k}});return best}
-function handFlash(p){HND.aim=1;HND.aimX=p.x/W*2-1-.3;HND.aimY=-(p.y/H*2-1)-.2;flash()}
+function handFlash(p){if(S.mon){toggleMon();return} // 패널이 올라와 있으면 먼저 내림
+  const nx=p.x/W*2-1,hf=Math.atan(Math.tan(R3.cam.fov*Math.PI/360)*W/H),a=(S.yaw||0)+Math.atan(nx*Math.tan(hf)); // 누른 곳의 방향
+  HND.aim=1;HND.aimX=nx-.3;HND.aimY=-(p.y/H*2-1)-.2;flash(a)}
 // 처음 몇 초: 손 물건마다 손글씨 이름표
 function handLabels(){if(!HND.sc||S.t>18||S.dawn)return;const a=Math.min(1,(18-S.t)/3)*.85,P=(o,dx,dy,txt)=>{const v=new R3.T.Vector3();o.getWorldPosition(v);v.project(HND.cam);const x=(v.x+1)/2*W+dx,y=(1-v.y)/2*H+dy;cx.fillText(txt,x,y)};
   cx.save();cx.globalAlpha=a;cx.font=`${Math.round(Math.max(18,H*.042))}px 'Nanum Pen Script',cursive`;cx.textAlign='center';cx.fillStyle='rgba(230,222,196,.95)';cx.shadowColor='#000';cx.shadowBlur=6;
-  P(HND.pTorch,-10,-H*.12,'손전등 누르기: 끄기/켜기');if(HND.bat.visible)P(HND.pBatt,0,H*.07,'여분 배터리');P(HND.mo,-W*.03,-H*.11,'모니터: 통로 패널');
-  if(S.night>=5)P(HND.pEye,W*.05,-H*.06,'왼손 꾹: 눈 감기');cx.font=`${Math.round(Math.max(20,H*.05))}px 'Nanum Pen Script',cursive`;cx.fillText('화면 누르기: 플래시',W/2,H*.3);cx.restore()}
+  P(HND.mo,-W*.03,-H*.11,'모니터: 통로 패널');if(S.night>=3)P(HND.pEye,W*.05,-H*.06,'왼손 꾹: 숨기');cx.font=`${Math.round(Math.max(20,H*.05))}px 'Nanum Pen Script',cursive`;cx.fillText('누른 쪽으로 플래시',W/2,H*.3);
+  cx.font=`${Math.round(Math.max(17,H*.038))}px 'Nanum Pen Script',cursive`;cx.fillText(PT.touch?'끌어서 둘러보기':'화면 가장자리로 둘러보기',W/2,H*.37);cx.restore()}
 function draw3D2(){
   if(!R3.sc2||R3.p2.n!==S.night)build3D2(S.night);
   const T3=R3.T,P=R3.p2,cam=R3.cam,eye=P.sp.eye;
@@ -2861,8 +2892,9 @@ function draw3D2(){
   // 손전등: 보는 쪽으로 약하게, 배터리가 적으면 깜빡임. 플래시 땐 팡
   const fk=Math.max(0,S.flashT||0)/.45,dirV=new T3.Vector3(0,0,-1).applyEuler(cam.rotation);
   let tI=torchOn()&&!lit?(S.power<20&&Math.random()<.12?1.5:9):0;if(fk>0)tI+=420*fk*fk;
-  P.torch.intensity=tI;P.torch.position.copy(cam.position).addScaledVector(dirV,-.1);P.torch.position.y-=.25;P.torch.target.position.copy(cam.position).addScaledVector(dirV,8);
-  P.flashL.intensity=fk>0?110*fk*fk:0;P.flashL.position.copy(cam.position).addScaledVector(dirV,.8);
+  const fa=S.flashYaw??0,fV=fk>0?new T3.Vector3(Math.sin(fa),-.12,-Math.cos(fa)).normalize():dirV; // 플래시는 누른 쪽(왼쪽·오른쪽 아치 등)으로
+  P.torch.intensity=tI;P.torch.position.copy(cam.position).addScaledVector(dirV,-.1);P.torch.position.y-=.25;P.torch.target.position.copy(cam.position).addScaledVector(fV,8);
+  P.flashL.intensity=fk>0?110*fk*fk:0;P.flashL.position.copy(cam.position).addScaledVector(fV,1.6);
   if(P.pool)P.pool.position.y=WATER_Y+Math.sin(T_*.6)*.006;if(P.canal)P.canal.position.y=P.pool.position.y;
   if(P.exitL)P.exitL.intensity=2.2*(Math.random()<.02?.3:1);
   if(S.drn){const k=Math.min(1,Math.max(0,(S.drn.p-15)/85)),e=k*k*(3-2*k),m=P.drn; // 바닥에 누워 있다가 수면 바로 밑까지 천천히 떠오름
@@ -2886,7 +2918,7 @@ function draw3D2(){
   R3.rd.render(R3.sc2,cam);
   if(handsOn())drawHands(fk,lit,(h.dir===0||h.dir===2)&&h.st===1&&!dw);
   cx.drawImage(R3.rd.domElement,0,0,W,H);
-  if(handsOn())handLabels();
+  if(handsOn())handLabels();else if(S.t<14&&!S.dawn){cx.save();cx.globalAlpha=Math.min(1,(14-S.t)/3)*.8;cx.font=`${Math.round(Math.max(17,H*.038))}px 'Nanum Pen Script',cursive`;cx.textAlign='center';cx.fillStyle='rgba(230,222,196,.95)';cx.shadowColor='#000';cx.shadowBlur=6;cx.fillText(PT.touch?'끌어서 둘러보기':'화면 가장자리로 둘러보기',W/2,H*.3);cx.restore()}
   if(fk>.55){cx.fillStyle=`rgba(245,250,255,${(fk-.55)*1.6})`;cx.fillRect(0,0,W,H)} // 팍
   S.eyeA=handsOn()?Math.max(0,Math.min(1,(HND.cov-.55)/.45)):Math.max(0,Math.min(1,(S.eyeA||0)+(S.eyes?.12:-.18))); // 손으로: 손이 눈앞을 덮은 다음 깜깜해짐if(S.eyeA>0){cx.fillStyle=`rgba(0,0,0,${.97*S.eyeA})`;cx.fillRect(0,0,W,H);if(S.eyes){cx.fillStyle='rgba(120,30,30,.06)';cx.fillRect(0,0,W,H)}} // 눈 감음
   // 화면 가장자리 빨간 빛: 교대자가 오는 쪽 (왼쪽/오른쪽). 아치에 서면 더 진하게 깜빡
@@ -2941,7 +2973,7 @@ function render(){
   post();drawNav();
 }
 function render3D(){
-  const turning=Math.abs(S.view-S.camX);S.tf=[1,0,0];
+  const turning=S.ch===2?Math.abs((S.yawT||0)-(S.yaw||0))*.4:Math.abs(S.view-S.camX);S.tf=[1,0,0];
   if(S.monA<.999||S.ch===2){
     cx.save();draw3D();if(S.bp&&S.bpA>.85)drawBp();
     if(lightVis()&&turning<.3){cx.globalCompositeOperation='lighter';DUST.forEach(d=>{cx.fillStyle=`rgba(255,240,190,${.06+.06*Math.sin(T_*2+d.p)})`;cx.fillRect(d.x*W,d.y*H,1.6,1.6)});cx.globalCompositeOperation='source-over'} // 먼지
@@ -2953,7 +2985,7 @@ function render3D(){
     cx.drawImage(camC,lerp(m.x,0,e),lerp(m.y,0,e),lerp(m.w,W,e),lerp(m.h,H,e));
   }
   if(S.monA>.95&&S.ch!==2)camHUD(S.cam);
-  if(turning>.04){cx.globalAlpha=.18;cx.drawImage(cv,(S.view>S.camX?-1:1)*12,0,W,H);cx.globalAlpha=1}
+  if(turning>.04){cx.globalAlpha=.18;cx.drawImage(cv,(S.ch===2?(S.yawT>S.yaw?-1:1):S.view>S.camX?-1:1)*12,0,W,H);cx.globalAlpha=1}
   post();drawNav();
 }
 function litView(i,ox){
@@ -3315,29 +3347,30 @@ addEventListener('keydown',e=>{if(mode==='cut'&&(e.key==='Escape'||e.key===' '))
 $('log').addEventListener('click',e=>{if(e.target.id==='log')closeLog()}); // 종이 바깥을 눌러도 덮힘
 $('camOff').onclick=e=>{e.stopPropagation();if(S&&S.mon)toggleMon()};
 $('camRep').onclick=e=>{e.stopPropagation();reportCam()};
-$('flashBtn').onclick=e=>{e.stopPropagation();flash()};
+$('flashBtn').onclick=e=>{e.stopPropagation();flash('R')};$('flashLBtn').onclick=e=>{e.stopPropagation();flash('L')};
 $('bpBack').onclick=e=>{e.stopPropagation();if(S&&S.bp)closeBrk()};
 function setEyes(v){if(!S||S.ch!==2||S.over)return;if(v&&(S.log||mode!=='game'))return;if(S.eyes===v)return;S.eyes=v;if(EYEF)EYEF.frequency.setTargetAtTime(v?500:20000,AC.currentTime,.08);$('eyeBtn').classList.toggle('on',v)}
 function toggleTorch(){if(!S||S.ch!==2||S.over||S.dawn)return;S.torchOff=!S.torchOff;sfx(S.torchOff?700:1100,.03,'square',.05);buildUI()}
 {const b=$('eyeBtn');b.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();setEyes(true)});['pointerup','pointerleave','pointercancel'].forEach(k=>b.addEventListener(k,()=>setEyes(false)));b.addEventListener('contextmenu',e=>e.preventDefault())}
 // ===================== 챕터 2 키 (설정에서 바꿀 수 있음) =====================
 // 키보드는 e.code(한글 입력 상태에서도 같음), 마우스는 'Mouse0'(좌)·'Mouse1'(휠)·'Mouse2'(우)
-const KEY_ACT=[['flash','플래시'],['pnl','통로 패널'],['torch','손전등 끄기/켜기'],['batt','배터리 교체'],['eyes','눈 감기 (누르고 있는 동안)'],['left','왼쪽 보기 / 패널 통로 ←'],['right','오른쪽 보기 / 패널 통로 →']];
-const KEY_DEF={flash:'KeyF',pnl:'KeyQ',torch:'KeyT',batt:'KeyR',eyes:'KeyE',left:'KeyA',right:'KeyD'};
-const keyOf=a=>(SET.keys&&SET.keys[a])||KEY_DEF[a];
+const KEY_ACT=[['flashL','왼쪽 플래시'],['flashR','오른쪽 플래시'],['pnl','통로 패널'],['eyes','숨기 (누르고 있는 동안)'],['left','왼쪽으로 둘러보기 / 패널 통로 ←'],['right','오른쪽으로 둘러보기 / 패널 통로 →']];
+const KEY_DEF={flashL:'KeyQ',flashR:'KeyE',pnl:'Space',eyes:'ShiftLeft',left:'KeyA',right:'KeyD'};
+const KEYH={}; // 누르고 있는 둘러보기 키
+const keyOf=a=>(SET.keys2&&SET.keys2[a])||KEY_DEF[a];
 const actOf=c=>KEY_ACT.map(x=>x[0]).find(a=>keyOf(a)===c);
 function keyName(c){if(!c)return'-';const M={Mouse0:'좌클릭',Mouse1:'휠 클릭',Mouse2:'우클릭',Space:'Space',ShiftLeft:'왼 Shift',ShiftRight:'오른 Shift',ControlLeft:'왼 Ctrl',ControlRight:'오른 Ctrl',AltLeft:'왼 Alt',AltRight:'오른 Alt',Tab:'Tab',Enter:'Enter',CapsLock:'Caps',Backquote:'`',ArrowLeft:'←',ArrowRight:'→',ArrowUp:'↑',ArrowDown:'↓'};
   return M[c]||c.replace(/^Key/,'').replace(/^Digit/,'').replace(/^Numpad/,'숫자패드 ')}
 let KEYWAIT=null; // 설정에서 키 바꾸는 중이면 그 동작 이름
 function keyAct(a,down){if(!S||S.ch!==2||mode!=='game')return false;
-  if(a==='eyes'){setEyes(down);return true}if(!down)return true;
-  if(a==='flash')flash();else if(a==='pnl'){if(!S.over)toggleMon()}else if(a==='torch')toggleTorch();
-  else if(a==='batt'){if(S.swap){if(!SWAP[S.swap.step][1])swapTap()}else startSwap()}
-  else if(a==='left'||a==='right'){const d=a==='left'?-1:1;if(S.mon)setCam(Math.max(0,Math.min(2,S.cam+d)));else turn(d)}
+  if(a==='eyes'){setEyes(down);return true}
+  if(a==='left'||a==='right'){KEYH[a]=down;if(down&&S.mon)setCam(Math.max(0,Math.min(2,S.cam+(a==='left'?-1:1))));return true}
+  if(!down)return true;
+  if(a==='flashL')flash('L');else if(a==='flashR')flash('R');else if(a==='pnl'){if(!S.over&&!S.eyes)toggleMon()}
   return true}
 addEventListener('keydown',e=>{if(KEYWAIT||e.repeat)return;const a=actOf(e.code);if(a&&keyAct(a,true))e.preventDefault()});
-addEventListener('keyup',e=>{if(actOf(e.code)==='eyes')keyAct('eyes',false)});
-addEventListener('blur',()=>{if(S&&S.eyes)setEyes(false)});
+addEventListener('keyup',e=>{const a=actOf(e.code);if(a==='eyes'||a==='left'||a==='right')keyAct(a,false)});
+addEventListener('blur',()=>{KEYH.left=KEYH.right=false;if(S&&S.eyes)setEyes(false)});
 $('torchBtn').onclick=e=>{e.stopPropagation();toggleTorch()};
 $('pnlBtn').onclick=e=>{e.stopPropagation();if(S&&S.ch===2&&!S.over)toggleMon()};
 $('battBtn').onclick=e=>{e.stopPropagation();startSwap()};
@@ -3351,14 +3384,15 @@ function gameXY(e){return isRot()?{x:e.clientY,y:H-e.clientX}:{x:e.clientX,y:e.c
 cv.addEventListener('pointerdown',e=>{PT.touch=e.pointerType!=='mouse';const p=gameXY(e);PT.fl=false;
   if(handsOn()&&S&&S.ch===2&&mode==='game'&&!S.log&&!S.over&&!PAUSE.on&&(e.pointerType!=='mouse'||e.button===0)){const k=handHit(p); // 손 조작: 손에 든 물건
     if(k==='eye'){PT.eyeId=e.pointerId;setEyes(true);return}
-    if(k==='torch'){HND.thP=1;toggleTorch();return}if(k==='batt'){if(S.swap){if(!SWAP[S.swap.step][1])swapTap()}else startSwap();return}if(k==='mon'){toggleMon();return}
+    if(k==='mon'){if(!S.eyes)toggleMon();return}
     if(e.pointerType==='mouse'&&canAct()&&!navZone(p)&&!hotAt(p)){PT.fl=true;handFlash(p);return}} // 마우스는 누르는 순간 플래시 (터치는 뗄 때: 밀어서 고개 돌리기와 구분)
   if(e.pointerType==='mouse'&&e.button===0&&actOf('Mouse0')&&S&&S.ch===2&&mode==='game'&&!S.log&&canAct()&&!navZone(p)&&!hotAt(p)){PT.fl=true;keyAct(actOf('Mouse0'),true);return} // 좌클릭에 동작을 배치했으면 누르는 순간 실행
-  PT.on=true;PT.sx=PT.x=p.x;PT.sy=PT.y=p.y;if(S&&S.bp&&R3.ok&&S.bpA>.5&&S.lockT<=0&&bpHit(p)==='lever')S.holding=true});
-cv.addEventListener('pointermove',e=>{const p=gameXY(e);PT.x=p.x;PT.y=p.y;if(e.pointerType==='mouse')PT.touch=false});
+  PT.on=true;PT.id=e.pointerId;PT.lx=p.x;PT.sx=PT.x=p.x;PT.sy=PT.y=p.y;if(S&&S.bp&&R3.ok&&S.bpA>.5&&S.lockT<=0&&bpHit(p)==='lever')S.holding=true});
+cv.addEventListener('pointermove',e=>{const p=gameXY(e);if(PT.on&&S&&S.ch===2&&mode==='game'&&!S.mon&&e.pointerId===PT.id){const dx=p.x-PT.lx;PT.lx=p.x;S.yawT=Math.max(-YAWMAX,Math.min(YAWMAX,(S.yawT||0)-dx*2.4/W))}PT.x=p.x;PT.y=p.y;if(e.pointerType==='mouse')PT.touch=false});
 cv.addEventListener('pointerup',e=>{
   if(!PT.on)return;PT.on=false;const p=gameXY(e),dx=p.x-PT.sx,dy=p.y-PT.sy;if(PT.touch)PT.x=PT.y=-1;
   if(S&&S.bp&&R3.ok&&mode==='game'){S.holding=false;if(Math.hypot(dx,dy)<=16&&!PAUSE.on){const k=bpHit(p);if(typeof k==='number')toggleSw(k)}return} // 3D 배전반
+  if(S&&S.ch===2&&Math.hypot(dx,dy)>16)return; // 수영장: 끌기는 둘러보기
   if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.3){turn(dx>0?-1:1);return} // 밀어서 고개 돌리기
   if(Math.hypot(dx,dy)>16||!canAct())return;
   const nz=navZone(p);if(nz){turn(nz);return}
@@ -3429,7 +3463,7 @@ function applySet(){
   keyBadges();document.body.classList.toggle('hands',SET.ctrl!=='buttons');
 }
 function saveSet(){try{localStorage.setItem('awful_settings',JSON.stringify(SET))}catch(e){}applySet()}
-function keyBadges(){[['flashBtn','flash'],['torchBtn','torch'],['eyeBtn','eyes'],['pnlBtn','pnl'],['battBtn','batt']].forEach(([id,a])=>{const b=$(id);if(b)b.dataset.k=keyName(keyOf(a))})} // PC: 버튼 귀퉁이 키 표시
+function keyBadges(){[['flashBtn','flashR'],['flashLBtn','flashL'],['eyeBtn','eyes'],['pnlBtn','pnl']].forEach(([id,a])=>{const b=$(id);if(b)b.dataset.k=keyName(keyOf(a))})} // PC: 버튼 귀퉁이 키 표시
 function buildSet(){
   const box=$('setRows');box.innerHTML='';const two=W>=640;box.classList.toggle('two',two);box.parentElement.classList.toggle('two',two);
   SET_ROWS.forEach(r=>{const row=document.createElement('div');row.className='srow';const lab=document.createElement('div');lab.className='sl';lab.textContent=r.t;if(r.d){const sm=document.createElement('small');sm.textContent=r.d;lab.appendChild(sm)}row.appendChild(lab);
@@ -3444,13 +3478,13 @@ function buildSet(){
       b.onclick=e=>{e.stopPropagation();KEYWAIT=a;buildSet()};b.oncontextmenu=e=>e.preventDefault();row.appendChild(b);box.appendChild(row)})}
 }
 // 키 바꾸기: 다음에 누른 키/마우스 버튼으로. 이미 다른 동작에 쓰던 키면 서로 맞바꿈
-function setKey(c){const a=KEYWAIT;KEYWAIT=null;if(c&&a){SET.keys=Object.assign({},KEY_DEF,SET.keys);const o=actOf(c);if(o&&o!==a)SET.keys[o]=SET.keys[a];SET.keys[a]=c;saveSet();sfx(900,.03,'square',.04)}buildSet()}
+function setKey(c){const a=KEYWAIT;KEYWAIT=null;if(c&&a){SET.keys2=Object.assign({},KEY_DEF,SET.keys2);const o=actOf(c);if(o&&o!==a)SET.keys2[o]=SET.keys2[a];SET.keys2[a]=c;saveSet();sfx(900,.03,'square',.04)}buildSet()}
 addEventListener('keydown',e=>{if(!KEYWAIT)return;e.preventDefault();e.stopImmediatePropagation();setKey(e.code==='Escape'?null:e.code)},true);
 addEventListener('mousedown',e=>{if(!KEYWAIT)return;if(e.button===0&&e.target.closest&&e.target.closest('.kbtn'))return;e.preventDefault();e.stopImmediatePropagation();setKey('Mouse'+e.button)},true);
 addEventListener('contextmenu',e=>{if(KEYWAIT||$('settings').classList.contains('show'))e.preventDefault()},true);
 function openSettings(){buildSet();$('settings').classList.add('show')}
 function closeSettings(){KEYWAIT=null;$('settings').classList.remove('show')}
-$('sBack').onclick=closeSettings;$('sReset').onclick=()=>{KEYWAIT=null;SET=Object.assign({},SET_DEF);delete SET.keys;saveSet();buildSet()};
+$('sBack').onclick=closeSettings;$('sReset').onclick=()=>{KEYWAIT=null;SET=Object.assign({},SET_DEF);delete SET.keys;delete SET.keys2;saveSet();buildSet()};
 $('mSet').onclick=openSettings;
 // ===================== 일시정지 (ESC, 화면 위 가운데 버튼) =====================
 const PAUSE={on:false,confirm:false};
