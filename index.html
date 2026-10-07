@@ -120,7 +120,8 @@ body[data-mode=cut] #camOff,body[data-mode=cut] #camRep{display:none!important}
 #flashBtn.ready{box-shadow:0 0 24px rgba(160,240,255,.5)}
 #pnl{position:fixed;left:12px;top:50%;transform:translateY(-50%);display:none;flex-direction:column;gap:6px;z-index:3}
 #pnlBtn,#battBtn{position:fixed;display:none;z-index:3;font-size:15px;letter-spacing:.1em;color:#d6f2f6;background:linear-gradient(#1c2a2e,#0c1416);border:1px solid rgba(140,210,225,.5);padding:10px 18px;box-shadow:0 0 16px rgba(80,180,200,.15)}
-#pnlBtn{left:16px;bottom:18px}#torchBtn{position:fixed;right:118px;bottom:30px;display:none;z-index:3;font-size:14px;letter-spacing:.08em;color:#f4e6b8;background:linear-gradient(#2a2418,#14100a);border:1px solid rgba(230,200,120,.5);padding:10px 14px}#torchBtn.off{color:#9fe8f0;border-color:rgba(140,210,225,.6)}
+#pnlBtn{left:16px;bottom:18px}#torchBtn{position:fixed;right:118px;bottom:30px;display:none;z-index:3;font-size:14px;letter-spacing:.08em;color:#f4e6b8;background:linear-gradient(#2a2418,#14100a);border:1px solid rgba(230,200,120,.5);padding:10px 14px}#torchBtn.off{color:#9fe8f0;border-color:rgba(140,210,225,.6)}#eyeBtn{position:fixed;left:16px;bottom:80px;display:none;z-index:4;font-size:16px;letter-spacing:.1em;color:#f0d8e8;background:linear-gradient(#2a1424,#140810);border:1px solid rgba(230,160,200,.5);padding:14px 22px;touch-action:none;user-select:none;-webkit-user-select:none}#eyeBtn.on{background:#000;color:#777}
+body:not([data-mode=game]) #eyeBtn,.scare #eyeBtn{display:none!important}
 body:not([data-mode=game]) #torchBtn,.scare #torchBtn{display:none!important}#bpBack{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);display:none;z-index:3;font-size:16px;letter-spacing:.1em;color:#efe6cc;background:linear-gradient(#2a2418,#14100a);border:1px solid rgba(220,200,150,.5);padding:10px 22px}
 body:not([data-mode=game]) #bpBack,.scare #bpBack{display:none!important}#battBtn{right:18px;bottom:118px;color:#f4e6b8;border-color:rgba(230,200,120,.5)}#battBtn b{color:#fff}
 #battOv{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);width:min(360px,86vw);display:none;flex-direction:column;gap:8px;z-index:4;padding:12px 14px;background:rgba(8,12,14,.92);border:1px solid rgba(140,210,225,.35)}#battOv.show{display:flex}
@@ -270,6 +271,7 @@ body[data-mode=game] #pauseBtn{display:flex}
 <button id="camRep"><span class="rd"></span>복제자 신고</button>
 <button id="flashBtn"><i></i><span>플래시</span></button>
 <button id="torchBtn">손전등 끄기</button>
+<button id="eyeBtn">눈 감기 (꾹)</button>
 <div id="pnl"><button data-c="0">왼쪽</button><button data-c="1">가운데</button><button data-c="2">오른쪽</button><button class="x">닫기</button></div>
 <button id="pnlBtn">통로 패널</button>
 <button id="bpBack">← 돌아가기</button>
@@ -323,7 +325,7 @@ body[data-mode=game] #pauseBtn{display:flex}
 <script nomodule>window.THREE_ERR='nomodule'</script>
 <script>
 // ===================== 기본 =====================
-const VER='0.17.0'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
+const VER='0.18.0'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
 const $=id=>document.getElementById(id);
 const cv=$('cv'),cx=cv.getContext('2d');
 let W,H,DPR=1;
@@ -1022,7 +1024,7 @@ function drawCloneFig(g,x,y,h,a,t){
 // ===================== 점프스케어 이미지 =====================
 // jumpscare 폴더에 stalker.png / gazer.png / shadow.png / sanity.png 를 넣으면 그 이미지를 대신 씀
 const JUMP={},JIMG={};
-[['교대자','stalker'],['응시자','gazer'],['그림자','shadow'],['정신','sanity'],['은둔자','static'],['질주자','runner'],['복제자','clone'],['잠수부','diver'],['익사자','drowned'],['미끄럼틀','slider']].forEach(([k,f])=>{const im=new Image();im.onload=()=>{JIMG[k]=im};im.src='jumpscare/'+f+'.png'});
+[['교대자','stalker'],['응시자','gazer'],['그림자','shadow'],['정신','sanity'],['은둔자','static'],['질주자','runner'],['복제자','clone'],['잠수부','diver'],['익사자','drowned'],['미끄럼틀','slider'],['흥얼이','hummer']].forEach(([k,f])=>{const im=new Image();im.onload=()=>{JIMG[k]=im};im.src='jumpscare/'+f+'.png'});
 function jumpFin(g,S2){
   try{const d=g.getImageData(0,0,S2,S2),p=d.data;for(let i=0;i<p.length;i+=4){const n=(Math.random()-.5)*40;p[i]+=n;p[i+1]+=n;p[i+2]+=n}g.putImageData(d,0,0)}catch(e){}
   const vg=g.createRadialGradient(256,256,120,256,256,380);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.95)');g.fillStyle=vg;g.fillRect(0,0,S2,S2);
@@ -1469,9 +1471,10 @@ function updMapDot(){const d=$('hd');if(!d)return;if(!(DEV.on&&DEV.info)){d.styl
 function scareOnly(c){ // 죽지 않는 점프스케어
   if(DEV.on&&DEV.noScare)return;
   scream();try{SET.vib&&navigator.vibrate&&navigator.vibrate([200,80,300])}catch(e){}
-  jump=1.1;jumpType=c;document.body.classList.add('scare');setTimeout(()=>{if(S&&!S.over)document.body.classList.remove('scare')},1150);
+  jump=JD;jumpType=c;document.body.classList.add('scare');setTimeout(()=>{if(S&&!S.over)document.body.classList.remove('scare')},JD*1000+50);
 }
 function die(c){
+  if(S&&S.eyes){S.eyes=false;if(EYEF)EYEF.frequency.setTargetAtTime(20000,AC.currentTime,.01)} // 눈 감은 채 죽으면 바로 뜸
   if(DEV.on&&DEV.god){
     say(`[무적] ${c} 사망 판정 무시`);
     if(c==='교대자'){S.hum.node=7;S.hum.spot=0;S.hum.timer=10}else if(c==='응시자')S.gaze.p=0;else if(c==='그림자')S.shadow.p=0;else if(c==='질주자'){S.run.phase=0;S.run.open=0;S.run.cd=20}else if(c==='은둔자'){S.stat.duct=-1;S.stat.node=7;S.stat.spot=0;S.stat.timer=12}else S.san=50;
@@ -1484,9 +1487,9 @@ function die(c){
   const end=()=>{setMode('end');showEnd('실종',(S.ch===2&&DEATH2[c])||DEATH[c],'다시 하기',()=>newNight(S.night))};
   if(DEV.on&&DEV.noScare){end();return}
   scream();
-  try{SET.vib&&navigator.vibrate&&navigator.vibrate([300,100,500])}catch(e){}
-  jump=1.1;jumpType=c;document.body.classList.add('scare');
-  setTimeout(end,1200);
+  try{SET.vib&&navigator.vibrate&&navigator.vibrate([350,60,120,60,600])}catch(e){}
+  jump=JD;jumpType=c;document.body.classList.add('scare');
+  setTimeout(end,JD*1000+100);
 }
 function win(){
   S.over=true;
@@ -1510,7 +1513,7 @@ function showEnd(title,text,label,fn){
 function buildUI(){
   const cam=S.mon&&!S.over;document.body.classList.toggle('cam',cam);
   const c2=S.ch===2;$('bpBack').style.display=S.bp&&R3.ok&&!S.over?'block':'none';$('map').style.display=cam&&!c2?'block':'none';$('camOff').style.display=cam&&!c2?'flex':'none';$('camRep').style.display=cam&&S.night>=4&&!c2?'flex':'none';
-  $('pnl').style.display=cam&&c2?'flex':'none';$('flashBtn').style.display=c2?'flex':'none';$('pnlBtn').style.display=c2&&!cam?'block':'none';$('torchBtn').style.display=c2&&!S.swap?'block':'none';if(c2){$('torchBtn').textContent=S.torchOff?'손전등 켜기':'손전등 끄기';$('torchBtn').classList.toggle('off',!!S.torchOff)}
+  $('pnl').style.display=cam&&c2?'flex':'none';$('flashBtn').style.display=c2?'flex':'none';$('pnlBtn').style.display=c2&&!cam?'block':'none';$('torchBtn').style.display=c2&&!S.swap?'block':'none';$('eyeBtn').style.display=c2&&S.night>=5&&!S.dawn?'block':'none';if(c2){$('torchBtn').textContent=S.torchOff?'손전등 켜기':'손전등 끄기';$('torchBtn').classList.toggle('off',!!S.torchOff)}
   $('battBtn').style.display=c2&&(S.spare??1)>0&&!S.swap&&!S.dawn?'block':'none';if(c2)$('battN').textContent=S.spare??1;$('pnl').querySelectorAll('[data-c]').forEach(b=>b.classList.toggle('on',+b.dataset.c===S.cam));updMap();
 }
 function updHUD(){
@@ -1548,7 +1551,7 @@ function hots(i){const lock=()=>S.door?'문 잠금 풀기':'문 잠그기',lab={
   if(!VIEWS.length)buildViews(true);
   const I=VIEWS[i].info;if(!I.storeB)I.storeB={x:W*.08,y:H*.2,w:W*.18,h:H*.6};if(!I.ventB)I.ventB={x:W*.62,y:H*.66,w:W*.12,h:H*.1};const rk={store:'storeB',vent:'ventB',lock:'lockB',door:'door',mon:'monB',phone:'phoneB',log:'logB',cab:'cab',sw:'swB'};return keys.map(k=>({k,r:I[rk[k]],lab:lab[k],act:act[k]}));
 }
-const canAct=()=>S&&mode==='game'&&!S.over&&!S.paused&&!PAUSE.on&&!S.log&&!S.bp&&(!S.mon||S.ch===2)&&jump<=0; // 챕터 2는 패널을 열어도 둘러볼 수 있음
+const canAct=()=>S&&mode==='game'&&!S.over&&!S.paused&&!PAUSE.on&&!S.log&&!S.bp&&!S.eyes&&(!S.mon||S.ch===2)&&jump<=0; // 챕터 2는 패널을 열어도 둘러볼 수 있음
 const navW=()=>Math.max(52,W*.065);
 function navZone(p){if(p.y<0||!canAct())return 0;if(p.x<navW()&&S.view>0)return -1;if(p.x>W-navW()&&S.view<2)return 1;return 0}
 function toView(p){const t=S.tf||[1,0,0];return{x:(p.x-W/2)/t[0]+W/2-t[1],y:(p.y-H/2)/t[0]+H/2-t[2]}}
@@ -2486,7 +2489,7 @@ CUTS.ending_hard={area:'outro',prep(){CUT.areas.outro.dyn.phone.visible=true},sh
 let CHAP=1,INTRO2=0;const CHT={};
 CHT[2]={CAMS:['1','2','3'],CAMN:['왼쪽 통로','가운데 수로','오른쪽 통로'],KIND:['p_tun','p_canal','p_tun'],
   ADJ:[[1],[0,2],[1]],DIST:[1,1,1],MAPP:[[10,40],[50,30],[90,40]],EXIT_CAM:[-1,-1,-1,-1,-1]};
-function setChapter(c){if(waterG)waterG.gain.setTargetAtTime(c===2?.09:0,AC.currentTime,.5);if(!CHT[1])CHT[1]={CAMS,CAMN,KIND,ADJ,DIST,MAPP,EXIT_CAM};CHAP=c;({CAMS,CAMN,KIND,ADJ,DIST,MAPP,EXIT_CAM}=CHT[c]);buildMap();
+function setChapter(c){if(EYEF)EYEF.frequency.setTargetAtTime(20000,AC.currentTime,.01);if(waterG)waterG.gain.setTargetAtTime(c===2?.09:0,AC.currentTime,.5);if(!CHT[1])CHT[1]={CAMS,CAMN,KIND,ADJ,DIST,MAPP,EXIT_CAM};CHAP=c;({CAMS,CAMN,KIND,ADJ,DIST,MAPP,EXIT_CAM}=CHT[c]);buildMap();
   const lb=document.querySelector('#hud .meter .lab span');if(lb)lb.textContent=c===2?'배터리':'전력'}
 // 안내판 (공공시설 말투)
 const POOL_RULES=[
@@ -2498,9 +2501,10 @@ const POOL_RULES=[
   [2,'가운데 수로 바닥을 패널로 자주 확인하십시오. 오래 안 보면 떠오릅니다.'],
   [3,'물 위로 머리가 올라오면 손전등을 끄고 가만히 계십시오. 빛을 쫓아옵니다. 플래시 금지.'],
   [4,'미끄럼틀에서 긁히는 소리가 나면, 끝에 손이 보일 때 앞을 보고 플래시를 터뜨리십시오.'],
+  [5,'흥얼거리는 소리가 가까이 오면 눈을 감으십시오. 노래가 완전히 멀어질 때까지 뜨지 마십시오.'],
   [1,'플래시는 충전되는 동안 쓸 수 없습니다.'],
   [1,'조명이 켜지면 다음 구역으로 이동하십시오.']];
-const DEATH2={'교대자':'어둠 속에서 젖은 손이 얼굴을 덮었다.','익사자':'물 밑에서 올라온 손이 발목을 잡았다.','잠수부':'불빛을 따라 물 밖으로 뛰어올랐다.','미끄럼틀':'미끄럼틀 끝에서 무언가 쏟아져 나왔다.'};
+const DEATH2={'흥얼이':'눈을 뜨자, 바로 앞에서 웃고 있었다.','교대자':'어둠 속에서 젖은 손이 얼굴을 덮었다.','익사자':'물 밑에서 올라온 손이 발목을 잡았다.','잠수부':'불빛을 따라 물 밖으로 뛰어올랐다.','미끄럼틀':'미끄럼틀 끝에서 무언가 쏟아져 나왔다.'};
 // 챕터 2는 한 자리(안전요원석)에서 버팀. 가운데 수로 끝 초록 비상구 불빛이 매일 아침 다가옴
 const SPOT1={name:'안전요원석',eye:2.05,R:7,plat:true,slide:true,pool:[-4.6,4.6,-1.8]},SPOT2=[SPOT1,SPOT1,SPOT1,SPOT1,SPOT1];
 const EXIT2=[18,14.5,11,7.5,4]; // 수로 입구에서 비상구 불빛까지 거리 (밤마다)
@@ -2516,7 +2520,7 @@ function update2(dt){
   if(S.dawn){S.dawn+=dt;if(S.dawn>3.2)win();return} // 6시: 불이 켜지는 중
   S.t+=dt;
   if(S.t>=HOUR*6){S.dawn=.01;setHum(true);if(S.swap)endSwap(true);for(let k=0;k<6;k++)setTimeout(()=>relay(),400+k*260);setTimeout(()=>{thump(50,.4,.4,0);humTo(.7,.3)},2100);return}
-  const h=S.hum;if(h.dir===undefined){humInit2(h);S.fl=1;S.spare=1;S.drn={p:0,said:0};S.dv={st:0,timer:rnd(40,55)-S.night*3,off:0};S.sl={st:0,timer:rnd(35,50),sT:0}}
+  const h=S.hum;if(h.dir===undefined){humInit2(h);S.fl=1;S.spare=1;S.drn={p:0,said:0};S.dv={st:0,timer:rnd(40,55)-S.night*3,off:0};S.sl={st:0,timer:rnd(35,50),sT:0};S.hm={st:0,timer:rnd(30,45),nT:0,ni:0,side:0,said:0}}
   // 배터리: 손전등이 켜져 있으면 닳음 (한 밤에 한 번은 갈아야 함), 패널, 플래시는 한 번에
   if(torchOn())S.power=Math.max(0,S.power-dt*((S.hard?.4:.34)+(S.mon?.05:0)));
   if(S.power<=0&&!S.outSaid){S.outSaid=true;say(S.spare>0?'손전등이 꺼졌다. 배터리를 갈아야 한다.':'손전등이 꺼졌다. 남은 배터리가 없다.','bad');sfx(50,1.5,'sawtooth',.2);buildUI()}
@@ -2526,7 +2530,8 @@ function update2(dt){
   const f0=S.fl;S.fl=Math.min(1,S.fl+dt/(S.hard?4.2:3));if(f0<1&&S.fl>=1)sfx(2600,.08,'sine',.04); // 충전 끝: 삑
   if(S.flashT>0)S.flashT-=dt;
   // 교대자: 세 통로 중 하나로 걸어옴 (먼 통로 → 통로 중간 → 아치 → 바로 앞). 그 아치 위 비상등이 깜빡이다 꺼짐
-  if(S.t>=10)h.timer-=dt; // 처음 10초는 아무것도 안 옴
+  const FZ=!!(S.hm&&S.hm.st===2),DVU=!!(S.dv&&S.dv.st===3); // 동시에 막을 수 없는 경우만 멈춤
+  if(S.t>=10&&!FZ&&!(DVU&&h.dir>=0))h.timer-=dt; // 처음 10초는 아무것도 안 옴
   const SIDE=['왼쪽','','오른쪽'];
   if(h.dir<0){if(h.timer<=0){h.dir=[0,2][ri(2)];h.st=0;h.timer=humStep2();footsteps(DIRX[h.dir],2,.04)}}
   else if(h.timer<=0){
@@ -2537,7 +2542,7 @@ function update2(dt){
     else return die('교대자');
   }
   h.node=h.dir<0?-5:h.st>=2?DOOR:h.dir;h.spot=Math.min(1,h.st);
-  if(S.t>=10){ // 처음 10초는 아무것도 안 옴
+  if(S.t>=10&&!FZ){ // 처음 10초는 아무것도 안 옴
   // 익사자 (2일 차~): 수로 바닥에 누워 있음. 패널 가운데 화면으로 안 보면 떠오름
   if(S.night>=2){const d=S.drn,watch=monOn()&&S.cam===1;d.p=Math.max(0,d.p+(watch?-8:(S.hard?1.5:1.05)+S.night*.15)*dt);
     if(d.p>50&&Math.random()<dt*(d.p/60))bubbles(0,.05+d.p/900);if(d.p>72&&!d.said){d.said=1;say('풀 밑에서 하얀 게 떠오른다. 가운데 수로를 확인해야 한다.','bad')}if(d.p<40)d.said=0;if(d.p>=100)return die('익사자')}
@@ -2548,10 +2553,20 @@ function update2(dt){
     else if(v.st===2&&v.timer<=0){v.st=3;v.off=0;v.timer=S.hard?2.2:3.2;nburst(900,1,.5,.25,0);thump(70,.3,.3,0);say('물 위로 머리가 올라왔다. 불빛을 보고 있다. 손전등을 꺼.','bad')}
     else if(v.st===3){if(torchOn()){if(v.timer<=0)return die('잠수부')}else{v.timer+=dt;v.off+=dt;if(v.off>=3){v.st=0;v.timer=Math.max(14,rnd(26,40)-S.night*2);bubbles(0,.15);say('천천히 가라앉았다.')}}}}
   // 미끄럼틀 (4일 차~): 긁히며 내려오는 소리 → 끝에 손이 보일 때 앞을 보고 플래시
-  if(S.night>=4){const l=S.sl;l.timer-=dt;
+  if(S.night>=4&&!DVU){const l=S.sl;l.timer-=dt;
     if(l.st===0&&l.timer<=0){l.st=1;l.timer=8;say('미끄럼틀 안에서 뭔가 긁히며 내려온다.')}
     else if(l.st===1){l.sT-=dt;if(l.sT<=0){l.sT=.22;const k=1-l.timer/8;nburst(lerp(500,1400,Math.random()),3,.18,.03+k*.12,lerp(.9,.4,k),0)}if(l.timer<=3&&!l.saw){l.saw=1;thump(90,.2,.25,.4)}if(l.timer<=0)return die('미끄럼틀')}}
   }
+  // 흥얼이 (5일 차~): 흥얼거리며 좌우 아치에서 옴 → 가까워지면 눈을 감음 → 의자 주위를 한 바퀴 돌고 감. 도는 동안 눈 뜨면 죽음
+  if(S.night>=5&&S.t>=10){const m=S.hm,SD=['왼쪽','','오른쪽'],sp=m.side===0?-1:1;
+    if(m.st===0){m.timer-=dt;if(m.timer<=0){m.st=1;m.side=[0,2][ri(2)];m.timer=9;m.ni=0;m.nT=0;say(m.said++?`${SD[m.side]}에서 흥얼거림.`:`${SD[m.side]}에서 흥얼거리는 소리가 다가온다. 가까워지면 눈을 감아.`,'bad')}}
+    else{m.timer-=dt;m.nT-=dt;
+      if(m.st===1&&m.timer<=0){m.st=2;m.timer=7.5;m.grace=.8}
+      else if(m.st===2){if(m.timer<=0){m.st=3;m.timer=3}else{m.grace-=dt;if(m.grace<=0&&!S.eyes)return die('흥얼이');if(m.timer<3.6&&!m.br){m.br=1;breathe(-sp*.2,.35)}}}
+      else if(m.st===3&&m.timer<=0){m.st=0;m.br=0;m.timer=Math.max(22,rnd(32,48)-(S.hard?8:0))}
+      if(m.nT<=0&&m.st>0){const [n,b]=HM_SONG[m.ni%HM_SONG.length];m.ni++;const bt=m.st===2?.5:.42,dur=b*bt;m.nT=dur;
+        let pan,v;if(m.st===1){const k=1-m.timer/9;pan=sp*lerp(1,.7,k);v=lerp(.07,.32,k)}else if(m.st===2){const k=1-m.timer/7.5;pan=sp*Math.cos(k*Math.PI);v=.4}else{const k=1-m.timer/3;pan=-sp*lerp(.7,1,k);v=lerp(.3,0,k)}
+        if(n!==null&&v>.01)hmNote(220*Math.pow(2,n/12)*(m.st===2?.97:1),dur,pan,v)}}}
   // 정신력: 어둠 속에선 천천히, 손전등이 꺼지면 빠르게
   if(S.log)S.san+=dt*4;else S.san-=dt*(.12+(h.st>=2?.5:0)+(torchOn()?0:.6));
   S.san=Math.min(100,S.san);if(S.san<=0)return die('정신');
@@ -2563,7 +2578,7 @@ function update2(dt){
 }
 // 플래시: 카메라 플래시처럼 팍. 지금 보는 쪽 아치에 서 있거나 바로 앞까지 온 것은 도망감
 function flash(){
-  if(!S||S.ch!==2||S.over||S.dawn||S.log||S.paused||PAUSE.on||mode!=='game'||jump>0)return;
+  if(!S||S.ch!==2||S.over||S.dawn||S.log||S.eyes||S.paused||PAUSE.on||mode!=='game'||jump>0)return;
   if(S.fl<1||!torchOn()){sfx(240,.05,'square',.05);return}
   S.fl=0;S.power=Math.max(0,S.power-2);S.flashT=.45;S.shake=.08;nburst(5200,1,.06,.28,0);thump(220,.04,.25,0);
   const h=S.hum;
@@ -2690,10 +2705,10 @@ function build3D2(n){
   {const wk=ctx3(cvs(256,256,(q,w,h)=>{q.strokeStyle='rgba(220,250,255,.55)';q.lineWidth=5;for(let k=0;k<4;k++){q.beginPath();q.moveTo(w*.5,h*.15+k*18);q.lineTo(w*(.1+k*.04),h*.95);q.moveTo(w*.5,h*.15+k*18);q.lineTo(w*(.9-k*.04),h*.95);q.stroke()}}));
    const m=mesh(new T3.PlaneGeometry(1.6,1.6),new T3.MeshBasicMaterial({map:wk,transparent:true,depthWrite:false,opacity:.8}),0,.04,-6,sc,false);m.rotation.x=-PI2;m.visible=false;P.wake=m;
    const ht=PIC.diver?imgTex(PIC.diver):ctx3(cvs(256,256,(q,w,h)=>{q.fillStyle='#07090a';q.beginPath();q.ellipse(w*.5,h*.55,w*.34,h*.45,0,0,7);q.fill();[-1,1].forEach(sd=>{const gx=w*(.5+sd*.15),gy=h*.48;q.fillStyle='#1a2a2e';q.beginPath();q.arc(gx,gy,w*.12,0,7);q.fill();q.fillStyle='rgba(190,240,250,.85)';q.beginPath();q.arc(gx-w*.03,gy-h*.03,w*.035,0,7);q.fill()});q.fillStyle='#b8c8c2';q.beginPath();q.ellipse(w*.5,h*.78,w*.14,h*.1,0,0,7);q.fill();q.fillStyle='#120606';q.beginPath();q.ellipse(w*.5,h*.8,w*.07,h*.06,0,0,7);q.fill()}));
-   const hd=mesh(new T3.PlaneGeometry(1.1,1.1),new T3.MeshBasicMaterial({map:ht,transparent:true,alphaTest:.05,side:T3.DoubleSide,color:0x9fb0ae}),0,.22,-2.1,sc,false);hd.visible=false;P.dvHead=hd}
+   const dI=PIC.diver,dW=dI?2.1:1.1,dH=dI?dW*dI.height/dI.width:1.1,hd=mesh(new T3.PlaneGeometry(dW,dH),new T3.MeshBasicMaterial({map:ht,transparent:true,alphaTest:.05,side:T3.DoubleSide,color:0x7f9492}),0,.22,-2.1,sc,false);hd.visible=false;P.dvHead=hd;P.dvH=dH}
   // 미끄럼틀 끝에 걸친 손
   {const ht=PIC.slider?imgTex(PIC.slider):ctx3(cvs(256,256,(q,w,h)=>{q.fillStyle='#d4d8cc';for(let k=0;k<4;k++){q.save();q.translate(w*(.3+k*.13),h*.15);q.rotate(.1-k*.05);q.fillRect(-7,0,14,h*(.42+(k%2)*.08));q.fillStyle='#8a2a20';q.fillRect(-7,h*.4,14,10);q.fillStyle='#d4d8cc';q.restore()}q.fillRect(w*.24,h*.5,w*.5,h*.3)}));
-   const [ex,ey,ez]=SLIDE_EXIT,hm=mesh(new T3.PlaneGeometry(.5,.5),new T3.MeshBasicMaterial({map:ht,transparent:true,alphaTest:.05,side:T3.DoubleSide,color:0xb8c4be}),ex,ey+.3,ez+.15,sc,false);hm.visible=false;P.slHand=hm}
+   const [ex,ey,ez]=SLIDE_EXIT,sI=PIC.slider,hm=mesh(new T3.PlaneGeometry(.72,sI?.72*sI.height/sI.width:.5),new T3.MeshBasicMaterial({map:ht,transparent:true,alphaTest:.05,side:T3.DoubleSide,color:0xb8c4be}),ex,ey+.3,ez+.15,sc,false);hm.visible=false;P.slHand=hm}
   // 5일 차: 앞 통로 끝에 초록 비상구 불빛
   if(sp.tunnel){const ex=grp(0,0,Z1,0,sc);mesh(new T3.PlaneGeometry(.42,.2),new T3.MeshBasicMaterial({map:exitTex(),fog:false}),0,2.1,-13.7,ex,false);const gl=new T3.PointLight(0x40ff70,1.8,7,1.5);gl.position.set(0,2,-13.2);ex.add(gl);ex.visible=false;P.exitG=ex}
   // 교대자 (빛을 받아야 보이는 판)
@@ -2726,7 +2741,7 @@ function draw3D2(){
   if(P.exitL)P.exitL.intensity=2.2*(Math.random()<.02?.3:1);
   if(S.drn){const k=Math.max(0,(S.drn.p-45)/55);P.drn.material.opacity=lit?0:k*.75;P.drn.position.y=.035;P.drn.scale.setScalar(.9+k*.15)}
   if(S.dv){const v=S.dv;P.wake.visible=!lit&&(v.st===1||v.st===2);if(P.wake.visible){const z=v.st===1?lerp(Z1C(P)-10,Z1C(P),1-Math.max(0,v.timer)/7):lerp(Z1C(P),-5.6,1-Math.max(0,v.timer)/6);P.wake.position.set(Math.sin(T_*.7)*.3,.045,z+.8)}
-    P.dvHead.visible=!lit&&v.st===3;if(P.dvHead.visible){P.dvHead.position.set(Math.sin(T_*.5)*.05,.32+Math.sin(T_*1.3)*.03,-5.2);P.dvHead.lookAt(cam.position.x,.32,cam.position.z)}}
+    P.dvHead.visible=!lit&&v.st===3;if(P.dvHead.visible){const yH=P.dvH/2-.06+Math.sin(T_*1.3)*.03;P.dvHead.position.set(Math.sin(T_*.5)*.05,yH,-5.2);P.dvHead.lookAt(cam.position.x,yH,cam.position.z)}}
   if(S.sl){const l=S.sl;P.slHand.visible=!lit&&l.st===1&&l.timer<=3;if(P.slHand.visible){P.slHand.lookAt(cam.position);P.slHand.position.y=SLIDE_EXIT[1]+.3+Math.sin(T_*20)*.01}}
   // 교대자: 아치에 서 있다가 바로 앞까지
   {const im=STK.full,v=h.dir>=0&&h.st>=2&&!!im&&!dw;P.hum.visible=v;
@@ -2736,6 +2751,7 @@ function draw3D2(){
   R3.rd.render(R3.sc2,cam);
   cx.drawImage(R3.rd.domElement,0,0,W,H);
   if(fk>.55){cx.fillStyle=`rgba(245,250,255,${(fk-.55)*1.6})`;cx.fillRect(0,0,W,H)} // 팍
+  S.eyeA=Math.max(0,Math.min(1,(S.eyeA||0)+(S.eyes?.12:-.18)));if(S.eyeA>0){cx.fillStyle=`rgba(0,0,0,${.97*S.eyeA})`;cx.fillRect(0,0,W,H);if(S.eyes){cx.fillStyle='rgba(120,30,30,.06)';cx.fillRect(0,0,W,H)}} // 눈 감음
   // 화면 가장자리 빨간 빛: 교대자가 오는 쪽 (왼쪽/오른쪽). 아치에 서면 더 진하게 깜빡
   if(h.dir===0||h.dir===2){const rel=h.dir-S.camX,side=rel<-.3?-1:rel>.3?1:0,a=h.st>=2?.32+.2*Math.sin(T_*10):h.st===1?.14+.08*Math.sin(T_*6):0;
     if(a>0&&!dw){if(side){const x0=side<0?0:W,gw=W*.16,gr=cx.createLinearGradient(x0,0,x0-side*gw,0);gr.addColorStop(0,`rgba(255,30,20,${a})`);gr.addColorStop(1,'rgba(255,30,20,0)');cx.fillStyle=gr;cx.fillRect(side<0?0:W-gw,0,gw,H)}
@@ -2971,27 +2987,35 @@ function renderStatic(){
   const by=((T_*60)%(H+80))-40;cx.fillStyle='rgba(255,255,255,.05)';cx.fillRect(0,by,W,40);
   cx.drawImage(VIG,0,0,W,H);
 }
+// 점프스케어: 확 덮쳤다가(펀치) 흔들리며 다가옴. 중간중간 암전 + 더 가까운 얼굴 컷이 번쩍, 끝엔 아래로 쏟아지며 암전
+const JD=1.5,JALT={};[['잠수부','diver_close.jpg'],['익사자','drowned_close.jpg'],['미끄럼틀','slider_close.jpg']].forEach(([k,f])=>{const im=new Image();im.onload=()=>{JALT[k]=im};im.src='img/'+f});
 function drawJump(){
-  const t=1.1-jump,img=JIMG[jumpType]||JUMP[jumpType]||JUMP['교대자'];
+  const t=JD-jump,soft=SET.scare==='soft',main=JIMG[jumpType]||JUMP[jumpType]||JUMP['교대자'],alt=JALT[jumpType]||(jumpType==='교대자'&&STK.close)||null;
   cx.fillStyle='#000';cx.fillRect(0,0,W,H);
-  if(t<.05&&SET.scare!=='soft'){cx.fillStyle='#fff';cx.fillRect(0,0,W,H);return} // 약하게: 흰 섬광 없음
+  if(t<.05&&!soft){cx.fillStyle='#fff';cx.fillRect(0,0,W,H);return} // 약하게: 흰 섬광 없음
+  if(!soft&&((t>.42&&t<.47)||(t>.86&&t<.9)))return; // 순간 암전 (끊기는 느낌)
+  const useAlt=!!alt&&!soft&&((t>.3&&t<.4)||(t>.95&&t<1.08)),img=useAlt?alt:main;
   const iw=img.naturalWidth||img.width,ih=img.naturalHeight||img.height;
-  const sc=Math.max(H/ih,W/iw*.62)*(1.1+t*.8),dw=iw*sc,dh=ih*sc; // 얼굴 전체가 보이게, 빠르게 커지며 덮쳐옴
-  const fy=jumpType==='은둔자'?.36:jumpType==='질주자'?.42:jumpType==='복제자'?.32:.5,x=W/2-dw/2+rnd(-30,30),y=H/2-dh*fy+rnd(-30,30)+(1-Math.min(1,t*5))*H*.25; // 은둔자는 눈과 입이 같이 보이게 위쪽에 맞춤
+  const punch=t<.18?lerp(2.3,1.05,ease(t/.18)):1.05+(t-.18)*.55,sc=Math.max(H/ih,W/iw*(S&&S.ch===2?.9:.62))*punch*(useAlt?1.12:1),dw=iw*sc,dh=ih*sc;
+  const sh=(soft?.3:1)*Math.max(4,60*Math.exp(-t*3.5));
+  const fy=useAlt?.5:jumpType==='은둔자'?.36:jumpType==='질주자'?.42:jumpType==='복제자'?.32:.5,x=W/2-dw/2+rnd(-sh,sh),y=H/2-dh*fy+rnd(-sh,sh)+(t>1.25?(t-1.25)*H*1.6:0);
   cx.drawImage(img,x,y,dw,dh);
-  cx.save();cx.globalAlpha=.3;cx.globalCompositeOperation='screen';cx.drawImage(img,x+rnd(8,18),y,dw,dh);cx.restore();
-  for(let k=0;k<3;k++){const yy=rnd(0,H),hh=rnd(6,40);cx.drawImage(cv,0,yy*DPR,W*DPR,hh*DPR,rnd(-40,40),yy,W,hh)}
-  cx.fillStyle=`rgba(${Math.random()<.5?140:0},0,0,${Math.random()*.35})`;cx.fillRect(0,0,W,H);
-  cx.save();cx.globalAlpha=.18;cx.fillStyle=NPm[ri(4)];cx.fillRect(0,0,W,H);cx.restore();
+  cx.save();cx.globalCompositeOperation='lighter';cx.globalAlpha=.2;cx.drawImage(img,x+sh*.4+6,y,dw,dh);cx.globalAlpha=.14;cx.drawImage(img,x-sh*.4-6,y+3,dw,dh);cx.restore(); // 색 갈라짐
+  for(let k=0;k<(soft?2:6);k++){const yy=rnd(0,H),hh=rnd(6,50);cx.drawImage(cv,0,yy*DPR,W*DPR,hh*DPR,rnd(-70,70),yy,W,hh)} // 화면 찢김
+  cx.fillStyle=`rgba(${120+ri(80)},0,0,${(soft?.12:.32)*(.5+.5*Math.sin(t*40))})`;cx.fillRect(0,0,W,H);
+  cx.save();cx.globalAlpha=.2;cx.fillStyle=NPm[ri(4)];cx.fillRect(0,0,W,H);cx.restore();
+  if(t>1.3){cx.fillStyle=`rgba(0,0,0,${Math.min(1,(t-1.3)/.2)})`;cx.fillRect(0,0,W,H)}
 }
 
 // ===================== 사운드 =====================
-let AC=null,master,humG,droneG,staticG,NB,radioG,OUT,AMB,waterG;
+let AC=null,master,humG,droneG,staticG,NB,radioG,OUT,AMB,waterG,EYEF,HMB;
 function initAudio(){
   if(AC){if(AC.state==='suspended')AC.resume();return}
   AC=new (window.AudioContext||window.webkitAudioContext)();
   const comp=AC.createDynamicsCompressor();comp.connect(AC.destination);
-  OUT=AC.createGain();OUT.connect(comp);AMB=AC.createGain();AMB.connect(OUT);master=AC.createGain();master.gain.value=.8;master.connect(OUT); // 전체(OUT) ← 효과음(master) + 배경음(AMB)
+  OUT=AC.createGain();EYEF=AC.createBiquadFilter();EYEF.type='lowpass';EYEF.frequency.value=20000;OUT.connect(EYEF);EYEF.connect(comp); // 눈 감으면 먹먹하게
+  {HMB=AC.createGain();HMB.gain.value=1;HMB.connect(comp);const cv5=AC.createConvolver(),L=AC.sampleRate*2.2,ir=AC.createBuffer(2,L,AC.sampleRate);for(let c=0;c<2;c++){const d=ir.getChannelData(c);for(let i=0;i<L;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/L,3)}cv5.buffer=ir;const rg=AC.createGain();rg.gain.value=.5;HMB.connect(cv5);cv5.connect(rg);rg.connect(comp)} /* 흥얼거림 전용 (안 먹먹해짐, 타일 울림) */
+  AMB=AC.createGain();AMB.connect(OUT);master=AC.createGain();master.gain.value=.8;master.connect(OUT); // 전체(OUT) ← 효과음(master) + 배경음(AMB)
   NB=AC.createBuffer(1,AC.sampleRate*2,AC.sampleRate);const nd=NB.getChannelData(0);for(let i=0;i<nd.length;i++)nd[i]=Math.random()*2-1;
   // 형광등 소리 (교대자 신호)
   humG=AC.createGain();humG.gain.value=0;
@@ -3068,6 +3092,15 @@ function breathe(pan,v=.22){if(!AC)return;const t=AC.currentTime;[[0,1.1,700,150
 // 무언가 질질 끌리는 소리
 function drag(pan,v=.2){if(!AC)return;const t=AC.currentTime,s2=AC.createBufferSource();s2.buffer=NB;const f=AC.createBiquadFilter(),g=AC.createGain();f.type='lowpass';f.frequency.value=420;f.Q.value=2;g.gain.setValueAtTime(.0001,t);const cv3=new Float32Array(40);for(let i=0;i<40;i++)cv3[i]=v*(.3+Math.random()*.7)*Math.sin(i/39*Math.PI);g.gain.setValueCurveAtTime(cv3,t,2.6);s2.connect(f);f.connect(g);g.connect(out(pan));s2.start(t,Math.random());s2.stop(t+2.7)}
 function bubbles(pan,v=.08){if(!AC)return;for(let k=0;k<rnd(4,8);k++){const t=AC.currentTime+k*rnd(.05,.14),o=AC.createOscillator(),g=AC.createGain(),f0=rnd(180,420);o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(f0*2.4,t+.06);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v,t+.006);g.gain.exponentialRampToValueAtTime(.001,t+.09);o.connect(g);g.connect(out(pan));o.start(t);o.stop(t+.1)}} // 보글보글
+// 흥얼이: 입 다문 채 '음-' 하는 여자 목소리. 떨림 + 음 시작에 살짝 끌어올림 + 콧소리 울림
+function hmNote(f,dur,pan,v){if(!AC||!HMB)return;const t=AC.currentTime,pn=AC.createStereoPanner?AC.createStereoPanner():null,g=AC.createGain(),lp=AC.createBiquadFilter(),pk=AC.createBiquadFilter(),ns=AC.createBiquadFilter();
+  lp.type='lowpass';lp.frequency.value=1250;lp.Q.value=.7;pk.type='peaking';pk.frequency.value=290;pk.Q.value=1.6;pk.gain.value=11;ns.type='peaking';ns.frequency.value=2500;ns.Q.value=3;ns.gain.value=4;
+  g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v,t+.07);g.gain.setValueAtTime(v,t+dur*.85);g.gain.linearRampToValueAtTime(.0001,t+dur+.08);
+  const lfo=AC.createOscillator(),lg=AC.createGain();lfo.frequency.value=5.2+Math.random()*.5;lg.gain.value=f*.013;lfo.connect(lg);
+  [['sawtooth',.55,0],['triangle',.9,-4],['sine',.6,1200]].forEach(([ty,a,dt])=>{const o=AC.createOscillator(),og=AC.createGain();o.type=ty;o.detune.value=dt;o.frequency.setValueAtTime(f*.96,t);o.frequency.exponentialRampToValueAtTime(f,t+.09);lg.connect(o.frequency);og.gain.value=a;o.connect(og);og.connect(lp);o.start(t);o.stop(t+dur+.12)});
+  {const b=AC.createBufferSource();b.buffer=NB;const bf=AC.createBiquadFilter();bf.type='bandpass';bf.frequency.value=600;bf.Q.value=1;const bg=AC.createGain();bg.gain.value=.08;b.connect(bf);bf.connect(bg);bg.connect(lp);b.start(t,Math.random());b.stop(t+dur+.1)} // 숨 섞인 소리
+  lp.connect(pk);pk.connect(ns);ns.connect(g);if(pn){pn.pan.value=Math.max(-1,Math.min(1,pan));g.connect(pn);pn.connect(HMB)}else g.connect(HMB);lfo.start(t);lfo.stop(t+dur+.12)}
+const HM_SONG=[[7,1],[10,1],[12,2],[10,1],[7,1],[5,2],[3,1],[5,1],[7,1],[3,1],[0,3],[null,1]]; // 짧은 자장가 (A 단조)
 function drip(pan){if(!AC)return;const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain(),f0=rnd(700,1100);o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(f0*2.3,t+.05);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(.07,t+.004);g.gain.exponentialRampToValueAtTime(.001,t+.1);o.connect(g);g.connect(out(pan));o.start(t);o.stop(t+.12)} // 물방울 똑
 // 키득거리는 웃음
 function giggle(pan,v=.07){if(!AC)return;const n=rnd(5,8);for(let k=0;k<n;k++){const t=AC.currentTime+k*(.13-k*.008),o=AC.createOscillator(),d=dist(4),f=AC.createBiquadFilter(),g=AC.createGain();o.type='sawtooth';o.frequency.setValueAtTime(rnd(300,380),t);o.frequency.linearRampToValueAtTime(rnd(240,280),t+.08);f.type='bandpass';f.frequency.value=1500;f.Q.value=4;g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v,t+.015);g.gain.exponentialRampToValueAtTime(.001,t+.09);o.connect(d);d.connect(f);f.connect(g);g.connect(out(pan));o.start(t);o.stop(t+.1)}}
@@ -3115,6 +3148,7 @@ function scream(){
   // 묵직한 충격
   {const o=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(120,t);o.frequency.exponentialRampToValueAtTime(32,t+.5);g.gain.setValueAtTime(1,t);g.gain.exponentialRampToValueAtTime(.001,t+1.1);o.connect(g);g.connect(master);o.start(t);o.stop(t+1.2)}
   crack(0,.5);
+  thump(55,.35,.7,0,.43);nburst(3000,1,.15,.35,0,.44);thump(48,.6,.8,0,.87);nburst(2000,1,.2,.3,0,.88); // 암전될 때마다 쾅
 }
 
 // ===================== 화면 크기 =====================
@@ -3147,7 +3181,10 @@ $('camOff').onclick=e=>{e.stopPropagation();if(S&&S.mon)toggleMon()};
 $('camRep').onclick=e=>{e.stopPropagation();reportCam()};
 $('flashBtn').onclick=e=>{e.stopPropagation();flash()};
 $('bpBack').onclick=e=>{e.stopPropagation();if(S&&S.bp)closeBrk()};
+function setEyes(v){if(!S||S.ch!==2||S.over)return;if(v&&(S.log||mode!=='game'))return;if(S.eyes===v)return;S.eyes=v;if(EYEF)EYEF.frequency.setTargetAtTime(v?500:20000,AC.currentTime,.08);$('eyeBtn').classList.toggle('on',v)}
 function toggleTorch(){if(!S||S.ch!==2||S.over||S.dawn)return;S.torchOff=!S.torchOff;sfx(S.torchOff?700:1100,.03,'square',.05);buildUI()}
+{const b=$('eyeBtn');b.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();setEyes(true)});['pointerup','pointerleave','pointercancel'].forEach(k=>b.addEventListener(k,()=>setEyes(false)));b.addEventListener('contextmenu',e=>e.preventDefault())}
+addEventListener('keydown',e=>{if((e.key==='e'||e.key==='E')&&S&&S.ch===2)setEyes(true)});addEventListener('keyup',e=>{if(e.key==='e'||e.key==='E')setEyes(false)});
 $('torchBtn').onclick=e=>{e.stopPropagation();toggleTorch()};
 $('pnlBtn').onclick=e=>{e.stopPropagation();if(S&&S.ch===2&&!S.over)toggleMon()};
 $('battBtn').onclick=e=>{e.stopPropagation();startSwap()};
