@@ -279,7 +279,7 @@ body[data-mode=game] #pauseBtn{display:flex}
 <script nomodule>window.THREE_ERR='nomodule'</script>
 <script>
 // ===================== 기본 =====================
-const VER='0.11.1'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
+const VER='0.11.2'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
 const $=id=>document.getElementById(id);
 const cv=$('cv'),cx=cv.getContext('2d');
 let W,H,DPR=1;
@@ -1131,7 +1131,7 @@ function update(dt){
       if(h.lock>=4){achCount('bolt',10,'bolt');if(S.lieDoor){S.lieDoor=false;ach('lie')}h.node=[5,6,7][ri(3)];h.spot=0;h.timer=Math.max(3.5,rnd(7,12)-S.night);sfx(200,.15,'sine',.1);say('형광등 소리가 돌아왔다.')}
     }else{
       h.wait+=dt;
-      if(h.wait>=(S.hard?7:8.5)-S.night*.5)return die('교대자');
+      if(h.wait>=(S.hard?5.5:6.5)-S.night*.5)return die('교대자');
     }
   }
 
@@ -1171,7 +1171,7 @@ function update(dt){
     if(r.phase===0){
       if(r.cd>0)r.cd-=dt;
       else if(watch)r.open=Math.max(0,r.open-dt*.015);             // 보고 있으면 안 열림 (아주 천천히 닫히기까지)
-      else r.open=Math.min(1,r.open+dt/((S.hard?30:44)-S.night*3));
+      else r.open=Math.min(1,r.open+dt/((S.hard?24:32)-S.night*3));
       const c=Math.floor(r.open*4);if(c>r.cr){r.cr=c;creakStore(c)}else if(c<r.cr)r.cr=c;
       if(r.open>=1){r.phase=1;r.runT=S.hard?2.6:3.4;r.step=0;runStart()}
     }else{
@@ -1187,8 +1187,8 @@ function update(dt){
     g.timer-=dt;
     if(g.timer<=0&&g.p<20){g.cam=ri(8);g.timer=rnd(12,20)}
     if(monOn()&&S.cam===g.cam){g.p+=dt*(S.hard?12+S.night*3:10+S.night*2);S.san-=dt*1.5}
-    if(g.p>50&&!g.sq){g.sq=1;squelch(0,.3)}if(g.p<20)g.sq=0; // 눈이 움직이는 질척한 소리
     else g.p=Math.max(0,g.p-dt*10);
+    if(g.p>50&&!g.sq){g.sq=1;squelch(0,.3)}if(g.p<20)g.sq=0; // 눈이 움직이는 질척한 소리
     if(g.p>90)g.hi=1;if(g.hi&&g.p<15){g.hi=0;ach('eye')}
     if(g.p>=100)return die('응시자');
   }
