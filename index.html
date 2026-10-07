@@ -325,7 +325,7 @@ body[data-mode=game] #pauseBtn{display:flex}
 <script nomodule>window.THREE_ERR='nomodule'</script>
 <script>
 // ===================== 기본 =====================
-const VER='0.18.0'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
+const VER='0.18.1'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
 const $=id=>document.getElementById(id);
 const cv=$('cv'),cx=cv.getContext('2d');
 let W,H,DPR=1;
@@ -2909,8 +2909,7 @@ function renderCam(i,menu){
   const g=cg,t=T_;let C=null;EXIT3.on=false;
   g.globalCompositeOperation='source-over';g.globalAlpha=1;
   if(R3.ok){if(menu)C=C3.menu;else{if(C3.key!==S.night+'|'+S.layout[0].seed)buildCams3D();C=C3.cams[i]}}
-  if(C)drawCam3D(g,C,i,menu,t);
-  if(C&&!menu&&S.ch===2&&i===1)canalOver(g,t);
+  if(C){drawCam3D(g,C,i,menu,t);if(!menu&&S.ch===2&&i===1)canalOver(g,t)} // 3D 화면 (수영장 가운데 수로는 익사자·물살을 덧그림)
   else{const B=menu?MENUB:CAMB[i],I=B.info;g.drawImage(B.c,0,0);
   if(!menu&&EXIT_CAM[S.night-1]===i){const e=I.eye;EXIT3.on=true;EXIT3.x=e.x;EXIT3.y=e.y-e.s*.42;EXIT3.s=Math.max(2,e.s*.06);g.fillStyle='#1a9a44';g.fillRect(EXIT3.x-EXIT3.s,EXIT3.y-EXIT3.s*.45,EXIT3.s*2,EXIT3.s*.9)} // 2D 화면의 비상구
   if(!menu){
@@ -3034,7 +3033,7 @@ function initAudio(){
   const bb=AC.createBuffer(1,AC.sampleRate*4,AC.sampleRate),bd=bb.getChannelData(0);let l=0;for(let i=0;i<bd.length;i++){l=(l+.02*(Math.random()*2-1))/1.02;bd[i]=l*3.5}
   const bs=AC.createBufferSource();bs.buffer=bb;bs.loop=true;const bf=AC.createBiquadFilter();bf.type='lowpass';bf.frequency.value=260;const bg=AC.createGain();bg.gain.value=.12;bs.connect(bf);bf.connect(bg);bg.connect(AMB);bs.start();
   // 지지직 (CCTV, 메뉴)
-  const ss=AC.createBufferSource();ss.buffer=NB;ss.loop=true;const sf=AC.createBiquadFilter();sf.type='bandpass';sf.frequency.value=2600;sf.Q.value=.7;staticG=AC.createGain();staticG.gain.value=0;ss.connect(sf);sf.connect(staticG);staticG.connect(AMB);ss.start();
+  const ss=AC.createBufferSource();ss.buffer=NB;ss.loop=true;const sf=AC.createBiquadFilter();sf.type='bandpass';sf.frequency.value=1500;sf.Q.value=.9;staticG=AC.createGain();staticG.gain.value=0;ss.connect(sf);sf.connect(staticG);staticG.connect(AMB);ss.start();
   {const rs=AC.createBufferSource();rs.buffer=NB;rs.loop=true;const f=AC.createBiquadFilter();f.type='bandpass';f.frequency.value=1700;f.Q.value=2.5;const am=AC.createGain(),lfo=AC.createOscillator(),lg=AC.createGain();lfo.type='square';lfo.frequency.value=13;lg.gain.value=0;am.gain.value=.5;lfo.connect(lg);lg.connect(am.gain);radioG=AC.createGain();radioG.gain.value=0;const pn=AC.createStereoPanner?AC.createStereoPanner():null;rs.connect(f);f.connect(am);am.connect(radioG);if(pn){pn.pan.value=-.35;radioG.connect(pn);pn.connect(master)}else radioG.connect(master);rs.start();lfo.start()} // 책상 무전기 잡음 (잡음이 덕트 안에 있을 때)
   applySet();
 }
@@ -3210,7 +3209,7 @@ cv.addEventListener('pointerleave',()=>{if(!PT.on)PT.x=PT.y=-1});
 // 배전반 레버 / 닫기
 {const lv=$('blever'),on=e=>{e.preventDefault();if(S)S.holding=true;lv.classList.add('hold')},off=()=>{if(S)S.holding=false;lv.classList.remove('hold')};lv.addEventListener('pointerdown',on);['pointerup','pointerleave','pointercancel'].forEach(t=>lv.addEventListener(t,off));lv.addEventListener('contextmenu',e=>e.preventDefault());$('bclose').onclick=closeBrk}
 // 브라우저는 첫 터치/클릭 전에는 소리를 못 냄
-const unlock=()=>{initAudio();if(staticG&&mode==='menu')staticG.gain.setTargetAtTime(.04,AC.currentTime,.3)};
+const unlock=()=>{initAudio();if(staticG&&mode==='menu')staticG.gain.setTargetAtTime(.009,AC.currentTime,.6)};
 addEventListener('pointerdown',unlock);addEventListener('keydown',unlock);
 
 // ===================== 업적 =====================
@@ -3300,7 +3299,7 @@ function toMenu(){
   if(S){S.over=true;if(radioG)radioG.gain.setTargetAtTime(0,AC.currentTime,.05);if(humG)humG.gain.setTargetAtTime(0,AC.currentTime,.05)}
   document.body.classList.remove('scare');S=null;['end','devp','log','intro','brkp'].forEach(id=>$(id).classList.remove('show'));
   $('play').classList.remove('show');
-  setMode('menu');if(staticG)staticG.gain.setTargetAtTime(.04,AC.currentTime,.3);
+  setMode('menu');if(staticG)staticG.gain.setTargetAtTime(.009,AC.currentTime,.6);
 }
 function startGame(n,dev,hard=false,ch=1){initAudio();setChapter(ch);DEV.on=dev;HARD=dev?DEV.hard:hard;DEV.speed=1;if(staticG)staticG.gain.setTargetAtTime(0,AC.currentTime,.1);newNight(n);buildDbg()}
 // 3D 엔진(700KB)이 아직 오는 중이면 잠깐 기다렸다 시작. 안 그러면 느린 폰 회선에서 2D 방으로 시작됨
