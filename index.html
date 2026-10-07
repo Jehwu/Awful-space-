@@ -49,6 +49,19 @@ body:not([data-mode=game]) #msg{display:none}
 /* 오버레이 */
 .ov{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;gap:16px;z-index:5}
 .ov.show{display:flex}
+#play{background:radial-gradient(ellipse at center,rgba(16,12,6,.82),rgba(0,0,0,.96));z-index:6}
+#play .pw{display:flex;gap:22px;width:min(1080px,96vw);max-height:94vh;align-items:stretch}
+#play .chs{flex:1;display:flex;flex-direction:column;gap:14px;min-width:0}
+#play .chc{position:relative;flex:1;display:block;min-height:clamp(140px,34vh,300px);padding:0;border:2px solid rgba(220,205,160,.25);background:#000;overflow:hidden;text-align:left;color:#efe6cc;font-family:var(--ui)}
+#play .chc img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.55;transition:opacity .2s}
+#play .chc .ct{position:absolute;left:18px;top:12px;font-size:14px;letter-spacing:.3em;opacity:.8}#play .chc .cn{position:absolute;left:18px;top:32px;font-size:clamp(22px,3vw,34px);letter-spacing:.14em;text-shadow:0 2px 8px #000}
+#play .chc .cp{position:absolute;left:18px;bottom:12px;font-size:14px;letter-spacing:.1em;opacity:.8;text-shadow:0 1px 4px #000}
+#play .chc.on{border-color:#c8231a;box-shadow:0 0 22px rgba(200,35,26,.35)}#play .chc.on img,#play .chc:hover img{opacity:.9}
+#play .chc .lk{display:none;position:absolute;inset:0;align-items:center;justify-content:center;background:rgba(0,0,0,.72);font-size:17px;letter-spacing:.14em;color:#d9b36a}#play .chc.locked .lk{display:flex}#play .chc.locked img{filter:grayscale(1) blur(2px)}
+#play .side{width:min(240px,30vw);display:flex;flex-direction:column;gap:10px;justify-content:center}
+#play .md{display:flex;gap:6px}#play .md button{flex:1;padding:12px 0;font-size:17px;letter-spacing:.14em;color:#cfc6a6;background:rgba(20,16,8,.8);border:1px solid rgba(220,205,160,.3)}#play .md button.on{color:#fff;background:linear-gradient(#4a120c,#200604);border-color:#c8231a}
+#play .sb{padding:16px 10px;font-size:clamp(17px,1.9vw,21px);letter-spacing:.14em;color:#efe6cc;background:linear-gradient(rgba(40,32,16,.85),rgba(16,12,6,.95));border:1px solid rgba(220,205,160,.4);text-align:left}
+#play .sb:hover{border-color:#c8231a;color:#fff}#play .sb:disabled{opacity:.3}#play .back{margin-top:10px;font-size:15px;opacity:.7}
 .ov pre{white-space:pre-wrap;font:inherit;line-height:1.8;max-width:520px;text-align:left;margin:0}
 /* 근무 일지: 바인더에 끼운 누런 종이 */
 #log{background:radial-gradient(ellipse at center,rgba(20,16,8,.6),rgba(0,0,0,.9))}
@@ -255,7 +268,7 @@ body[data-mode=game] #pauseBtn{display:flex}
 <button id="camOff"><span class="ar">▼</span> 닫기</button>
 <button id="camRep"><span class="rd"></span>복제자 신고</button>
 <button id="flashBtn"><i></i><span>플래시</span></button>
-<div id="pnl"><button data-c="0">왼쪽</button><button data-c="1">앞</button><button data-c="2">오른쪽</button><button class="x">닫기</button></div>
+<div id="pnl"><button data-c="0">왼쪽</button><button data-c="1">가운데</button><button data-c="2">오른쪽</button><button class="x">닫기</button></div>
 <button id="pnlBtn">통로 패널</button>
 <button id="bpBack">← 돌아가기</button>
 <button id="battBtn">배터리 교체 <b id="battN">1</b></button>
@@ -268,10 +281,7 @@ body[data-mode=game] #pauseBtn{display:flex}
 <div id="menu">
   <h1 id="title">AWFUL SPACE</h1>
   <div class="sub">야간 경비 구함 · 숙식 제공 · <b>교대 없음</b></div>
-  <button class="mbtn" id="mNew">처음부터</button>
-  <button class="mbtn" id="mCont">이어하기</button>
-  <button class="mbtn" id="mHard">하드 모드</button>
-  <button class="mbtn" id="mCh2">챕터 2 · 수영장 (제작 중)</button>
+  <button class="mbtn" id="mPlay">게임 플레이</button>
   <button class="mbtn" id="mAch">기록</button>
   <button class="mbtn" id="mSet">설정</button>
   <button class="mbtn" id="mDev">개발자 모드</button>
@@ -294,6 +304,8 @@ body[data-mode=game] #pauseBtn{display:flex}
   <button id="devBack">메인 메뉴</button>
 </div>
 
+<div class="ov" id="play"><div class="pw"><div class="chs"><button class="chc" data-ch="1"><img src="img/ch1.jpg" alt=""><span class="ct">챕터 1</span><span class="cn">경비실</span><span class="cp"></span></button><button class="chc" data-ch="2"><img src="img/ch2.jpg" alt=""><span class="ct">챕터 2</span><span class="cn">수영장</span><span class="cp"></span><span class="lk">챕터 1을 깨야 열림</span></button></div>
+<div class="side"><div class="md"><button data-h="0">노말</button><button data-h="1">하드</button></div><button class="sb" id="pCont">이어하기</button><button class="sb" id="pNew">처음부터</button><button class="sb back" id="pBack">뒤로</button></div></div></div>
 <div class="ov" id="intro"><div class="big" id="introBig">12:00 AM</div><div class="small" id="introSmall"></div></div>
 <div class="ov" id="brkp"><div class="cab"><div class="cab-h"><span class="bpt">MAIN BREAKER</span><span class="hv"><span>고압 위험</span></span></div><div class="bhint">빨간 불 스위치를 전부 올리고 레버를 누르고 있을 것</div><div id="bsw"></div><div class="mrow"><button id="blever"><span class="knob"></span><span>메인 레버</span></button><div class="bbar"><i id="bprog"></i></div></div><button id="bclose">닫기</button></div></div>
 <div class="ov" id="log"><div class="sheet"><div id="logText"></div><button id="logClose">일지 덮기</button></div></div>
@@ -309,7 +321,7 @@ body[data-mode=game] #pauseBtn{display:flex}
 <script nomodule>window.THREE_ERR='nomodule'</script>
 <script>
 // ===================== 기본 =====================
-const VER='0.15.0'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
+const VER='0.16.0'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
 const $=id=>document.getElementById(id);
 const cv=$('cv'),cx=cv.getContext('2d');
 let W,H,DPR=1;
@@ -337,7 +349,7 @@ const DOOR=-1;
 let S=null,last=0,jump=0,jumpType='',T_=0,menuT=0,mode='menu';
 let savedNight=1,savedHard=1,HARD=false; // 일반 / 하드 모드 진행 저장
 try{savedNight=+localStorage.getItem('obs_night')||1;savedHard=+localStorage.getItem('obs_night_hard')||1}catch(e){}
-let savedCh2=1;try{savedCh2=+localStorage.getItem('obs2_night')||1}catch(e){} // 챕터 2 진행
+let savedCh2=1,savedCh2h=1;try{savedCh2=+localStorage.getItem('obs2_night')||1;savedCh2h=+localStorage.getItem('obs2_night_hard')||1}catch(e){} // 챕터 2 진행
 const DEV={on:false,noScare:true,info:true,god:false,bright:false,speed:1,hard:false};
 
 // ===================== 텍스처 =====================
@@ -903,6 +915,7 @@ function drawStalker(g,x,y,h,a,t,pose){
 }
 // 응시자·그림자·복제자 AI 이미지
 const PIC={};[['rfull','runner_full'],['rside','runner_side'],['rclose','runner_close'],['sfull','static_full'],['speek','static_peek'],['sclose','static_close'],['sh1','shadow_1'],['sh2','shadow_2'],['sh3','shadow_3'],['cseat','clone_seat'],['cstand','clone_stand'],['cface','clone_face'],['sjfull','seojin_full']].forEach(([k,f])=>{const im=new Image();im.onload=()=>{PIC[k]=im};im.src='img/'+f+'.png'});
+[['sjbars','seojin_bars.jpg'],['sjup','seojin_up.jpg']].forEach(([k,f])=>{const im=new Image();im.onload=()=>{PIC[k]=im};im.src='img/'+f}); // 엔딩 서진 사진 컷
 // 교대자 AI 이미지 (img 폴더). 못 불러오면 코드로 그린 버전 사용
 const STK={},PEEK_EDGE=.2985; // peek 이미지에서 벽 모서리 위치(가로 비율)
 ['full','peek','close'].forEach(k=>{const im=new Image();im.onload=()=>{STK[k]=im};im.src='img/stalker_'+k+'.png'});
@@ -2247,6 +2260,8 @@ function renderCut(dt){
     R3.rd.setViewport(0,0,W,H);R3.rd.render(sc,C);cx.drawImage(R3.rd.domElement,0,0,W,H);
     cx.save();cx.globalCompositeOperation='soft-light';cx.globalAlpha=.25;cx.fillStyle='#5c4a22';cx.fillRect(0,0,W,H);cx.restore();
   }
+  if(sh.pic&&PIC[sh.pic]){const im=PIC[sh.pic],iw=im.width,ih=im.height,sc2=Math.max(W/iw,H/ih)*(1.06+u*.09),dw=iw*sc2,dh=ih*sc2,fl=Math.random()<.06?.55:1; // 사진 컷: 천천히 다가가며 전구가 깜빡
+    cx.save();cx.globalAlpha=fl;cx.drawImage(im,W/2-dw/2+rnd(-1.5,1.5),H/2-dh*(sh.pfy??.5)+rnd(-1.5,1.5),dw,dh);cx.restore();cx.save();cx.globalCompositeOperation='soft-light';cx.globalAlpha=.35;cx.fillStyle='#5c4a22';cx.fillRect(0,0,W,H);cx.restore()}
   // 필름 질감: 노이즈, 비네트, 위아래 검은 띠, 페이드
   cx.save();cx.globalAlpha=.08;cx.globalCompositeOperation='overlay';cx.translate(rnd(-128,0),rnd(-128,0));cx.fillStyle=NPm[ri(4)];cx.fillRect(0,0,W+128,H+128);cx.restore();
   cx.drawImage(VIG,0,0,W,H);
@@ -2330,7 +2345,7 @@ BP.outro=()=>({Hc:2.6,rooms:[[-1.2,1.2,.6,-5.4],[-3.6,3.0,-5.4,-11.4],[-4.2,-1.2
       q.fillRect(w*.22,h*.21,w*.09,h*.33);q.fillRect(w*.69,h*.21,w*.09,h*.33);q.fillStyle='#b9b09a';q.fillRect(w*.23,h*.53,w*.07,h*.05);q.fillRect(w*.7,h*.53,w*.07,h*.05);q.fillStyle='#262a25';q.fillRect(w*.31,h*.58,w*.38,h*.03);
       q.fillStyle='#c9c0aa';q.beginPath();q.ellipse(w*.5,h*.12,w*.1,h*.07,0,0,7);q.fill();q.fillStyle='rgba(10,10,8,.85)';q.fillRect(w*.38,h*.05,w*.24,h*.06);q.fillStyle='#22251f';q.beginPath();q.ellipse(w*.5,h*.06,w*.12,h*.035,0,Math.PI,0);q.fill();q.fillRect(w*.36,h*.06,w*.3,h*.015);
       q.strokeStyle='#3a1a14';q.lineWidth=2;q.beginPath();q.moveTo(w*.45,h*.155);q.quadraticCurveTo(w*.5,h*.168,w*.56,h*.152);q.stroke()});
-    const sjI=PIC.sjfull,sp=mesh(new T3.PlaneGeometry(sjI?1.78*sjI.width/sjI.height:.66,1.78),MS({map:sjI?imgTex(sjI):sj,transparent:true,alphaTest:.1,roughness:.85}),.08,.89,.05,cB,false);sp.rotation.y=-PI2; // 서진 사진 (없으면 그림)
+    const sjI=PIC.sjfull,sp=mesh(new T3.PlaneGeometry(sjI?1.78*sjI.width/sjI.height:.66,1.78),MS({map:sjI?imgTex(sjI):sj,transparent:true,alphaTest:.1,roughness:.85}),.08,.89,.05,cB,false);sp.rotation.y=-PI2;sp.visible=false; // 3D 서진은 숨김 (등신대 같아서). 엇갈리는 순간은 사진 컷으로
     const g=grp(-1.4,0,-11.38,0,sc);[[-.52,1.08,.06,2.16],[.52,1.08,.06,2.16],[0,2.13,1.1,.07]].forEach(([x,y,w,h])=>BOX(w,h,.45,M.dark,x,y,.05,g)); // 문틀
     const hg=grp(-.495,0,0,0,g),dr=grp(.495,0,0,0,hg);BOX(.99,2.1,.05,M.metal2,0,1.05,0,dr);BOX(.7,.05,.06,M.grey,0,1.0,.04,dr);C.dyn.exDoor=hg;
     // 맨 아래: 하얀 타일 수영장
@@ -2416,11 +2431,13 @@ const CUTS={
     {d:4,scene:'outro',cam:(u,t,C)=>shotCam(C,V(-1.2,1.62,-8.6),V(-1.4,1.62,-10.9),V(-1.4,1.8,-11.4),V(-1.4,1.3,-13.2),u),fx:(u,t)=>{const D=CUT.areas.outro.dyn,o=Math.min(1,Math.max(0,(t-1.4)/.9));D.exDoor.rotation.y=-o*1.6;setCars(0);carLt(0,D.carA,o)},at:{1.3:()=>{thump(160,.06,.3,0);nburst(1200,2,.08,.2,0)},2.4:()=>sfx(60,1.4,'sawtooth',.03)}},
     {d:2.6,scene:'outro',cam:(u,t,C)=>shotCam(C,V(-1.4,1.62,-10.9),V(-1.4,1.62,-12.85),V(-1.4,1.4,-13.3),V(-1.4,1.45,-13.4),u,{walk:true}),fx:()=>{const D=CUT.areas.outro.dyn;setCars(0);carLt(0,D.carA,1)},at:{0:()=>steps(4,.6,.16),1.6:()=>thump(90,.15,.2,0)}},
     {d:3.4,scene:'outro',cam:(u,t,C)=>inCar(C,0,Math.PI*ease(Math.min(1,u*2.2))),fx:(u,t)=>{const D=CUT.areas.outro.dyn;setCars(0);carLt(0,D.carA,1);D.gate.scale.x=.06+.94*ease(Math.min(1,Math.max(0,(t-1.3)/.7)))},at:{1.3:()=>nburst(2600,6,.6,.1,0),2.05:()=>{thump(70,.3,.4,0);metal()},2.9:()=>relay()}}, // 돌아서면 철창문이 닫힘
-    {d:7,scene:'outro',cap:'고마워.',capDelay:4200,cam:(u,t,C)=>{const s=16*u**1.5,a=Math.PI-PI2*ease(Math.min(1,Math.max(0,(u-.2)/.3))),y=-s+1.62,hy=-16+s+1.6;inCar(C,s,a,y+Math.max(-.7,Math.min(1,(hy-y)*.5)));C.position.y+=Math.sin(t*37)*.006},
-      fx:(u,t)=>{const D=CUT.areas.outro.dyn;setCars(16*u**1.5);carLt(0,D.carA,1);carLt(1,D.carB,1,0xfff0d0)},at:{0:()=>{thump(45,.9,.55,0);for(let k=0;k<15;k++)thump(36,.3,.12,0,.5+k*.45)},2.5:()=>metal(),4.3:()=>whisper()}}, // 내려가는 동안 서진 칸이 올라와 엇갈림
-    {d:4,scene:'outro',cap:'이거 혼자선 안 움직이거든.',cam:(u,t,C)=>{const s=16+3.5*t,y=-s+1.62,hy=-16+s+1.6;inCar(C,s,PI2+.15*u,y+Math.min(1.1,(hy-y)*.5))},
-      fx:(u,t)=>{const D=CUT.areas.outro.dyn;setCars(16+3.5*t);carLt(0,D.carA,u>.6&&(t*11)%1<.45?.12:1);carLt(1,D.carB,1,0xfff0d0)},at:{0:()=>{for(let k=0;k<9;k++)thump(36,.3,.12,0,k*.45)},2.8:()=>buzzClick()}},
-    {d:3,scene:'outro',cap:'',cam:(u,t,C)=>{const s=30+3.5*t-.5*(3.5/3)*t*t;inCar(C,s,PI2+(PI2-.15)*ease(u))},fx:(u,t)=>{const D=CUT.areas.outro.dyn;setCars(30+3.5*t-.5*(3.5/3)*t*t);carLt(0,D.carA,(t*7)%1<.3?.5:.08);carLt(1,D.carB,0)},fo:.5,at:{0:()=>{for(let k=0;k<5;k++)thump(36,.3,.1,0,k*.5)},2.85:()=>{thump(48,.7,.6,0);metal()}}},
+    {d:4.5,scene:'outro',cap:'',cam:(u,t,C)=>{const s=16*(t/7)**1.5,a=Math.PI-PI2*ease(Math.min(1,Math.max(0,(t/7-.2)/.3))),y=-s+1.62,hy=-16+s+1.6;inCar(C,s,a,y+Math.max(-.7,Math.min(1,(hy-y)*.5)));C.position.y+=Math.sin(t*37)*.006},
+      fx:(u,t)=>{const D=CUT.areas.outro.dyn;setCars(16*(t/7)**1.5);carLt(0,D.carA,1);carLt(1,D.carB,1,0xfff0d0)},at:{0:()=>{thump(45,.9,.55,0);for(let k=0;k<10;k++)thump(36,.3,.12,0,.5+k*.45)},2.5:()=>metal(),4.1:()=>whisper()}}, // 아래에서 맞은편 칸 불빛이 올라옴
+    {d:2.6,pic:'sjbars',pfy:.48,cap:'고마워.',capDelay:500,at:{0:()=>{thump(60,.3,.3,0);nburst(3000,3,.4,.08,0)},.2:()=>buzzClick()}}, // 철창 너머 서진 (사진)
+    {d:3.2,scene:'outro',cap:'',cam:(u,t,C)=>{const s=8.25+3.4*t,y=-s+1.62;inCar(C,s,Math.PI-.25*u,y+.4*u)},
+      fx:(u,t)=>{const D=CUT.areas.outro.dyn;setCars(8.25+3.4*t);carLt(0,D.carA,(t*11)%1<.4&&u>.5?.15:1);carLt(1,D.carB,1,0xfff0d0)},at:{0:()=>{for(let k=0;k<7;k++)thump(36,.3,.12,0,k*.45)}}},
+    {d:2.6,pic:'sjup',pfy:.36,cap:'이거 혼자선 안 움직이거든.',capDelay:300,at:{0:()=>{for(let k=0;k<5;k++)thump(36,.3,.08,0,k*.45)},1.8:()=>buzzClick()}}, // 위로 올라가며 내려다보는 서진 (사진)
+    {d:4,scene:'outro',cap:'',cam:(u,t,C)=>{const s=19.13+4.03*t;inCar(C,s,Math.PI-.25+.25*u)},fx:(u,t)=>{const D=CUT.areas.outro.dyn;setCars(19.13+4.03*t);carLt(0,D.carA,(t*7)%1<.3?.5:.08);carLt(1,D.carB,0)},fo:.5,at:{0:()=>{for(let k=0;k<7;k++)thump(36,.3,.1,0,k*.5)},3.85:()=>{thump(48,.7,.6,0);metal()}}},
     {d:1.6,black:true,at:{.3:()=>drip(-.3),.9:()=>drip(.4),1.3:()=>drip(0)}},
     {d:5,scene:'outro',fi:.8,cam:(u,t,C)=>{const B=ELEV_BOT,p=V(-1.4,-B+1.62,-12.75).lerp(V(-1.4,-B+1.62,-11.7),ease(Math.max(0,(u-.35)/.65)));C.position.copy(p);C.lookAt(-1.2,-B+1.1,-6)},fx:(u,t)=>{poolFx();CUT.areas.outro.dyn.gate.scale.x=.06+.94*(1-ease(Math.min(1,Math.max(0,(t-.6)/.8))))},at:{.6:()=>nburst(2600,6,.6,.1,0),1.2:()=>drip(.5),2.4:()=>drip(-.6),3.5:()=>drip(.2)}}, // 철창문이 열리면 하얀 타일 수영장
     {d:2.4,scene:'outro',fo:2,cam:(u,t,C)=>{const B=ELEV_BOT;C.position.set(-1.4,-B+1.62,-11.7);C.lookAt(-1.2+u*.3,-B+1.1,-6)},fx:()=>{poolFx();CUT.areas.outro.dyn.gate.scale.x=.06},at:{.8:()=>drip(0)}}]},
@@ -2434,25 +2451,26 @@ CUTS.ending_hard={area:'outro',prep(){CUT.areas.outro.dyn.phone.visible=true},sh
 // 엘리베이터로 떨어진 곳. 밤엔 불이 다 꺼짐. 손전등 플래시를 터뜨리면 그쪽 아치에 선 것이 도망감. 패널로는 근처 통로 3개만 봄
 // 6시에 불이 켜지면 다음 자리로 옮김. 5일째 끝에 물속 터널 너머 비상구
 let CHAP=1;const CHT={};
-CHT[2]={CAMS:['1','2','3'],CAMN:['왼쪽 통로','앞 통로','오른쪽 통로'],KIND:['p_tun','p_tun','p_tun'],
+CHT[2]={CAMS:['1','2','3'],CAMN:['왼쪽 통로','가운데 수로','오른쪽 통로'],KIND:['p_tun','p_canal','p_tun'],
   ADJ:[[1],[0,2],[1]],DIST:[1,1,1],MAPP:[[10,40],[50,30],[90,40]],EXIT_CAM:[-1,-1,-1,-1,-1]};
-function setChapter(c){if(!CHT[1])CHT[1]={CAMS,CAMN,KIND,ADJ,DIST,MAPP,EXIT_CAM};CHAP=c;({CAMS,CAMN,KIND,ADJ,DIST,MAPP,EXIT_CAM}=CHT[c]);buildMap();
+function setChapter(c){if(waterG)waterG.gain.setTargetAtTime(c===2?.09:0,AC.currentTime,.5);if(!CHT[1])CHT[1]={CAMS,CAMN,KIND,ADJ,DIST,MAPP,EXIT_CAM};CHAP=c;({CAMS,CAMN,KIND,ADJ,DIST,MAPP,EXIT_CAM}=CHT[c]);buildMap();
   const lb=document.querySelector('#hud .meter .lab span');if(lb)lb.textContent=c===2?'배터리':'전력'}
 // 안내판 (공공시설 말투)
 const POOL_RULES=[
   [1,'야간에는 조명이 꺼집니다. 오전 6시에 다시 켜집니다.'],
-  [1,'천장 조명 소리가 멈추면 소리 나는 쪽 통로를 확인하십시오.'],
-  [1,'통로 입구에 누가 서 있으면 플래시를 터뜨리십시오. 빛을 싫어합니다.'],
+  [1,'좌우 통로 위 비상등이 빨갛게 깜빡이면, 그 통로로 누가 오고 있습니다.'],
+  [1,'비상등이 꺼지면 그 아치에 서 있는 것입니다. 그쪽을 보고 플래시를 터뜨리십시오.'],
+  [1,'가운데 수로는 물입니다. 걸어서 오는 사람은 없습니다.'],
   [1,'플래시는 충전되는 동안 쓸 수 없습니다.'],
   [1,'조명이 켜지면 다음 구역으로 이동하십시오.']];
 const DEATH2={'교대자':'어둠 속에서 젖은 손이 얼굴을 덮었다.'};
 // 밤마다 옮겨 가는 자리 (넓은 방, 가운데 큰 풀 — 나중에 물속 괴물이 올라올 자리)
 const SPOT2=[
-  {name:'안전요원석',eye:2.05,R:7,plat:true,pool:[-4.6,4.6,-1.8,-5.6]},
-  {name:'샤워실 벤치',eye:1.15,R:6,shower:true,ankle:true,pool:[-3,3,-2.2,-4.4]},
-  {name:'미끄럼틀 아래',eye:1.2,R:7.5,slide:true,pool:[-5,5,-1.8,-6.2]},
-  {name:'탈의실',eye:1.15,R:6,locker:true,pool:[-2.8,2.8,-2,-4.4]},
-  {name:'물속 터널 앞',eye:1.2,R:7,pool:[-4.6,4.6,-1.8,-5.6],tunnel:true}];
+  {name:'안전요원석',eye:2.05,R:7,plat:true,pool:[-4.6,4.6,-1.8]},
+  {name:'샤워실 벤치',eye:1.15,R:6.5,shower:true,ankle:true,pool:[-3.8,3.8,-2.2]},
+  {name:'미끄럼틀 아래',eye:1.2,R:7.5,slide:true,pool:[-5,5,-1.8]},
+  {name:'탈의실',eye:1.15,R:6.5,locker:true,pool:[-3.8,3.8,-2]},
+  {name:'물속 터널 앞',eye:1.2,R:7,pool:[-4.6,4.6,-1.8],tunnel:true}];
 const DIRX=[-.8,0,.8]; // 왼쪽·앞·오른쪽 소리 방향
 function humInit2(h){h.dir=-1;h.st=0;h.node=-5;h.spot=0;h.timer=rnd(14,22)}
 const humStep2=()=>Math.max(3.5,rnd(6,9)-S.night*.6)*(S.hard?.75:1)*(hasMod('fast')?.8:1);
@@ -2474,12 +2492,13 @@ function update2(dt){
   const f0=S.fl;S.fl=Math.min(1,S.fl+dt/(S.hard?6:4.5));if(f0<1&&S.fl>=1)sfx(2600,.08,'sine',.04); // 충전 끝: 삑
   if(S.flashT>0)S.flashT-=dt;
   // 교대자: 세 통로 중 하나로 걸어옴 (먼 통로 → 통로 중간 → 아치 → 바로 앞). 그 아치 위 비상등이 깜빡이다 꺼짐
-  h.timer-=dt;
-  if(h.dir<0){if(h.timer<=0){h.dir=ri(3);h.st=0;h.timer=humStep2();footsteps(DIRX[h.dir],2,.04)}}
+  if(S.t>=10)h.timer-=dt; // 처음 10초는 아무것도 안 옴
+  const SIDE=['왼쪽','','오른쪽'];
+  if(h.dir<0){if(h.timer<=0){h.dir=[0,2][ri(2)];h.st=0;h.timer=humStep2();footsteps(DIRX[h.dir],2,.04)}}
   else if(h.timer<=0){
     h.st++;
-    if(h.st===1){h.timer=humStep2();footsteps(DIRX[h.dir],3,.08);buzzClick()}
-    else if(h.st===2){h.timer=humArch2();footsteps(DIRX[h.dir],3,.16);relay();if(monOn()&&S.cam===h.dir)S.camSw=.6}
+    if(h.st===1){h.timer=humStep2();footsteps(DIRX[h.dir],3,.08);buzzClick();say(SIDE[h.dir]+' 통로 비상등이 빨갛게 깜빡인다.')}
+    else if(h.st===2){h.timer=humArch2();footsteps(DIRX[h.dir],3,.16);relay();say(SIDE[h.dir]+' 아치 불이 꺼졌다. 뭔가 서 있다.','bad');if(monOn()&&S.cam===h.dir)S.camSw=.6}
     else if(h.st===3){h.timer=humNear2();breathe(DIRX[h.dir],.3);drip(DIRX[h.dir])}
     else return die('교대자');
   }
@@ -2490,6 +2509,7 @@ function update2(dt){
   setHum(!(h.dir>=0&&h.st>=2));
   if(S.msgT>0)S.msgT-=dt;if(S.shake>0)S.shake-=dt;
   ambient(dt);heartbeat(dt);threeAM();if(S.monMsg){S.monMsg.t+=dt;if(S.monMsg.t>1.6)S.monMsg=null}if(S.clockRev>0)S.clockRev-=dt;
+  if(Math.random()<dt*.5)drip(rnd(-1,1));if(Math.random()<dt*.06)nburst(rnd(500,900),2,.5,.04,rnd(-1,1),0); // 물방울, 멀리서 출렁
   updHUD();
 }
 // 플래시: 카메라 플래시처럼 팍. 지금 보는 쪽 아치에 서 있거나 바로 앞까지 온 것은 도망감
@@ -2509,7 +2529,7 @@ function endSwap(cancel){if(!cancel){S.power=100;S.spare--;S.outSaid=false;S.low
 function updSwap(){const sw=S.swap,b=$('battOv');if(!sw){b.classList.remove('show');return}b.classList.add('show');const [t,need]=SWAP[sw.step];$('battStep').textContent=`${sw.step+1}/${SWAP.length}`;$('battAct').textContent=need?t+' (꾹)':t;$('battBar').style.width=(need?sw.p*100:0)+'%';
   $('battPic').dataset.s=sw.step}
 function win2(n,last){
-  if(!last&&!DEV.on){try{savedCh2=Math.max(savedCh2,n+1);localStorage.setItem('obs2_night',savedCh2)}catch(e){}}
+  if(!last&&!DEV.on){try{if(S.hard){savedCh2h=Math.max(savedCh2h,n+1);localStorage.setItem('obs2_night_hard',savedCh2h)}else{savedCh2=Math.max(savedCh2,n+1);localStorage.setItem('obs2_night',savedCh2)}}catch(e){}}
   setMode('end');
   if(!last)showEnd('6:00 AM',`${n}일 차 끝.\n불이 켜졌다. ${SPOT2[n].name} 쪽으로 걸어갔다.`,`${n+1}일 차`,()=>newNight(n+1));
   else showEnd('비상구','5일 차 끝.\n물속 터널 끝에 초록 불이 켜져 있었다.\n(챕터 3 제작 중)','메뉴로',toMenu);
@@ -2547,12 +2567,21 @@ BP.p_tun=(r)=>{const w=1.1,L=11,Hs=2.0;return{Hc:Hs,tile:true,noCeil:true,lc:0x9
     const lamp=mesh(new T3.BoxGeometry(.22,.08,.05),new T3.MeshBasicMaterial({color:0x8ff0f8}),X(w-.05),1.85,-L+1.8,sc,false);lamp.rotation.y=PI2; // 비상등
     if(r()<.5)ladder3(sc,X(-w+.3),-7,X(1)<0?-PI2:PI2)}}};
 
+BP.p_canal=(r)=>{const w=3.2,L=14,Hs=2.4;return{Hc:Hs,tile:true,noCeil:true,lc:0x9fe8f0,rooms:[[-w,w,.6,-L]],
+  walls:[[-w,.6,w,.6],[-w,.6,-w,-L],[w,.6,w,-L]],panels:[],dead:1,fog:[0x081012,3,18],hemi:.5,spec:{c:0x7fe0ea,i:2.4,d:9,p:[0,2.2,-L+2]},
+  spots:{far:[0,-L+1.0],peek:{cx:-w+.06,z:-3.97,side:0},seat:[.3,-4.4],fake:[0,-6.6],eye:[0,1.05,-L]},
+  anom:{chair:[0,-3.8,.15],door:[w-.06,-2.9,-PI2],blood:[-.15,-2.4,0,-L+1],fig:[0,-7.8],writ:[w-.07,1.3,-6.2,-PI2,.8]},exit:[0,2.3,-L+.05,0],
+  props(sc,M,X,B,C){const T3=R3.T,PM=poolMats();C.hemi.color.setHex(0xbfe6ee);C.hemi.groundColor.setHex(0x18262a);
+    {const c=new T3.CylinderGeometry(w,w,L+.6,32,1,true,-PI2,Math.PI);c.rotateX(-PI2);c.translate(0,Hs,(.6-L)/2);wUV(c,2.6,2.6);sc.add(new T3.Mesh(c,PM.roomD))}
+    [-1,1].forEach(s=>BOX(.8,.06,L+.6,PM.edge,s*(w-.4),.03,(.6-L)/2,sc)); // 양옆 좁은 턱
+    const wp=mesh(new T3.PlaneGeometry(2*w-1.6,L+.6),PM.water,0,.02,(.6-L)/2,sc,false);wp.rotation.x=-PI2;
+    mesh(new T3.PlaneGeometry(2*w,Hs+w),M.void,0,(Hs+w)/2,-L,sc,false)}}};
 // ---- 밤마다 앉는 자리 (넓은 방 + 크고 높은 아치 3개 + 둥근 천장 통로) ----
 // 단위 m. 내 자리 (0,eye,.4). 0=왼쪽 아치(-X), 1=앞 아치(-Z), 2=오른쪽 아치(+X), 뒤는 막힌 벽
 function disposeSc(sc){sc.traverse(o=>{if(o.geometry)o.geometry.dispose();const m=o.material;if(!m||m.userData.keep)return;(Array.isArray(m)?m:[m]).forEach(x=>{if(x.map&&!x.map.userData.keep)x.map.dispose();x.dispose()})})}
 function build3D2(n){
   if(R3.sc2)disposeSc(R3.sc2);
-  const T3=R3.T,sp=SPOT2[Math.min(4,n-1)],R=sp.R,Hc=5.2,AW=2.7,AH=4.0,sc=new T3.Scene(),M=poolMats(),P={hot:{},n,sp,R,day:[],lamps:[]};R3.sc2=sc;R3.p2=P;
+  const T3=R3.T,sp=SPOT2[Math.min(4,n-1)],R=sp.R,Hc=6.4,AW=2.7,AH=4.0,FW=Math.min(2*R-3.2,8),FH=5.6,sc=new T3.Scene(),M=poolMats(),P={hot:{},n,sp,R,day:[],lamps:[]};R3.sc2=sc;R3.p2=P;
   sc.background=new T3.Color(0x020405);sc.fog=new T3.Fog(0x020405,5,22);P.fog=sc.fog;
   const add=(geo,m=M.room)=>{wUV(geo,2.6,2.6);const o=new T3.Mesh(geo,m);o.receiveShadow=true;sc.add(o);return o};
   const BX=(w,h,d,x,y,z,m)=>{const g=new T3.BoxGeometry(w,h,d);g.translate(x,y,z);return add(g,m)};
@@ -2563,17 +2592,18 @@ function build3D2(n){
   {const b=new T3.PlaneGeometry(2*R,Hc);b.rotateY(Math.PI);b.translate(0,Hc/2,Z0);add(b)}
   // 아치 벽 3개 + 그 너머 둥근 천장 통로. 아치마다 위에 비상등 (교대자가 그 통로로 오면 깜빡이다 꺼짐)
   P.arch=[];
-  [[-R,c,PI2,dep,c+.2],[0,Z1,0,2*R,0],[R,c,-PI2,dep,-.2-c]].forEach(([x,z,ry,len,au],i)=>{const g=archGeo(len,Hc,AW,AH,au,.35);g.rotateY(ry);g.translate(x,0,z);add(g);
-    const tx=i===1?0:x,tz=i===1?Z1:-.2,tg=grp(tx,0,tz,[PI2,0,-PI2][i],sc);vaultTun(tg,M,AW,AH-AW/2,14,sp.ankle||(i===1&&sp.tunnel));
-    mesh(new T3.PlaneGeometry(AW+.2,AH+.2),new T3.MeshBasicMaterial({color:0x000000}),0,AH/2,-14,tg,false);P.arch.push({x:tx,z:tz});
-    const lg=grp(tx,0,tz,[PI2,0,-PI2][i],sc),box=mesh(new T3.BoxGeometry(.42,.13,.08),new T3.MeshBasicMaterial({color:0x6fd8e0}),0,AH+.32,.22,lg,false),
-      l=new T3.PointLight(0x6fd8e0,3.2,11,1.4);l.position.set(0,AH-.2,1.0);lg.add(l);P.lamps.push({box,l})});
+  [[-R,c,PI2,dep,c+.2],[0,Z1,0,2*R,0],[R,c,-PI2,dep,-.2-c]].forEach(([x,z,ry,len,au],i)=>{const aw=i===1?FW:AW,ah=i===1?FH:AH,g=archGeo(len,Hc,aw,ah,au,.35);g.rotateY(ry);g.translate(x,0,z);add(g);
+    const tx=i===1?0:x,tz=i===1?Z1:-.2,tg=grp(tx,0,tz,[PI2,0,-PI2][i],sc);vaultTun(tg,M,aw,ah-aw/2,i===1?20:14,sp.ankle&&i!==1);
+    if(i===1){const w=mesh(new T3.PlaneGeometry(aw,20),M.water,0,.02,-10,tg,false);w.rotation.x=-PI2;P.canal=w} // 가운데: 큰 물 수로 (걸어올 수 없음)
+    mesh(new T3.PlaneGeometry(aw+.2,ah+.2),new T3.MeshBasicMaterial({color:0x000000}),0,ah/2,i===1?-20:-14,tg,false);P.arch.push({x:tx,z:tz});
+    const lg=grp(tx,0,tz,[PI2,0,-PI2][i],sc),box=mesh(new T3.BoxGeometry(.5,.16,.08),new T3.MeshBasicMaterial({color:0x6fd8e0}),0,(i===1?FH:AH)+.32,.22,lg,false),
+      l=new T3.PointLight(0x6fd8e0,3.2,11,1.4);l.position.set(0,(i===1?FH:AH)-.2,1.0);lg.add(l);P.lamps.push({box,l})});
   // 둥근 기둥
   [[-R+.6,Z1+.6],[R-.6,Z1+.6]].forEach(([x,z])=>{const g=new T3.CylinderGeometry(.5,.5,Hc,24);g.translate(x,Hc/2,z);add(g)});
   // 가운데 큰 풀 (물속 괴물 자리) + 둘레 타일
-  {const [x0,x1,z0,z1]=sp.pool,pl=mesh(new T3.PlaneGeometry(x1-x0,z0-z1),M.water,(x0+x1)/2,.02,(z0+z1)/2,sc,false);pl.rotation.x=-PI2;P.pool=pl;
-   [[x0,(z0+z1)/2,.16,z0-z1],[x1,(z0+z1)/2,.16,z0-z1],[(x0+x1)/2,z0,x1-x0,.16],[(x0+x1)/2,z1,x1-x0,.16]].forEach(([x,z,w,d])=>BOX(w,.04,d,M.edge,x,.02,z,sc));
-   ladder3(sc,x0+.5,z0+.05,Math.PI);ladder3(sc,x1-.5,z1-.05,0)}
+  {const [x0,x1,z0]=sp.pool,z1=Z1,pl=mesh(new T3.PlaneGeometry(x1-x0,z0-z1),M.water,(x0+x1)/2,.02,(z0+z1)/2,sc,false);pl.rotation.x=-PI2;P.pool=pl; // 풀은 앞 아치 너머 수로로 이어짐
+   [[x0,(z0+z1)/2,.16,z0-z1],[x1,(z0+z1)/2,.16,z0-z1],[(x0+x1)/2,z0,x1-x0,.16]].forEach(([x,z,w,d])=>BOX(w,.04,d,M.edge,x,.02,z,sc));
+   ladder3(sc,x0+.5,z0+.05,Math.PI);ladder3(sc,x1-.5,z0+.05,Math.PI)}
   if(sp.ankle){const a=mesh(new T3.PlaneGeometry(2*R,dep),M.waterS,0,.03,c,sc,false);a.rotation.x=-PI2}
   // 자리마다 다른 것
   const eye=sp.eye,lam=MS({color:0xdfe4e2,roughness:.4});
@@ -2615,13 +2645,13 @@ function draw3D2(){
   const lit=dw>1.6,bg=lit?0xb4c8ca:0x020405;R3.sc2.background.setHex(bg);P.fog.color.setHex(bg);P.fog.far=lit?60:22;P.hemi.intensity=lit?.8:.05;
   if(P.exitG)P.exitG.visible=dw>2; // 5일 차 6시: 앞 통로 끝에 비상구
   // 아치 위 비상등: 교대자가 그 통로 중간까지 오면 깜빡, 아치에 서면 꺼짐
-  P.lamps.forEach((L,i)=>{const me=h.dir===i&&!dw,k=lit?0:me&&h.st>=2?0:me&&h.st===1?(Math.sin(T_*23+i)>.1||Math.random()<.25?.05:1):(Math.random()<.01?.4:1);L.l.intensity=3.2*k;L.box.material.color.setHex(k>.5?0x6fd8e0:me&&h.st>=2?0x3a0806:0x10282a)});
+  P.lamps.forEach((L,i)=>{const me=h.dir===i&&!dw,warn=me&&h.st===1,k=lit?0:me&&h.st>=2?0:warn?(Math.sin(T_*14+i)>0?1.2:.08):(Math.random()<.01?.4:1);L.l.intensity=3.2*k;L.l.color.setHex(warn?0xff2a18:0x6fd8e0);L.box.material.color.setHex(warn?(k>.5?0xff3a20:0x300604):me&&h.st>=2?0x220402:0x6fd8e0)});
   // 손전등: 보는 쪽으로 약하게, 배터리가 적으면 깜빡임. 플래시 땐 팡
   const fk=Math.max(0,S.flashT||0)/.45,dirV=new T3.Vector3(0,0,-1).applyEuler(cam.rotation);
   let tI=torchOn()&&!lit?(S.power<20&&Math.random()<.12?1.5:9):0;if(fk>0)tI+=420*fk*fk;
   P.torch.intensity=tI;P.torch.position.copy(cam.position).addScaledVector(dirV,-.1);P.torch.position.y-=.25;P.torch.target.position.copy(cam.position).addScaledVector(dirV,8);
   P.flashL.intensity=fk>0?110*fk*fk:0;P.flashL.position.copy(cam.position).addScaledVector(dirV,.8);
-  if(P.pool)P.pool.position.y=.02+Math.sin(T_*.6)*.006;
+  if(P.pool)P.pool.position.y=.02+Math.sin(T_*.6)*.006;if(P.canal)P.canal.position.y=P.pool.position.y;
   // 교대자: 아치에 서 있다가 바로 앞까지
   {const im=STK.full,v=h.dir>=0&&h.st>=2&&!!im&&!dw;P.hum.visible=v;
    if(v){if(P.hum.userData.im!==im){P.hum.material.map=P.hum.material.emissiveMap=imgTex(im);P.hum.material.needsUpdate=true;P.hum.userData.im=im}
@@ -2630,6 +2660,10 @@ function draw3D2(){
   R3.rd.render(R3.sc2,cam);
   cx.drawImage(R3.rd.domElement,0,0,W,H);
   if(fk>.55){cx.fillStyle=`rgba(245,250,255,${(fk-.55)*1.6})`;cx.fillRect(0,0,W,H)} // 팍
+  // 화면 가장자리 빨간 빛: 교대자가 오는 쪽 (왼쪽/오른쪽). 아치에 서면 더 진하게 깜빡
+  if(h.dir===0||h.dir===2){const rel=h.dir-S.camX,side=rel<-.3?-1:rel>.3?1:0,a=h.st>=2?.32+.2*Math.sin(T_*10):h.st===1?.14+.08*Math.sin(T_*6):0;
+    if(a>0&&!dw){if(side){const x0=side<0?0:W,gw=W*.16,gr=cx.createLinearGradient(x0,0,x0-side*gw,0);gr.addColorStop(0,`rgba(255,30,20,${a})`);gr.addColorStop(1,'rgba(255,30,20,0)');cx.fillStyle=gr;cx.fillRect(side<0?0:W-gw,0,gw,H)}
+     else{const gr=cx.createRadialGradient(W/2,H/2,H*.35,W/2,H/2,W*.7);gr.addColorStop(0,'rgba(255,30,20,0)');gr.addColorStop(1,`rgba(255,30,20,${a*.9})`);cx.fillStyle=gr;cx.fillRect(0,0,W,H)}}}
 }
 // 패널: 왼쪽에서 밀려 나옴 (통로 3개 중 하나)
 function drawPanel2(){
@@ -2870,7 +2904,7 @@ function drawJump(){
 }
 
 // ===================== 사운드 =====================
-let AC=null,master,humG,droneG,staticG,NB,radioG,OUT,AMB;
+let AC=null,master,humG,droneG,staticG,NB,radioG,OUT,AMB,waterG;
 function initAudio(){
   if(AC){if(AC.state==='suspended')AC.resume();return}
   AC=new (window.AudioContext||window.webkitAudioContext)();
@@ -2879,15 +2913,17 @@ function initAudio(){
   NB=AC.createBuffer(1,AC.sampleRate*2,AC.sampleRate);const nd=NB.getChannelData(0);for(let i=0;i<nd.length;i++)nd[i]=Math.random()*2-1;
   // 형광등 소리 (교대자 신호)
   humG=AC.createGain();humG.gain.value=0;
-  const lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=400;
+  const lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=1600;
   humG.connect(lp);lp.connect(master);
-  [60,120,180].forEach((f,i)=>{
-    const o=AC.createOscillator();o.type=i?'sine':'sawtooth';o.frequency.value=f;
-    const g=AC.createGain();g.gain.value=[.06,.04,.02][i];o.connect(g);g.connect(humG);o.start();
-  });
+  {const o=AC.createOscillator();o.type='square';o.frequency.value=120;const bp=AC.createBiquadFilter();bp.type='bandpass';bp.frequency.value=480;bp.Q.value=1.4;const g=AC.createGain();g.gain.value=.022;o.connect(bp);bp.connect(g);g.connect(humG);o.start()} // 형광등 지잉
+  [[60,.05],[120,.03],[240,.012]].forEach(([f,v])=>{const o=AC.createOscillator();o.frequency.value=f;const g=AC.createGain();g.gain.value=v;o.connect(g);g.connect(humG);o.start()});
   // 낮은 웅웅거림 (항상)
   droneG=AC.createGain();droneG.gain.value=.03;droneG.connect(AMB);
-  [41,43.6,82.5].forEach((f,i)=>{const o=AC.createOscillator();o.frequency.value=f;const g=AC.createGain();g.gain.value=[.6,.6,.15][i];o.connect(g);g.connect(droneG);o.start()});
+  {const lpd=AC.createBiquadFilter();lpd.type='lowpass';lpd.frequency.value=150;lpd.Q.value=3;lpd.connect(droneG);const lfo=AC.createOscillator(),lg3=AC.createGain();lfo.frequency.value=.06;lg3.gain.value=60;lfo.connect(lg3);lg3.connect(lpd.frequency);lfo.start();
+   [[43,'sawtooth',.5],[43.4,'sawtooth',.5],[86.5,'triangle',.2]].forEach(([f,ty,v])=>{const o=AC.createOscillator();o.type=ty;o.frequency.value=f;const g=AC.createGain();g.gain.value=v;o.connect(g);g.connect(lpd);o.start()})} // 낮게 숨 쉬는 건물 소리
+  // 물 출렁이는 소리 (챕터 2)
+  {const wb=AC.createBuffer(1,AC.sampleRate*6,AC.sampleRate),wd=wb.getChannelData(0);let l2=0;for(let i=0;i<wd.length;i++){l2=(l2+.03*(Math.random()*2-1))/1.03;wd[i]=l2*4}const ws=AC.createBufferSource();ws.buffer=wb;ws.loop=true;const wf=AC.createBiquadFilter();wf.type='bandpass';wf.frequency.value=420;wf.Q.value=.8;
+   const am=AC.createGain(),lfo=AC.createOscillator(),lg4=AC.createGain();am.gain.value=.6;lfo.frequency.value=.23;lg4.gain.value=.45;lfo.connect(lg4);lg4.connect(am.gain);waterG=AC.createGain();waterG.gain.value=0;ws.connect(wf);wf.connect(am);am.connect(waterG);waterG.connect(AMB);ws.start();lfo.start()}
   // 방 공기 소리 (갈색 소음)
   const bb=AC.createBuffer(1,AC.sampleRate*4,AC.sampleRate),bd=bb.getChannelData(0);let l=0;for(let i=0;i<bd.length;i++){l=(l+.02*(Math.random()*2-1))/1.02;bd[i]=l*3.5}
   const bs=AC.createBufferSource();bs.buffer=bb;bs.loop=true;const bf=AC.createBiquadFilter();bf.type='lowpass';bf.frequency.value=260;const bg=AC.createGain();bg.gain.value=.12;bs.connect(bf);bf.connect(bg);bg.connect(AMB);bs.start();
@@ -2949,10 +2985,10 @@ function crack(pan,v=.35){nburst(2600,1.5,.04,v,pan,0,'highpass');nburst(1200,8,
 function breathe(pan,v=.22){if(!AC)return;const t=AC.currentTime;[[0,1.1,700,1500],[1.25,1.5,1300,600]].forEach(([w,d,f0,f1])=>{const s2=AC.createBufferSource();s2.buffer=NB;const f=AC.createBiquadFilter(),am=AC.createGain(),lfo=AC.createOscillator(),lg2=AC.createGain(),g=AC.createGain();f.type='bandpass';f.Q.value=1.2;f.frequency.setValueAtTime(f0,t+w);f.frequency.linearRampToValueAtTime(f1,t+w+d);lfo.frequency.value=rnd(18,30);lg2.gain.value=.4;am.gain.value=.6;lfo.connect(lg2);lg2.connect(am.gain);g.gain.setValueAtTime(.0001,t+w);g.gain.linearRampToValueAtTime(v,t+w+d*.4);g.gain.linearRampToValueAtTime(.0001,t+w+d);s2.connect(f);f.connect(am);am.connect(g);g.connect(out(pan));s2.start(t+w,Math.random());lfo.start(t+w);s2.stop(t+w+d+.05);lfo.stop(t+w+d+.05)})}
 // 무언가 질질 끌리는 소리
 function drag(pan,v=.2){if(!AC)return;const t=AC.currentTime,s2=AC.createBufferSource();s2.buffer=NB;const f=AC.createBiquadFilter(),g=AC.createGain();f.type='lowpass';f.frequency.value=420;f.Q.value=2;g.gain.setValueAtTime(.0001,t);const cv3=new Float32Array(40);for(let i=0;i<40;i++)cv3[i]=v*(.3+Math.random()*.7)*Math.sin(i/39*Math.PI);g.gain.setValueCurveAtTime(cv3,t,2.6);s2.connect(f);f.connect(g);g.connect(out(pan));s2.start(t,Math.random());s2.stop(t+2.7)}
-function drip(pan){if(!AC)return;const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(rnd(1400,2200),t);o.frequency.exponentialRampToValueAtTime(500,t+.07);g.gain.setValueAtTime(.06,t);g.gain.exponentialRampToValueAtTime(.001,t+.12);o.connect(g);g.connect(out(pan));o.start(t);o.stop(t+.13)}
+function drip(pan){if(!AC)return;const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain(),f0=rnd(700,1100);o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(f0*2.3,t+.05);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(.07,t+.004);g.gain.exponentialRampToValueAtTime(.001,t+.1);o.connect(g);g.connect(out(pan));o.start(t);o.stop(t+.12)} // 물방울 똑
 // 키득거리는 웃음
 function giggle(pan,v=.07){if(!AC)return;const n=rnd(5,8);for(let k=0;k<n;k++){const t=AC.currentTime+k*(.13-k*.008),o=AC.createOscillator(),d=dist(4),f=AC.createBiquadFilter(),g=AC.createGain();o.type='sawtooth';o.frequency.setValueAtTime(rnd(300,380),t);o.frequency.linearRampToValueAtTime(rnd(240,280),t+.08);f.type='bandpass';f.frequency.value=1500;f.Q.value=4;g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v,t+.015);g.gain.exponentialRampToValueAtTime(.001,t+.09);o.connect(d);d.connect(f);f.connect(g);g.connect(out(pan));o.start(t);o.stop(t+.1)}}
-function ringTone(){if(!AC)return;const t=AC.currentTime;for(let k=0;k<2;k++){const o=AC.createOscillator(),o2=AC.createOscillator(),g=AC.createGain(),am=AC.createOscillator(),ag=AC.createGain();o.frequency.value=440;o2.frequency.value=480;am.frequency.value=20;ag.gain.value=.5;am.connect(ag);ag.connect(g.gain);g.gain.setValueAtTime(.0001,t+k*.5);g.gain.linearRampToValueAtTime(.05,t+k*.5+.02);g.gain.setValueAtTime(.05,t+k*.5+.38);g.gain.linearRampToValueAtTime(.0001,t+k*.5+.42);[o,o2].forEach(x=>x.connect(g));g.connect(out(.35));[o,o2,am].forEach(x=>{x.start(t+k*.5);x.stop(t+k*.5+.45)})}}
+function ringTone(){if(!AC)return;const t=AC.currentTime,o2=out(.35),dur=.95;[[1180,1],[1180*2.76,.3],[1460,.55]].forEach(([f,a])=>{const o=AC.createOscillator(),g=AC.createGain(),am=AC.createOscillator(),ag=AC.createGain();o.frequency.value=f;am.type='square';am.frequency.value=21;ag.gain.value=.022*a;am.connect(ag);ag.connect(g.gain);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(.034*a,t+.01);g.gain.setValueAtTime(.034*a,t+dur);g.gain.exponentialRampToValueAtTime(.0003,t+dur+.35);o.connect(g);g.connect(o2);[o,am].forEach(x=>{x.start(t);x.stop(t+dur+.4)})})} // 옛날 전화 종
 function musicBoxFar(){if(!AC)return;const save=master.gain.value;const lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=900;const g=AC.createGain();g.gain.value=.5;lp.connect(g);g.connect(out(rnd(-1,1)));const notes=[659,622,587,523,494],t0=AC.currentTime;notes.forEach((fq,k)=>{const t=t0+k*.7*(1+k*.08),o=AC.createOscillator(),gg=AC.createGain();o.frequency.setValueAtTime(fq*(1-k*.01),t);gg.gain.setValueAtTime(.0001,t);gg.gain.linearRampToValueAtTime(.05,t+.005);gg.gain.exponentialRampToValueAtTime(.001,t+1.3);o.connect(gg);gg.connect(lp);o.start(t);o.stop(t+1.4)})}
 // 메뉴의 고장 난 오르골
 function musicBox(){if(!AC)return;const notes=[659,622,587,523,494,523,587,440,415,440],t0=AC.currentTime;notes.forEach((fq,k)=>{const t=t0+k*.55*(1+k*.04),o=AC.createOscillator(),o2=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(fq,t);o2.frequency.setValueAtTime(fq*2.01,t);if(k===notes.length-1)o.frequency.linearRampToValueAtTime(fq*.8,t+1.5);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(.05,t+.005);g.gain.exponentialRampToValueAtTime(.001,t+1.4);o.connect(g);o2.connect(g);g.connect(out(0));o.start(t);o2.start(t);o.stop(t+1.5);o2.stop(t+1.5)})}
@@ -2964,15 +3000,20 @@ function sfx(f,d,type='sine',v=.1){
   if(!AC)return;
   const o=AC.createOscillator(),g=AC.createGain();
   o.type=type;o.frequency.value=f;
-  g.gain.setValueAtTime(v,AC.currentTime);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);
-  o.connect(g);g.connect(master);o.start();o.stop(AC.currentTime+d);
+  const t=AC.currentTime,lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=type==='sine'?12000:Math.min(5000,f*6);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v,t+.004);g.gain.exponentialRampToValueAtTime(.001,t+d);
+  o.connect(lp);lp.connect(g);g.connect(master);o.start();o.stop(t+d+.02);
 }
 function thump(f,d,v,pan,when=0){if(!AC)return;const t=AC.currentTime+when,o=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(f*1.6,t);o.frequency.exponentialRampToValueAtTime(f,t+.05);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v,t+.01);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(out(pan));o.start(t);o.stop(t+d+.05)}
 function nburst(freq,q,d,v,pan,when=0,type='bandpass'){if(!AC)return;const t=AC.currentTime+when,s=AC.createBufferSource();s.buffer=NB;const f=AC.createBiquadFilter();f.type=type;f.frequency.value=freq;f.Q.value=q;const g=AC.createGain();g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v,t+.01);g.gain.exponentialRampToValueAtTime(.001,t+d);s.connect(f);f.connect(g);g.connect(out(pan));s.start(t,Math.random()*1.5);s.stop(t+d+.05)}
-function footsteps(pan,n=5,vol){if(!AC)return;const v=vol??rnd(.12,.3);for(let i=0;i<n;i++){const w=i*.55+rnd(0,.08);nburst(320,1,.16,v,pan,w,'lowpass');thump(55,.14,v*.5,pan,w)}}
-function creak(){if(!AC)return;const t=AC.currentTime,o=AC.createOscillator(),f=AC.createBiquadFilter(),g=AC.createGain();o.type='sawtooth';o.frequency.setValueAtTime(rnd(70,110),t);o.frequency.linearRampToValueAtTime(rnd(45,65),t+1.6);f.type='bandpass';f.frequency.value=700;f.Q.value=9;g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(.06,t+.3);g.gain.linearRampToValueAtTime(.0001,t+1.7);o.connect(f);f.connect(g);g.connect(out(rnd(-1,1)));o.start(t);o.stop(t+1.8)}
-function metal(){const p=rnd(-1,1);nburst(2400,14,1.6,.07,p);thump(42,1,.18,p)}
-function knock(){[0,.32,.64].forEach(w=>{thump(95,.18,.35,-.4,w);nburst(900,2,.08,.18,-.4,w)})}
+function step1(pan,v,t,wet){const o=AC.createOscillator(),g=AC.createGain(),o2=out(pan);o.frequency.setValueAtTime(rnd(85,110),t);o.frequency.exponentialRampToValueAtTime(42,t+.09);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v,t+.006);g.gain.exponentialRampToValueAtTime(.001,t+.17);o.connect(g);g.connect(o2);o.start(t);o.stop(t+.2);
+  const s2=AC.createBufferSource();s2.buffer=NB;const f=AC.createBiquadFilter();f.type='bandpass';f.frequency.value=rnd(1300,2400);f.Q.value=.8;const g2=AC.createGain(),t2=t+rnd(.06,.1);g2.gain.setValueAtTime(.0001,t);g2.gain.linearRampToValueAtTime(v*.45,t+.004);g2.gain.exponentialRampToValueAtTime(v*.08,t+.03);g2.gain.linearRampToValueAtTime(v*.3,t2);g2.gain.exponentialRampToValueAtTime(.001,t2+.08);s2.connect(f);f.connect(g2);g2.connect(o2);s2.start(t,Math.random()*1.5);s2.stop(t2+.1);
+  if(wet){const s3=AC.createBufferSource();s3.buffer=NB;const f3=AC.createBiquadFilter();f3.type='bandpass';f3.Q.value=3;f3.frequency.setValueAtTime(rnd(450,700),t);f3.frequency.exponentialRampToValueAtTime(rnd(1800,2800),t+.12);const g3=AC.createGain();g3.gain.setValueAtTime(.0001,t);g3.gain.linearRampToValueAtTime(v*.9,t+.015);g3.gain.exponentialRampToValueAtTime(.001,t+.3);s3.connect(f3);f3.connect(g3);g3.connect(o2);s3.start(t,Math.random()*1.5);s3.stop(t+.32)}} // 발 한 번
+function footsteps(pan,n=5,vol){if(!AC)return;const v=vol??rnd(.12,.3),wet=!!(S&&S.ch===2),gap=rnd(.5,.62);for(let i=0;i<n;i++)step1(pan,v*rnd(.8,1.1),AC.currentTime+i*gap+rnd(0,.06),wet)}
+function creak(pan){if(!AC)return;const t=AC.currentTime,d=rnd(1,1.8),sr=AC.sampleRate,L=Math.floor(sr*d),b=AC.createBuffer(1,L,sr),x=b.getChannelData(0),ph=rnd(0,6),sp2=rnd(4,9);let pos=0;
+  while(pos<L){const u=pos/L,rate=lerp(30,95,.5+.5*Math.sin(ph+u*sp2))*rnd(.85,1.15),a=Math.pow(Math.sin(Math.PI*u),.6)*rnd(.5,1);for(let k=0;k<24&&pos+k<L;k++)x[pos+k]+=a*(1-k/24)*(Math.random()*2-1);pos+=Math.max(40,Math.floor(sr/rate))}
+  const src=AC.createBufferSource();src.buffer=b;const o2=out(pan??rnd(-1,1)),g=AC.createGain();g.gain.value=.22;[[rnd(480,650),14],[rnd(1050,1400),16],[rnd(2200,2800),18]].forEach(([fr,q])=>{const f=AC.createBiquadFilter();f.type='bandpass';f.frequency.value=fr;f.Q.value=q;src.connect(f);f.connect(g)});g.connect(o2);src.start(t)} // 나무·쇠가 삐걱
+function metal(){if(!AC)return;const p=rnd(-1,1),t=AC.currentTime,bf=rnd(85,130),o2=out(p);[1,2.76,5.4,8.93,13.3].forEach((m,k)=>{const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=bf*m*rnd(.99,1.01);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(.05/(k+1),t+.004);g.gain.exponentialRampToValueAtTime(.0005,t+2.6/(1+k*.4));o.connect(g);g.connect(o2);o.start(t);o.stop(t+2.7)});nburst(1800,1,.07,.1,p);thump(48,.6,.14,p)} // 멀리서 쇠 울림
+function knock(){[0,.3,.6].forEach(w=>{thump(150,.09,.38,-.4,w);nburst(420,3,.08,.26,-.4,w);nburst(1700,2,.02,.08,-.4,w)})} // 철문 두드림
 function whisper(){if(!AC)return;const t=AC.currentTime,s=AC.createBufferSource();s.buffer=NB;const f=AC.createBiquadFilter();f.type='bandpass';f.Q.value=5;f.frequency.setValueAtTime(900,t);f.frequency.linearRampToValueAtTime(2200,t+1.2);f.frequency.linearRampToValueAtTime(1100,t+2.4);const g=AC.createGain();const cv2=new Float32Array(24);for(let i=0;i<24;i++)cv2[i]=Math.random()*.09*Math.sin(i/23*Math.PI);g.gain.setValueCurveAtTime(cv2,t,2.4);s.connect(f);f.connect(g);g.connect(out(rnd(-1,1)));s.start(t);s.stop(t+2.5)}
 function heart(){thump(48,.25,.35,0);thump(44,.3,.28,0,.17)}
 function buzzClick(){nburst(4200,2,.05,.07,0)}
@@ -2980,15 +3021,17 @@ function whoosh(){nburst(600,.8,.25,.05,0,0,'lowpass')}
 function scream(){
   if(!AC)return;
   if(SET.scare==='soft'){const m=master.gain.value,t0=AC.currentTime;master.gain.setValueAtTime(m*.35,t0);master.gain.setValueAtTime(m,t0+1.6)}
-  const len=AC.sampleRate*1.5,b=AC.createBuffer(1,len,AC.sampleRate),d=b.getChannelData(0);
-  for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*(1-i/len);
-  const s=AC.createBufferSource();s.buffer=b;const g=AC.createGain();g.gain.value=1;
-  s.connect(g);g.connect(master);s.start();
-  sfx(70,1.2,'sawtooth',.5);sfx(300,1,'square',.25);
-  // 일그러진 비명 + 낮은 충격음
-  const t=AC.currentTime,ds=dist(30),f=AC.createBiquadFilter(),sg=AC.createGain();f.type='bandpass';f.frequency.value=1300;f.Q.value=2;sg.gain.setValueAtTime(.55,t);sg.gain.exponentialRampToValueAtTime(.001,t+1.4);ds.connect(f);f.connect(sg);sg.connect(master);
-  [0,25,-30,50].forEach(dt2=>{const o=AC.createOscillator(),lfo=AC.createOscillator(),lg2=AC.createGain();o.type='sawtooth';o.detune.value=dt2;o.frequency.setValueAtTime(220,t);o.frequency.linearRampToValueAtTime(620,t+.25);o.frequency.linearRampToValueAtTime(180,t+1.4);lfo.frequency.value=23;lg2.gain.value=40;lfo.connect(lg2);lg2.connect(o.frequency);o.connect(ds);o.start(t);lfo.start(t);o.stop(t+1.45);lfo.stop(t+1.45)});
-  thump(38,1.2,.8);crack(0,.5);
+  const t=AC.currentTime,bus=AC.createGain();bus.gain.setValueAtTime(.9,t);bus.gain.exponentialRampToValueAtTime(.001,t+1.5);bus.connect(master);
+  // 찢어지는 목소리: 흔들리는 톱니파 여러 개 → 일그러뜨림 → 목소리 울림통
+  {const ds=dist(40),f1=AC.createBiquadFilter(),f2=AC.createBiquadFilter(),g=AC.createGain();f1.type='bandpass';f1.frequency.setValueAtTime(900,t);f1.frequency.linearRampToValueAtTime(1300,t+.3);f1.Q.value=3;f2.type='bandpass';f2.frequency.value=2600;f2.Q.value=4;g.gain.value=.5;ds.connect(f1);ds.connect(f2);f1.connect(g);f2.connect(g);g.connect(bus);
+   [0,18,-24,41,-9].forEach(dt2=>{const o=AC.createOscillator(),lfo=AC.createOscillator(),lg2=AC.createGain();o.type='sawtooth';o.detune.value=dt2;o.frequency.setValueAtTime(280,t);o.frequency.exponentialRampToValueAtTime(820,t+.18);o.frequency.exponentialRampToValueAtTime(240,t+1.4);lfo.frequency.value=rnd(7,11);lg2.gain.value=55;lfo.connect(lg2);lg2.connect(o.frequency);o.connect(ds);o.start(t);lfo.start(t);o.stop(t+1.5);lfo.stop(t+1.5)})}
+  // 숨 섞인 잡음 (비명의 공기)
+  {const s2=AC.createBufferSource();s2.buffer=NB;const f=AC.createBiquadFilter();f.type='highpass';f.frequency.value=1800;const g=AC.createGain();g.gain.setValueAtTime(.55,t);g.gain.exponentialRampToValueAtTime(.001,t+1.2);s2.connect(f);f.connect(g);g.connect(bus);s2.start(t,Math.random());s2.stop(t+1.3)}
+  // 쇳소리 끼익
+  {const o=AC.createOscillator(),fm=AC.createOscillator(),fg=AC.createGain(),g=AC.createGain();o.frequency.setValueAtTime(2300,t);o.frequency.linearRampToValueAtTime(3400,t+.6);fm.frequency.value=173;fg.gain.value=900;fm.connect(fg);fg.connect(o.frequency);g.gain.setValueAtTime(.07,t);g.gain.exponentialRampToValueAtTime(.001,t+.9);o.connect(g);g.connect(bus);o.start(t);fm.start(t);o.stop(t+1);fm.stop(t+1)}
+  // 묵직한 충격
+  {const o=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(120,t);o.frequency.exponentialRampToValueAtTime(32,t+.5);g.gain.setValueAtTime(1,t);g.gain.exponentialRampToValueAtTime(.001,t+1.1);o.connect(g);g.connect(master);o.start(t);o.stop(t+1.2)}
+  crack(0,.5);
 }
 
 // ===================== 화면 크기 =====================
@@ -3134,9 +3177,7 @@ function toMenu(){
   if(PAUSE.on)closePause();
   if(S){S.over=true;if(radioG)radioG.gain.setTargetAtTime(0,AC.currentTime,.05);if(humG)humG.gain.setTargetAtTime(0,AC.currentTime,.05)}
   document.body.classList.remove('scare');S=null;['end','devp','log','intro','brkp'].forEach(id=>$(id).classList.remove('show'));
-  $('mCont').style.display=savedNight>1?'block':'none';$('mCont').textContent=`이어하기 (${savedNight}일 차)`;
-  $('mHard').textContent=`하드 모드${savedHard>1?` (${savedHard}일 차)`:''}`;
-  $('mCh2').textContent=`챕터 2 · 수영장 (제작 중)${savedCh2>1?` · ${savedCh2}일 차`:''}`;
+  $('play').classList.remove('show');
   setMode('menu');if(staticG)staticG.gain.setTargetAtTime(.04,AC.currentTime,.3);
 }
 function startGame(n,dev,hard=false,ch=1){initAudio();setChapter(ch);DEV.on=dev;HARD=dev?DEV.hard:hard;DEV.speed=1;if(staticG)staticG.gain.setTargetAtTime(0,AC.currentTime,.1);newNight(n);buildDbg()}
@@ -3148,10 +3189,20 @@ function go(fn){
     clearInterval(iv);going=false;if(R3.state==='wait'){R3.state='fail';R3.why='3D 로딩이 너무 느림';updFoot()}fn()},100); // 늦게라도 오면 게임 중에 3D로 바뀜
 }
 function updFoot(){const f=$('foot'),st=R3.state;f.textContent=`v${VER}`+(st==='wait'?' · 불러오는 중':st==='fail'?' · 2D 모드 ('+R3.why+')':'');f.classList.toggle('warn',st==='fail')}
-$('mNew').onclick=()=>go(()=>{if(R3.ok)playCut('intro',()=>startGame(1,false),1);else startGame(1,false)});
-$('mCont').onclick=()=>go(()=>startGame(savedNight,false));
-$('mHard').onclick=()=>go(()=>startGame(savedHard,false,true));
-$('mCh2').onclick=()=>go(()=>startGame(savedCh2,false,false,2));
+// 게임 플레이: 챕터 고르기 → 노말/하드 → 이어하기/처음부터. 챕터 2는 챕터 1을 깨야 열림
+const PLAY={ch:1,hard:false};
+const ch1Clear=()=>!!(AS.got.ch1_normal||AS.got.ch1_hard);
+const savedOf=(ch,h)=>ch===1?(h?savedHard:savedNight):(h?savedCh2h:savedCh2);
+function updPlay(){const lock2=!ch1Clear();if(lock2&&PLAY.ch===2)PLAY.ch=1;
+  $('play').querySelectorAll('.chc').forEach(b=>{const c=+b.dataset.ch;b.classList.toggle('on',c===PLAY.ch);b.classList.toggle('locked',c===2&&lock2);const n=savedOf(c,PLAY.hard);b.querySelector('.cp').textContent=n>1?`${PLAY.hard?'하드':'노말'} · ${n}일 차까지 옴`:''});
+  $('play').querySelectorAll('.md button').forEach(b=>b.classList.toggle('on',(+b.dataset.h===1)===PLAY.hard));
+  const n=savedOf(PLAY.ch,PLAY.hard);$('pCont').disabled=n<=1;$('pCont').textContent=n>1?`이어하기 (${n}일 차)`:'이어하기'}
+$('mPlay').onclick=()=>{updPlay();$('play').classList.add('show')};
+$('play').querySelectorAll('.chc').forEach(b=>b.onclick=()=>{if(+b.dataset.ch===2&&!ch1Clear()){b.classList.remove('shake');void b.offsetWidth;return}PLAY.ch=+b.dataset.ch;updPlay()});
+$('play').querySelectorAll('.md button').forEach(b=>b.onclick=()=>{PLAY.hard=b.dataset.h==='1';updPlay()});
+$('pBack').onclick=()=>$('play').classList.remove('show');
+$('pCont').onclick=()=>{const n=savedOf(PLAY.ch,PLAY.hard);$('play').classList.remove('show');go(()=>startGame(n,false,PLAY.hard,PLAY.ch))};
+$('pNew').onclick=()=>{$('play').classList.remove('show');const {ch,hard}=PLAY;go(()=>{if(ch===1&&!hard&&R3.ok)playCut('intro',()=>startGame(1,false),1);else startGame(1,false,hard,ch)})};
 $('mDev').onclick=()=>$('devp').classList.add('show');
 $('devBack').onclick=()=>$('devp').classList.remove('show');
 [['인트로','intro',1],['밤 시작','night_start',3],['5일 차 시작','night5_open',5],['6시','reset',2],['엔딩','ending',5],['하드 엔딩','ending_hard',5]].forEach(([t,id,n])=>{const b=document.createElement('button');b.textContent=t;b.onclick=()=>devCut(id,n);$('devCuts').appendChild(b)});
