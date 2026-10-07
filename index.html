@@ -279,7 +279,7 @@ body[data-mode=game] #pauseBtn{display:flex}
 <script nomodule>window.THREE_ERR='nomodule'</script>
 <script>
 // ===================== 기본 =====================
-const VER='0.11.3'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
+const VER='0.12.0'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
 const $=id=>document.getElementById(id);
 const cv=$('cv'),cx=cv.getContext('2d');
 let W,H,DPR=1;
@@ -1023,7 +1023,7 @@ function buildJumps(){
 // ===================== 이야기 =====================
 // 노란 방에서 길을 잃은 플레이어가 전화벨을 따라 누군가 만들어 둔 경비실을 찾음. 일지는 먼저 있던 강서진이 씀
 // 6시마다 노란 방 불이 다 나갔다 들어오고 배치가 바뀜. 그때마다 비상구 표시등이 한 칸씩 경비실로 옴 (H→G→D→B→A)
-// 5일 차 일지 줄은 서진이 쓴 게 아님 (서진이 신고하지 않은 복사본이 씀)
+// 5일 차 일지 빨간 줄은 서진이 쓴 게 아님 (서진 흉내 내는 괴물이 씀)
 const EXIT_CAM=[7,6,3,1,0];
 const ANOM_TXT=['여기 아까 왔음','왼쪽 말고','불 켜 줘','문 열어','나 여기 있어','6시','서진','→']; // 밤마다 비상구가 보이는 구역
 const BASE_RULES='여기 들어왔으면 이것부터 읽어.\n6시까지만 버티면 돼.\n비상구가 하루에 한 칸씩 와. 닷새째 6시면 문 앞이야.\n그 전엔 절대 밖에 나가지 마.\n전기 아껴. 차단기 떨어지면 바로 올려.\n누가 뭐라고 하든 형광등 소리 끊기면 문 잠가.';
@@ -1035,10 +1035,10 @@ const hasMod=id=>S.mods.includes(id);
 // 서진의 전화. 빈 줄은 말없이 지나가는 시간
 const CALLS=[
   ['"어, 받았네. 벨 울린 거 나야."','"형광등 소리 끊기면 문부터 잠가. 생각하지 말고."','"6시까지만 버텨. 그때 불이 한 번 다 나가."','"제일 어두운 화면에 초록 불 보이지? 비상구야."','"그리고 기억해. 내가 문 잠그지 말라고 하는 일은 절대 없어."','"그런 말 들리면 그건 내가 아니야."'],
-  ['"살았네. 6시에 불 다 나가는 거 봤지?"','"그리고 무전기에서 지직거리는 소리 나면 환풍구 닫아. 그건 문으로 안 와."','"초록 불 한 칸 왔지? 하루에 한 칸씩 와."','"벽 얼룩은 오래 보지 마. 눈 떠."','"화면이 가끔 이상하게 바뀌어도 신경 쓰지 마. 여기가 원래 그래."','"나? 밖이야. 여기도 다 노란 방이야."'],
-  ['"불 끄지 마."','"배전반 옆 창고 문, 오늘부터 열려. 틈 보이면 닫아. 뛰는 소리 나면 그냥 닫아."','"불 나간 칸에 뭐가 서 있어. 어두우면 그게 와."','"차단기 내려가면 바로 올려. 바로."','"...잠깐. 여기 형광등 소리가 멈췄어."','','"......갔다. 괜찮아."'],
-  ['"오늘은 화면에 네가 앉아 있을 거야."','"보이면 바로 신고해. 그거 너 아니야."','"난 신고 안 했어. 나랑 똑같이 앉아 있길래."','"...거기 옷걸이에 내 점퍼 아직 있어?"','"없으면 누가 입고 나간 거야."'],
-  ['"오늘 마지막이야. 초록 불 문 앞 복도까지 왔지?"','"일지 마지막 줄, 빨간 글씨. 그거 내가 안 썼어."','"난 그거 믿고 문 안 잠갔다가 이렇게 됐어."','"소리 끊기면 잠가. 6시 되면 문은 알아서 열려."','','"......잠그지 마. 나야. 데리러 왔어."']];
+  ['"살았네. 6시에 불 다 나가는 거 봤지?"','"그리고 무전기에서 지직거리는 소리 나면 환풍구 닫아. 그건 문으로 안 와."','"초록 불 한 칸 왔지? 하루에 한 칸씩 와."','"벽 얼룩은 오래 보지 마. 눈 떠."','"화면이 가끔 이상하게 바뀌어도 신경 쓰지 마. 여기가 원래 그래."','"나? 기다리는 중이야. 너 오기를."'],
+  ['"불 끄지 마."','"배전반 옆 창고 문, 오늘부터 열려. 틈 보이면 닫아. 뛰는 소리 나면 그냥 닫아."','"불 나간 칸에 뭐가 서 있어. 어두우면 그게 와."','"차단기 내려가면 바로 올려. 바로."','"...잠깐. 여기 형광등 소리가 멈췄어."','','"......갔다. 괜찮아."','"넌 꼭 끝까지 버텨야 돼. 꼭."'],
+  ['"오늘은 화면에 네가 앉아 있을 거야."','"보이면 바로 신고해. 그거 너 아니야."','"이틀 남았네. 잘하고 있어."','"초록 불 따라와. 내가 거기서 기다릴게."'],
+  ['"오늘 마지막이야. 초록 불 문 앞 복도까지 왔지?"','"일지 마지막 줄, 빨간 글씨. 그거 내가 안 썼어. 믿지 마."','"소리 끊기면 잠가. 6시 되면 문은 알아서 열려."','"열리면 그냥 타. 아무 생각 하지 말고."','"조금만 더. ...우리 둘 다."','','"......잠그지 마. 나야. 데리러 왔어."']];
 const RULES=[ // [몇 일 차부터, 내용] — 번호는 순서대로 붙음
   [1,'형광등 소리 끊기면 바로 문 잠가. 소리 돌아오면 열고.'],
   [2,'화면 속 얼룩이 커지면 바로 다른 화면으로 넘겨.'],
@@ -1435,7 +1435,7 @@ function win(){
     AS.streak=n===1?1:AS.streak===n-1?n:0;achSave();if(n===5&&AS.streak===5)ach('tally')}
   if(!last&&!DEV.on){try{if(hard){savedHard=Math.max(savedHard,n+1);localStorage.setItem('obs_night_hard',savedHard)}else{savedNight=Math.max(savedNight,n+1);localStorage.setItem('obs_night',savedNight)}}catch(e){}}
   const fin=()=>{setMode('end');if(!last)showEnd('6:00 AM',`${n}일 차 끝.\n비상구가 한 칸 가까워졌다.`,`${n+1}일 차`,()=>newNight(n+1));
-    else showEnd('비상구',hard?'5일 차 끝.\n계단 끝에 철문이 있었다.\n안에서 전화가 울리고 있었다.':'5일 차 끝.\n계단은 위로 이어졌다.','처음부터',()=>newNight(1))};
+    else showEnd('비상구',hard?'5일 차 끝.\n엘리베이터는 아래로 내려갔다.\n물가에서 전화가 울리고 있었다.':'5일 차 끝.\n엘리베이터는 아래로 내려갔다.','처음부터',()=>newNight(1))};
   if(R3.ok&&!DEV.on)playCut(last?(hard?'ending_hard':'ending'):'reset',fin,n);else if(!DEV.on)playCut('reset2d',fin,n);else{sfx(880,.6,'sine',.2);fin()}
 }
 function showEnd(title,text,label,fn){
@@ -2223,7 +2223,7 @@ function roomCut(o,u,t){
 // 컷씬 카메라 도우미: 점 목록을 부드럽게 잇는 경로
 function walkPath(pts,y=1.62){const V3=R3.T.Vector3,c=new R3.T.CatmullRomCurve3(pts.map(p=>new V3(p[0],y,p[1])));return c}
 // ---- 컷씬용 공간 ----
-// 인트로: 기둥 방(R1) → 복도(R2) → 경비실 철문이 있는 방(R3). 엔딩: 불 꺼진 경비실 앞 복도, 서진이 있는 옆방, 비상구 계단
+// 인트로: 기둥 방(R1) → 복도(R2) → 경비실 철문이 있는 방(R3). 엔딩: 불 꺼진 경비실 앞 복도, 비상구 너머 화물 엘리베이터, 맨 아래 수영장
 BP.intro=()=>({Hc:2.6,rooms:[[-5,5,2,-10],[-1.1,1.1,-10,-18.5],[1.1,7.5,-11.5,-17.5]],
   walls:[[-5,2,5,2],[-5,2,-5,-4.5],[-5,-5.5,-5,-10],[-5,-4.5,-5,-5.5,2.1],[5,2,5,-7.5],[5,-8.5,5,-10],[5,-7.5,5,-8.5,2.1],[-5,-10,-.55,-10],[.55,-10,5,-10],[-.55,-10,.55,-10,2.1],
     [-1.1,-10,-1.1,-18.5],[1.1,-10,1.1,-13.6],[1.1,-14.8,1.1,-18.5],[1.1,-11.5,7.5,-11.5],[1.1,-17.5,7.5,-17.5],[7.5,-11.5,7.5,-13.93],[7.5,-15.07,7.5,-17.5],[7.5,-14.0,7.5,-15.0,2.15]],
@@ -2252,27 +2252,45 @@ BP.intro=()=>({Hc:2.6,rooms:[[-5,5,2,-10],[-1.1,1.1,-10,-18.5],[1.1,7.5,-11.5,-1
     const tp=mesh(new T3.PlaneGeometry(.16,2.0),MS({map:c3cv('tape',256,32,tapeDraw),roughness:.7}),6.3,.004,-14.5,sc,false);tp.rotation.set(-PI2,0,PI2);
     // 복도 끝에 서 있는 것 (불이 깜빡이면 사라짐)
     C.dyn.fig=bb3(sc,2.35,0,-18.0,{position:new V3(0,1.6,-12)});C.dyn.fig.userData.m.material.color.setHex(0xd8ccaa)}});
+const ELEV_BOT=35.25; // 엔딩 엘리베이터가 내려가는 깊이
 BP.outro=()=>({Hc:2.6,rooms:[[-1.2,1.2,.6,-5.4],[-3.6,3.0,-5.4,-11.4],[-4.2,-1.2,-2.6,-5.4]],
   walls:[[-1.2,.6,1.2,.6],[-1.2,.6,-1.2,-3.4],[-1.2,-4.5,-1.2,-5.4],[-1.2,-3.4,-1.2,-4.5,2.1],[1.2,.6,1.2,-5.4],[-3.6,-5.4,-1.2,-5.4],[1.2,-5.4,3.0,-5.4],[-3.6,-5.4,-3.6,-11.4],[3.0,-5.4,3.0,-11.4],[-3.6,-11.4,-1.97,-11.4],[-.83,-11.4,3.0,-11.4],[-1.9,-11.4,-.9,-11.4,2.1],
     [-4.2,-2.6,-1.2,-2.6],[-4.2,-2.6,-4.2,-5.4],[-4.2,-5.4,-3.6,-5.4]],
   panels:[[0,-1.8],[0,-4.2],[-2.4,-6.6],[0,-6.6],[2.4,-6.6],[-2.4,-9.0],[0,-9.0],[2.4,-9.0],[-2.7,-4.0]],dead:2,
   fog:[0x020403,3,16],hemi:.05,spec:{c:0x40ff70,i:2.5,d:12,p:[-1.4,2.0,-10.6]},exit:[-1.4,2.3,-11.33,0],
   props(sc,M,X,B,C){const T3=R3.T;
-    // 서진: 등을 돌리고 접이식 의자에 앉아 끊긴 수화기를 귀에 댐
-    const t=c3cv('seojin',256,384,(q,w,h)=>{q.fillStyle='#1c1e1a';q.beginPath();q.ellipse(w*.5,h*.2,w*.13,h*.09,0,0,7);q.fill();q.fillStyle='#3a3c36';q.beginPath();q.moveTo(w*.26,h*.32);q.quadraticCurveTo(w*.5,h*.25,w*.74,h*.32);q.lineTo(w*.78,h*.7);q.lineTo(w*.22,h*.7);q.closePath();q.fill();
-      q.fillStyle='rgba(20,22,18,.6)';q.beginPath();q.ellipse(w*.5,h*.45,w*.14,h*.12,0,0,7);q.fill();q.fillStyle='#2a2c28';q.beginPath();q.moveTo(w*.72,h*.34);q.quadraticCurveTo(w*.86,h*.3,w*.66,h*.18);q.lineTo(w*.62,h*.22);q.quadraticCurveTo(w*.76,h*.3,w*.66,h*.36);q.fill();
-      q.fillStyle='#d8c8a8';q.fillRect(w*.6,h*.14,w*.1,h*.06);q.strokeStyle='#1a1a18';q.lineWidth=3;q.beginPath();let y=h*.2;q.moveTo(w*.66,y);for(let k=0;k<14;k++){y+=h*.03;q.lineTo(w*(.66+(k%2?.03:-.03)),y)}q.stroke();
-      q.fillStyle='#4a4a46';q.fillRect(w*.2,h*.7,w*.6,h*.04);q.fillRect(w*.22,h*.74,w*.04,h*.26);q.fillRect(w*.74,h*.74,w*.04,h*.26);q.fillStyle='#22241f';q.fillRect(w*.3,h*.7,w*.15,h*.3);q.fillRect(w*.55,h*.7,w*.15,h*.3)});
-    const s=bb3(sc,1.45,-2.9,-4.3,{position:new R3.T.Vector3(-1.2,1.6,-4.0)},1,true);s.userData.m.material.map=t;s.userData.m.scale.x=1.45*256/384;s.userData.m.material.color.setHex(0x7aa882);s.visible=true;C.dyn.seojin=s;
-    // 비상구 문 너머 위로 이어지는 콘크리트 계단 (차가운 흰빛)
-    const cM=MS({map:tx3(T.conc,1,1),roughness:.95,color:0xb8bcc0});for(let k=0;k<16;k++)BOX(1.0,.18,.3,cM,-1.4,.09+k*.18,-11.6-k*.3,sc);BOX(1.0,3.2,4.9,cM,-1.4,1.0+2.9,-14.0,sc).visible=false;
-    [-1.95,-.85].forEach(x=>BOX(.1,6,5,cM,x,2.8,-14,sc));mesh(new T3.PlaneGeometry(1.2,5.4),new T3.MeshBasicMaterial({color:0xf4f8ff}),-1.4,6.2,-14,sc,false).rotation.x=PI2;
+    // 비상구 문 너머: 줄 하나에 매달린 화물 엘리베이터 두 칸. 내 칸이 내려가야 서진 칸이 올라온다
+    const cM=MS({map:tx3(T.conc,1.2,32),roughness:.95,color:0x8a8c88}),Y0=-62,HH=65,yc=Y0+HH/2,BT=-ELEV_BOT; // 승강로 벽 (y -62 ~ 3)
+    [[-2.0,PI2],[.55,-PI2]].forEach(([x,r])=>{const q=mesh(new T3.PlaneGeometry(1.85,HH),cM,x,yc,-12.375,sc,false);q.rotation.y=r});
+    mesh(new T3.PlaneGeometry(2.55,HH),cM,-.725,yc,-13.3,sc,false);
+    const fw=(x,y,w,h)=>{const q=mesh(new T3.PlaneGeometry(w,h),cM,x,y,-11.45,sc,false);q.rotation.y=Math.PI}; // 문 쪽 벽: 위 비상구 구멍, 맨 아래 수영장 구멍만 뚫림
+    fw(-.725,2.7,2.55,1);fw(-1.95,1.1,.1,2.2);fw(-.175,1.1,1.45,2.2);fw(-.725,(BT+2.2)/2,2.55,-(BT+2.2));fw(-1.95,BT+1.1,.1,2.2);fw(-.175,BT+1.1,1.45,2.2);fw(-.725,(Y0+BT)/2,2.55,BT-Y0);
+    const FL=['B1','B2','B3','B4','B4','B7','B13','B','B?','-','-'];
+    for(let k=1;k<=11;k++){const y=-3*k;if(y<BT+2.6)break;BOX(2.55,.14,.08,M.dark,-.725,y,-11.5,sc);BOX(2.55,.14,.08,M.dark,-.725,y,-13.25,sc);BOX(.08,.14,1.85,M.dark,-1.96,y,-12.375,sc);BOX(.08,.14,1.85,M.dark,.51,y,-12.375,sc);
+      const lb=mesh(new T3.PlaneGeometry(.36,.18),MS({map:c3cv('fl'+k,128,64,(q,w,h)=>{q.fillStyle='rgba(20,18,14,.85)';q.font=`900 ${h*.7}px 'Nanum Gothic Coding',sans-serif`;q.textAlign='center';q.textBaseline='middle';q.fillText(FL[k-1],w/2,h/2)}),transparent:true,roughness:.9}),-1.4,y+.5,-11.47,sc,false);lb.rotation.y=Math.PI;
+      mesh(new T3.SphereGeometry(.03,8,6),new T3.MeshBasicMaterial({color:k%3?0xffa040:0x40ff70}),-1.0,y+.5,-11.48,sc,false)} // 층마다 작은 표시등 (지나가는 게 보이게)
+    const car=(x,sd)=>{const g=grp(x,0,-12.4,0,sc);BOX(1.1,.06,1.6,M.metal2,0,-.03,0,g);BOX(1.1,.05,1.6,M.dark,0,2.42,0,g);BOX(1.1,2.4,.04,M.metal2,0,1.2,-.78,g);BOX(.04,2.4,1.6,M.metal2,-.53*sd,1.2,0,g);
+      for(let k=0;k<9;k++)BOX(.025,2.4,.025,M.dark,.54*sd,1.2,-.72+k*.18,g);[.05,1.1,2.36].forEach(y=>BOX(.03,.04,1.6,M.dark,.54*sd,y,0,g)); // 옆 철창
+      mesh(new T3.SphereGeometry(.05,10,8),new T3.MeshBasicMaterial({color:0xffd9a0}),0,2.33,0,g,false);BOX(.03,40,.03,M.black,0,22.44,0,g);return g}
+    const cA=car(-1.4,1),gt=grp(-.53,0,.78,0,cA);for(let k=0;k<8;k++)BOX(.022,2.3,.022,M.dark,k*.152,1.17,0,gt);[.06,2.3].forEach(y=>BOX(1.06,.03,.03,M.dark,.53,y,0,gt));gt.scale.x=.06;C.dyn.gate=gt;C.dyn.carA=cA; // 접이식 철창문
+    const cB=car(-.1,-1);cB.position.y=-16;C.dyn.carB=cB;
+    // 서진: 맞은편 칸에 서서 이쪽을 봄
+    const sj=c3cv('seojin2',256,512,(q,w,h)=>{q.fillStyle='#1c1e1b';q.fillRect(w*.36,h*.6,w*.12,h*.4);q.fillRect(w*.52,h*.6,w*.12,h*.4);q.fillStyle='#5e635d';q.beginPath();q.moveTo(w*.3,h*.2);q.quadraticCurveTo(w*.5,h*.16,w*.7,h*.2);q.lineTo(w*.68,h*.62);q.lineTo(w*.32,h*.62);q.closePath();q.fill();
+      q.fillRect(w*.22,h*.21,w*.09,h*.33);q.fillRect(w*.69,h*.21,w*.09,h*.33);q.fillStyle='#b9b09a';q.fillRect(w*.23,h*.53,w*.07,h*.05);q.fillRect(w*.7,h*.53,w*.07,h*.05);q.fillStyle='#262a25';q.fillRect(w*.31,h*.58,w*.38,h*.03);
+      q.fillStyle='#c9c0aa';q.beginPath();q.ellipse(w*.5,h*.12,w*.1,h*.07,0,0,7);q.fill();q.fillStyle='rgba(10,10,8,.85)';q.fillRect(w*.38,h*.05,w*.24,h*.06);q.fillStyle='#22251f';q.beginPath();q.ellipse(w*.5,h*.06,w*.12,h*.035,0,Math.PI,0);q.fill();q.fillRect(w*.36,h*.06,w*.3,h*.015);
+      q.strokeStyle='#3a1a14';q.lineWidth=2;q.beginPath();q.moveTo(w*.45,h*.155);q.quadraticCurveTo(w*.5,h*.168,w*.56,h*.152);q.stroke()});
+    const sp=mesh(new T3.PlaneGeometry(.66,1.76),MS({map:sj,transparent:true,alphaTest:.1,roughness:.85}),.08,.88,.05,cB,false);sp.rotation.y=-PI2;
     const g=grp(-1.4,0,-11.38,0,sc);[[-.52,1.08,.06,2.16],[.52,1.08,.06,2.16],[0,2.13,1.1,.07]].forEach(([x,y,w,h])=>BOX(w,h,.45,M.dark,x,y,.05,g)); // 문틀
     const hg=grp(-.495,0,0,0,g),dr=grp(.495,0,0,0,hg);BOX(.99,2.1,.05,M.metal2,0,1.05,0,dr);BOX(.7,.05,.06,M.grey,0,1.0,.04,dr);C.dyn.exDoor=hg;
-    // 하드 모드: 계단 끝 층계참의 또 다른 경비실 철문
-    const lg=grp(-1.4,2.88,-16.6,0,sc);mesh(new T3.PlaneGeometry(1.8,2.6),MS({map:tx3(T.conc,1,1.3),roughness:.95,color:0x9a9890}),0,1.3,0,lg,false);BOX(1.0,2.1,.05,M.metal2,0,1.05,.03,lg);
-    mesh(new T3.PlaneGeometry(.6,.13),MS({map:c3cv('stencilG',512,96,stencilDraw),transparent:true,roughness:.8}),0,1.75,.06,lg,false);mesh(new T3.SphereGeometry(.07,12,8),new T3.MeshBasicMaterial({color:0xffc070}),0,2.4,.12,lg,false);
-    mesh(new T3.PlaneGeometry(.3,.38),new T3.MeshBasicMaterial({map:c3cv('inside',128,160,(q,w,h)=>{q.fillStyle='#1a1006';q.fillRect(0,0,w,h);const gr=q.createRadialGradient(w*.6,h*.4,0,w*.6,h*.4,w*.7);gr.addColorStop(0,'rgba(255,170,80,.5)');gr.addColorStop(1,'rgba(255,170,80,0)');q.fillStyle=gr;q.fillRect(0,0,w,h);q.fillStyle='#3a2410';q.fillRect(0,h*.62,w,h*.4);q.fillStyle='#a01810';q.fillRect(w*.3,h*.55,w*.3,h*.1);q.fillRect(w*.32,h*.5,w*.26,h*.06);q.strokeStyle='rgba(180,180,170,.6)';for(let k=-w;k<w*2;k+=10){q.beginPath();q.moveTo(k,0);q.lineTo(k+h,h);q.moveTo(k+h,0);q.lineTo(k,h);q.stroke()}})}),0,1.5,.06,lg,false);C.dyn.landing=lg;C.dyn.topWhite=mesh(new T3.PlaneGeometry(1.2,3),new T3.MeshBasicMaterial({color:0xf8faff,fog:false}),-1.4,4.4,-16.5,sc,false)}}); // 일반 엔딩: 계단 끝은 흰빛
+    // 맨 아래: 하얀 타일 수영장
+    const tC=cvs(256,256,(q,w,h)=>{q.fillStyle='#b9c2bf';q.fillRect(0,0,w,h);for(let i=0;i<8;i++)for(let j=0;j<8;j++){q.fillStyle=`rgb(${226+ri(14)},${234+ri(10)},${232+ri(10)})`;q.fillRect(i*32+1.5,j*32+1.5,29,29)}}),tM=(rx,ry,c)=>MS({map:tx3(tC,rx,ry),roughness:.22,metalness:.05,color:c||0xffffff});
+    const pg=grp(0,BT,0,0,sc),fl=mesh(new T3.PlaneGeometry(9,1.6),tM(9,1.6),-1,0,-10.65,pg,false);fl.rotation.x=-PI2;
+    const wb=mesh(new T3.PlaneGeometry(9,1.6),tM(9,1.6,0xa8c4c8),-1,-.8,-9.85,pg,false);const bf=mesh(new T3.PlaneGeometry(9,16),tM(9,16,0x7fb6c0),-1,-1.6,-1.85,pg,false);bf.rotation.x=-PI2;
+    const wt=mesh(new T3.PlaneGeometry(9,16),MS({color:0x4f98a8,roughness:.04,metalness:.4,transparent:true,opacity:.78}),-1,-.22,-1.85,pg,false);wt.rotation.x=-PI2;C.dyn.water=wt;
+    [[-5.5,PI2],[3.5,-PI2]].forEach(([x,r])=>{const q=mesh(new T3.PlaneGeometry(18,5.2),tM(18,5.2),x,1.0,-2.45,pg,false);q.rotation.y=r});mesh(new T3.PlaneGeometry(9,5.2),tM(9,5.2),-1,1.0,6.5,pg,false).rotation.y=Math.PI;
+    const ce=mesh(new T3.PlaneGeometry(9,18),tM(9,18,0xd8dedc),-1,3.6,-2.45,pg,false);ce.rotation.x=PI2;
+    [[-2.6,-7],[.6,-7],[-2.6,-1],[.6,-1],[-2.6,5],[.6,5]].forEach(([x,z])=>{const q=mesh(new T3.PlaneGeometry(1.2,.3),new T3.MeshBasicMaterial({color:0xeef8ff}),x,3.58,z,pg,false);q.rotation.x=PI2});
+    const ph=grp(1.7,0,-10.35,-.5,pg);BOX(.26,.1,.2,MS({color:0xa01810,roughness:.4}),0,.05,0,ph);BOX(.24,.05,.07,MS({color:0x8a140c,roughness:.4}),0,.125,-.04,ph);ph.visible=false;C.dyn.phone=ph}}); // 하드 모드: 물가에 빨간 전화기
 // 컷씬 공간: 설계도로 만들고, 걷는 동안 가까운 켜진 등 4개로 실제 광원을 옮김
 function buildCutArea(k){const B=BP[k](),C=buildArea(B,mulberry(k==='intro'?31:57),1);C.tick=cam=>followLights(C,cam);if(C.dyn.fig)bbImg(C.dyn.fig,STK.full);if(C.exit)C.exit.visible=true;return C}
 function followLights(C,cam){
@@ -2300,8 +2318,11 @@ function crtMap(zone,blink){const g=R3.scrC.getContext('2d'),w=R3.scrC.width,h=R
 function tallyGrow(mine,f){const D=R3.dyn;tally3(mine);if(f<=0||mine>=5)return;const g=D.calC.getContext('2d'),w=D.calC.width,h=D.calC.height,rows=6,ch=h/rows*.7,y=h*.04+5*(h/rows),x0=w*.06+mulberry(77)()*0,L=[[.1,.08,.9,.08],[.5,.08,.5,.92],[.5,.5,.85,.5],[.25,.42,.25,.92],[0,.92,1,.92]][mine];
   const r=mulberry(77);for(let k=0;k<rows*2;k++)r();const xs=w*.06+mulberry(77)()*w*.05;g.strokeStyle='#2a2a2a';g.lineWidth=4;g.lineCap='round';g.beginPath();g.moveTo(xs+L[0]*ch,y+L[1]*ch);g.lineTo(xs+lerp(L[0],L[2],f)*ch,y+lerp(L[1],L[3],f)*ch);g.stroke();D.calT.needsUpdate=true}
 function stencilDraw(q,w,h){q.fillStyle='rgba(30,28,24,.85)';q.font=`900 ${h*.62}px 'Nanum Gothic Coding',sans-serif`;q.textAlign='center';q.textBaseline='middle';q.fillText('경비실',w/2,h/2);q.globalCompositeOperation='destination-out';for(let x=w*.3;x<w*.75;x+=w*.09)q.fillRect(x,0,3,h)}
-function stairLight(k=1){const L=CUT.areas.outro.lights[0];L.position.set(-1.4,5.6,-14.2);L.color.setHex(0xf2f6ff);L.distance=12;L.intensity=14*k}
-function landLight(){const L=CUT.areas.outro.lights[0];L.position.set(-1.4,5.3,-16.2);L.color.setHex(0xffc27a);L.distance=5;L.intensity=3}
+// 엔딩 엘리베이터: s=내려간 거리. 내 칸이 s만큼 내려가면 서진 칸은 s만큼 올라옴 (8m에서 엇갈림)
+function setCars(s){const D=CUT.areas.outro.dyn;D.carA.position.y=-s;D.carB.position.y=-16+s}
+function carLt(i,car,k,c=0xffcf8a){const L=CUT.areas.outro.lights[i];L.position.set(car.position.x,car.position.y+2.15,car.position.z);L.color.setHex(c);L.distance=5;L.intensity=5*k}
+function inCar(C,s,a,ty,dz=0){const x=-1.4,y=-s+1.62,z=-12.85+dz;C.position.set(x,y,z);C.lookAt(x+Math.sin(a)*1.4,ty??y-.05,z-Math.cos(a)*1.4)} // a=0 안쪽 벽, π/2 서진 칸 쪽, π 철창문 쪽
+function poolFx(){const A=CUT.areas.outro,D=A.dyn,L=A.lights[0];setCars(ELEV_BOT);D.gate.scale.x=.06;carLt(1,D.carB,0);L.position.set(-1,-ELEV_BOT+3.2,-7);L.color.setHex(0xe8fbff);L.distance=18;L.intensity=12;A.fog.color.setHex(0x8fa9ae);A.fog.near=3;A.fog.far=22;A.sc.background.setHex(0x8fa9ae);A.hemi.color.setHex(0xd8f4ff);A.hemi.intensity=.7;D.water.position.y=-.22+Math.sin(T_*1.3)*.012}
 // ---- 컷씬 목록 ----
 const CUTS={
   intro:{area:'intro',prep(){humTo(0,.01)},after(){humTo(0,.2);const D=CUT.areas.intro.dyn;D.door.rotation.y=0},shots:[
@@ -2333,23 +2354,30 @@ const CUTS={
     {d:1.5,scene:'room',room:{light:u=>u>.15&&!(u>.35&&u<.45)&&!(u>.55&&u<.62),win:u=>u>.15?1.7:0,clock6:true},cam:(u,t,C)=>{C.position.set(0,1.3,-.2);C.lookAt(-RX,1.5,CAMZ)},at:{.2:()=>{buzzClick();humTo(.5,.4)},.6:()=>buzzClick(),.9:()=>buzzClick()}},
     {d:1.5,scene:'room',room:{light:true,clock6:true,tally:u=>u},cam:(u,t,C)=>shotCam(C,V(-.85,2.12,-.8),V(-.85,2.12,-.85),V(-.85,2.2,-1.4),V(-.85,2.2,-1.4),u),at:{.2:()=>nburst(3200,6,.25,.06,0)}},
     {d:1.6,scene:'room',fo:.5,room:{light:true,clock6:true,map:u=>EXIT_CAM[Math.min(4,CUT.n)],tally:()=>1},cam:(u,t,C)=>shotCam(C,V(0,1.08,-.62),V(0,1.06,-.66),V(0,1.03,-.95),V(0,1.03,-.95),u),at:{.2:()=>sfx(990,.05,'sine',.06),.65:()=>sfx(990,.05,'sine',.06),1.1:()=>sfx(990,.05,'sine',.06)}}]},
-  ending:{area:'outro',prep(){const D=CUT.areas.outro.dyn;D.landing.visible=false;D.topWhite.visible=true},shots:[
+  ending:{area:'outro',prep(){CUT.areas.outro.dyn.phone.visible=false},shots:[
     {d:2,scene:'room',fi:.3,room:{light:true,mon:true,monText:['CAM A-H 연결됨'],clock6:true},cam:(u,t,C)=>shotCam(C,V(0,1.3,-.2),V(0,1.3,-.25),V(0,1.75,-1.4),V(0,1.8,-1.4),u),at:{.8:()=>sfx(1200,.03,'square',.08)}},
     {d:2.5,scene:'room',room:{light:u=>u<.8,mon:true,win:u=>Math.max(0,1-u*1.3),clock6:true},cam:(u,t,C)=>{C.position.set(0,1.3,-.2);const a=V(0,1.8,-1.4),b=V(-RX,1.5,CAMZ);C.lookAt(a.lerp(b,ease(Math.min(1,u*2))))},at:{0:()=>relay(),.5:()=>relay(),.9:()=>relay(),1.2:()=>relay(),1.5:()=>relay(),1.8:()=>{relay();humTo(0,.02)}}},
     {d:3,scene:'room',room:{light:false,win:()=>0,green:u=>u,clock6:true},cam:(u,t,C)=>{C.position.set(0,1.3,-.2);C.lookAt(-RX,1.5,CAMZ)},at:{1:()=>sfx(2400,2.2,'sine',.015)}},
     {d:2,scene:'room',room:{light:false,green:()=>1,tally:u=>u,clock6:true},cam:(u,t,C)=>shotCam(C,V(-.85,2.12,-.8),V(-.85,2.12,-.85),V(-.85,2.2,-1.4),V(-.85,2.2,-1.4),u),at:{.3:()=>nburst(3200,6,.25,.06,0)}},
     {d:3,scene:'room',room:{light:false,green:()=>1,tally:()=>1,keyGreen:u=>u>.2,hinge:u=>u>.45?-.16*ease(Math.min(1,(u-.45)/.5)):0,clock6:true},cam:(u,t,C)=>shotCam(C,V(-1.2,1.35,CAMZ-.35),V(-1.3,1.3,CAMZ-.4),V(-RX,1.25,CAMZ-.68),V(-RX,1.1,CAMZ-.3),u),at:{.6:()=>sfx(880,.08,'square',.06),1.1:()=>thump(80,.2,.3,-.4),1.5:()=>creak()}},
     {d:5,scene:'outro',fi:.6,cam:(u,t,C)=>shotCam(C,V(0,1.62,.3),V(-.1,1.62,-3.0),V(-1.2,1.9,-11.3),V(-1.2,1.9,-11.3),u,{walk:true,lin:true}),at:{0:()=>steps(7,.6,.14)}},
-    {d:6,scene:'outro',cap:'...받아. 받아 봐.',cam:(u,t,C)=>{const p=V(-.1,1.62,-3.0).lerp(V(-.4,1.62,-3.9),ease(Math.min(1,u*1.5)));C.position.copy(p);const a=V(-1.2,1.9,-11.3),b=V(-2.9,1.0,-4.3);C.lookAt(u<.8?a.lerp(b,ease(Math.min(1,u/.35))):b.lerp(a,ease((u-.8)/.2)))},at:{1.2:()=>whisper(),3.4:()=>whisper()}},
-    {d:3,scene:'outro',cap:'',cam:(u,t,C)=>shotCam(C,V(-.4,1.62,-3.9),V(-1.2,1.62,-8.6),V(-1.4,1.8,-11.3),V(-1.4,1.8,-11.3),u,{walk:true,lin:true}),at:{0:()=>steps(5,.6,.14),1.2:()=>{if(AC){const m=master.gain.value;master.gain.setTargetAtTime(m*.5,AC.currentTime,.05);ringTone();setTimeout(()=>master.gain.setTargetAtTime(m,AC.currentTime,.1),900)}}}},
-    {d:4,scene:'outro',cam:(u,t,C)=>shotCam(C,V(-1.2,1.62,-8.6),V(-1.4,1.62,-10.9),V(-1.4,1.8,-11.4),V(-1.4,3.2,-15),u),fx:(u,t)=>{const D=CUT.areas.outro.dyn,o=Math.min(1,Math.max(0,(t-1.4)/.9));D.exDoor.rotation.y=-o*1.6;stairLight(o)},at:{1.3:()=>{thump(160,.06,.3,0);nburst(1200,2,.08,.2,0)}}},
-    {d:5,scene:'outro',white:u=>Math.max(0,(u-.45)/.55),fx:()=>stairLight(),cam:(u,t,C)=>{const e=u,z=-11.2-e*4.2,y=1.62+Math.max(0,(-11.6-z)/.3)*.18;C.position.set(-1.4,y+Math.sin(e*28)*.02,z);C.lookAt(-1.4,y+1.4,z-2.4)},at:{0:()=>{for(let k=0;k<8;k++)thump(90,.08,.18,0,k*.55)}}},
-    {d:2,white:u=>1-u,black:false,scene:null}]},
+    {d:4.5,scene:'outro',cap:'',cam:(u,t,C)=>shotCam(C,V(-.1,1.62,-3.0),V(-1.2,1.62,-8.6),V(-1.4,1.8,-11.3),V(-1.4,1.8,-11.3),u,{walk:true,lin:true}),at:{0:()=>steps(8,.6,.14),2.2:()=>{if(AC){const m=master.gain.value;master.gain.setTargetAtTime(m*.5,AC.currentTime,.05);ringTone();setTimeout(()=>master.gain.setTargetAtTime(m,AC.currentTime,.1),900)}}}},
+    {d:4,scene:'outro',cam:(u,t,C)=>shotCam(C,V(-1.2,1.62,-8.6),V(-1.4,1.62,-10.9),V(-1.4,1.8,-11.4),V(-1.4,1.3,-13.2),u),fx:(u,t)=>{const D=CUT.areas.outro.dyn,o=Math.min(1,Math.max(0,(t-1.4)/.9));D.exDoor.rotation.y=-o*1.6;setCars(0);carLt(0,D.carA,o)},at:{1.3:()=>{thump(160,.06,.3,0);nburst(1200,2,.08,.2,0)},2.4:()=>sfx(60,1.4,'sawtooth',.03)}},
+    {d:2.6,scene:'outro',cam:(u,t,C)=>shotCam(C,V(-1.4,1.62,-10.9),V(-1.4,1.62,-12.85),V(-1.4,1.4,-13.3),V(-1.4,1.45,-13.4),u,{walk:true}),fx:()=>{const D=CUT.areas.outro.dyn;setCars(0);carLt(0,D.carA,1)},at:{0:()=>steps(4,.6,.16),1.6:()=>thump(90,.15,.2,0)}},
+    {d:3.4,scene:'outro',cam:(u,t,C)=>inCar(C,0,Math.PI*ease(Math.min(1,u*2.2))),fx:(u,t)=>{const D=CUT.areas.outro.dyn;setCars(0);carLt(0,D.carA,1);D.gate.scale.x=.06+.94*ease(Math.min(1,Math.max(0,(t-1.3)/.7)))},at:{1.3:()=>nburst(2600,6,.6,.1,0),2.05:()=>{thump(70,.3,.4,0);metal()},2.9:()=>relay()}}, // 돌아서면 철창문이 닫힘
+    {d:7,scene:'outro',cap:'고마워.',capDelay:4200,cam:(u,t,C)=>{const s=16*u**1.5,a=Math.PI-PI2*ease(Math.min(1,Math.max(0,(u-.2)/.3))),y=-s+1.62,hy=-16+s+1.6;inCar(C,s,a,y+Math.max(-.7,Math.min(1,(hy-y)*.5)));C.position.y+=Math.sin(t*37)*.006},
+      fx:(u,t)=>{const D=CUT.areas.outro.dyn;setCars(16*u**1.5);carLt(0,D.carA,1);carLt(1,D.carB,1,0xfff0d0)},at:{0:()=>{thump(45,.9,.55,0);for(let k=0;k<15;k++)thump(36,.3,.12,0,.5+k*.45)},2.5:()=>metal(),4.3:()=>whisper()}}, // 내려가는 동안 서진 칸이 올라와 엇갈림
+    {d:4,scene:'outro',cap:'이거 혼자선 안 움직이거든.',cam:(u,t,C)=>{const s=16+3.5*t,y=-s+1.62,hy=-16+s+1.6;inCar(C,s,PI2+.15*u,y+Math.min(1.1,(hy-y)*.5))},
+      fx:(u,t)=>{const D=CUT.areas.outro.dyn;setCars(16+3.5*t);carLt(0,D.carA,u>.6&&(t*11)%1<.45?.12:1);carLt(1,D.carB,1,0xfff0d0)},at:{0:()=>{for(let k=0;k<9;k++)thump(36,.3,.12,0,k*.45)},2.8:()=>buzzClick()}},
+    {d:3,scene:'outro',cap:'',cam:(u,t,C)=>{const s=30+3.5*t-.5*(3.5/3)*t*t;inCar(C,s,PI2+(PI2-.15)*ease(u))},fx:(u,t)=>{const D=CUT.areas.outro.dyn;setCars(30+3.5*t-.5*(3.5/3)*t*t);carLt(0,D.carA,(t*7)%1<.3?.5:.08);carLt(1,D.carB,0)},fo:.5,at:{0:()=>{for(let k=0;k<5;k++)thump(36,.3,.1,0,k*.5)},2.85:()=>{thump(48,.7,.6,0);metal()}}},
+    {d:1.6,black:true,at:{.3:()=>drip(-.3),.9:()=>drip(.4),1.3:()=>drip(0)}},
+    {d:5,scene:'outro',fi:.8,cam:(u,t,C)=>{const B=ELEV_BOT,p=V(-1.4,-B+1.62,-12.75).lerp(V(-1.4,-B+1.62,-11.7),ease(Math.max(0,(u-.35)/.65)));C.position.copy(p);C.lookAt(-1.2,-B+1.1,-6)},fx:(u,t)=>{poolFx();CUT.areas.outro.dyn.gate.scale.x=.06+.94*(1-ease(Math.min(1,Math.max(0,(t-.6)/.8))))},at:{.6:()=>nburst(2600,6,.6,.1,0),1.2:()=>drip(.5),2.4:()=>drip(-.6),3.5:()=>drip(.2)}}, // 철창문이 열리면 하얀 타일 수영장
+    {d:2.4,scene:'outro',fo:2,cam:(u,t,C)=>{const B=ELEV_BOT;C.position.set(-1.4,-B+1.62,-11.7);C.lookAt(-1.2+u*.3,-B+1.1,-6)},fx:()=>{poolFx();CUT.areas.outro.dyn.gate.scale.x=.06},at:{.8:()=>drip(0)}}]},
 };
 CUTS.reset2d={shots:[{d:1.4,black:true,at:{0:()=>{relay();humTo(0,.05)},.35:()=>relay(),.65:()=>relay()}},{d:1.6,black:true,at:{.4:()=>drag(0,.25),1.3:()=>buzzClick()}}]}; // 3D가 안 될 때 6시 소등은 소리로만
-CUTS.ending_hard={area:'outro',prep(){const D=CUT.areas.outro.dyn;D.landing.visible=true;D.topWhite.visible=false},shots:CUTS.ending.shots.slice(0,-1).concat([
-  {d:3.5,scene:'outro',white:u=>1-Math.min(1,u*2),fx:()=>landLight(),cam:(u,t,C)=>shotCam(C,V(-1.4,4.5,-14.2),V(-1.4,4.5,-14.6),V(-1.4,4.4,-16.6),V(-1.4,4.4,-16.6),u),at:{.6:()=>ringTone(),2.6:()=>ringTone()}},
-  {d:2.5,scene:'outro',fx:()=>landLight(),cam:(u,t,C)=>shotCam(C,V(-1.4,4.4,-15.1),V(-1.4,4.38,-16.1),V(-1.4,4.38,-16.6),V(-1.4,4.38,-16.6),u),at:{.5:()=>ringTone()},cutAt:2.2}])};
+CUTS.ending_hard={area:'outro',prep(){CUT.areas.outro.dyn.phone.visible=true},shots:CUTS.ending.shots.slice(0,-1).concat([ // 하드: 물가에서 빨간 전화기가 울림
+  {d:3.5,scene:'outro',cam:(u,t,C)=>{const B=ELEV_BOT;C.position.set(-1.4,-B+1.62,-11.7);const a=V(-1.2,-B+1.1,-6),b=V(1.7,-B+.1,-10.35);C.lookAt(a.lerp(b,ease(Math.min(1,Math.max(0,(u-.3)/.5)))))},fx:()=>{poolFx();CUT.areas.outro.dyn.gate.scale.x=.06},at:{.2:()=>ringTone(),2.2:()=>ringTone()}},
+  {d:2.5,scene:'outro',cam:(u,t,C)=>{const B=ELEV_BOT;shotCam(C,V(-1.4,-B+1.62,-11.7),V(.9,-B+1.1,-10.6),V(1.7,-B+.1,-10.35),V(1.7,-B+.1,-10.35),u,{walk:true})},fx:()=>{poolFx();CUT.areas.outro.dyn.gate.scale.x=.06},at:{0:()=>steps(4,.6,.14),.5:()=>ringTone()},cutAt:2.2}])};
 
 // ===================== 게임 화면 그리기 =====================
 const SPOTS=[[.8,.95],[.06,.98],[.88,.96]]; // 그림자가 서는 자리 (방향별)
@@ -2751,7 +2779,7 @@ addEventListener('pointerdown',unlock);addEventListener('keydown',unlock);
 const ACH=[
   ['first_shift','첫 근무','1일 차를 버틴다'],
   ['ch1_normal','챕터 1: 비상구','노말 모드 5일 차 클리어'],
-  ['ch1_hard','챕터 1: 계단 끝 철문','하드 모드 5일 차 클리어'],
+  ['ch1_hard','챕터 1: 물가의 전화','하드 모드 5일 차 클리어'],
   ['lie','잠그지 마','5일 차, 서진이 아닌 목소리를 믿지 않는다'],
   ['bolt','빗장','교대자를 문 앞에서 10번 돌려보낸다'],
   ['vent','숨 참기','은둔자를 환풍구에서 5번 돌려보낸다'],
