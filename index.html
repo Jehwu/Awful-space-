@@ -180,6 +180,8 @@ body[data-mode=game] #pauseBtn{display:flex}
 .pnl.wide{width:min(560px,94%)}
 .pnl.wide.two{width:min(900px,95%)}
 #setRows.two{display:grid;grid-template-columns:1fr 1fr;column-gap:28px}
+.skh{grid-column:1/-1;margin:18px 2px 4px;font-size:13px;letter-spacing:.08em;color:#e6c890;opacity:.85}
+.kbtn{min-width:96px;padding:6px 12px;font:18px VT323,'Nanum Gothic Coding',monospace;color:#efe6cc;background:#1a1712;border:1px solid rgba(220,200,150,.4);border-bottom-width:3px;border-radius:4px}.kbtn.wait{color:#111;background:#e6c890;animation:kbw .8s infinite}@keyframes kbw{50%{opacity:.55}}
 .short .pnl{padding:12px 18px 12px}.short .ph{font-size:24px}.short .psub{font-size:15px;margin-bottom:6px}.short .pb{padding:8px 6px 8px 22px;font-size:17px}
 .short .srow{padding:4px 2px;font-size:14px}.short .srow .sl small{display:none}.short .seg button{min-height:30px;padding:2px 9px}.short .srow2{margin-top:8px}
 .pnl::before{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 1px,transparent 1px 3px)}
@@ -280,13 +282,13 @@ body[data-mode=game] #pauseBtn{display:flex}
 <div id="msg"></div>
 <button id="camOff"><span class="ar">▼</span> 닫기</button>
 <button id="camRep"><span class="rd"></span>복제자 신고</button>
-<button id="flashBtn" class="hb" data-k="클릭"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/><path d="M17.5 10.5h.01"/></svg><span>플래시</span></button>
-<button id="torchBtn" class="hb" data-k="S"><svg viewBox="0 0 24 24"><path d="M9 9h6l-1 4v7h-4v-7z"/><path d="M9 9V6h6v3"/><path class="ray" d="M12 3V1.5M7 4.5 6 3.5M17 4.5l1-1"/></svg><span>손전등 끄기</span></button>
-<button id="eyeBtn" class="hb" data-k="우클릭"><svg viewBox="0 0 24 24"><path class="lid" d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6S2 12 2 12z"/><circle class="lid" cx="12" cy="12" r="2.8"/><path class="shut" d="M2 11c3 3.5 6.5 5 10 5s7-1.5 10-5M6 15l-1.5 2M12 16.5V19M18 15l1.5 2"/></svg><span>눈 감기 (꾹)</span></button>
+<button id="flashBtn" class="hb"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/><path d="M17.5 10.5h.01"/></svg><span>플래시</span></button>
+<button id="torchBtn" class="hb"><svg viewBox="0 0 24 24"><path d="M9 9h6l-1 4v7h-4v-7z"/><path d="M9 9V6h6v3"/><path class="ray" d="M12 3V1.5M7 4.5 6 3.5M17 4.5l1-1"/></svg><span>손전등 끄기</span></button>
+<button id="eyeBtn" class="hb"><svg viewBox="0 0 24 24"><path class="lid" d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6S2 12 2 12z"/><circle class="lid" cx="12" cy="12" r="2.8"/><path class="shut" d="M2 11c3 3.5 6.5 5 10 5s7-1.5 10-5M6 15l-1.5 2M12 16.5V19M18 15l1.5 2"/></svg><span>눈 감기 (꾹)</span></button>
 <div id="pnl"><button data-c="0">왼쪽</button><button data-c="1">가운데</button><button data-c="2">오른쪽</button><button class="x">닫기</button></div>
-<button id="pnlBtn" class="hb" data-k="Space"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M7 7h10v8H7z"/><path d="M9 18h6"/></svg><span>패널</span></button>
+<button id="pnlBtn" class="hb"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M7 7h10v8H7z"/><path d="M9 18h6"/></svg><span>패널</span></button>
 <button id="bpBack">← 돌아가기</button>
-<button id="battBtn" class="hb" data-k="R"><svg viewBox="0 0 24 24"><rect x="5" y="7" width="13" height="10" rx="1.5"/><path d="M18 10.5h2v3h-2"/><path d="M8 10v4M11 10v4"/></svg><span>배터리</span><b id="battN">1</b></button>
+<button id="battBtn" class="hb"><svg viewBox="0 0 24 24"><rect x="5" y="7" width="13" height="10" rx="1.5"/><path d="M18 10.5h2v3h-2"/><path d="M8 10v4M11 10v4"/></svg><span>배터리</span><b id="battN">1</b></button>
 <div id="battOv"><svg id="battPic" data-s="0" viewBox="0 0 300 70"><rect class="tube" x="60" y="18" width="170" height="34" rx="6"/><path class="head" d="M10 8h50v54H10z"/><rect class="lens" x="4" y="14" width="10" height="42" rx="3"/><rect class="old" x="90" y="24" width="110" height="22" rx="4"/><rect class="new" x="90" y="24" width="110" height="22" rx="4"/><rect class="cap" x="228" y="14" width="34" height="42" rx="5"/></svg>
 <div class="row"><span id="battStep">1/4</span><button id="battAct">뚜껑 돌려서 열기</button></div><div class="bar"><i id="battBar"></i></div></div>
 <div id="map"></div>
@@ -336,7 +338,7 @@ body[data-mode=game] #pauseBtn{display:flex}
 <script nomodule>window.THREE_ERR='nomodule'</script>
 <script>
 // ===================== 기본 =====================
-const VER='0.19.3'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
+const VER='0.19.4'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
 const $=id=>document.getElementById(id);
 const cv=$('cv'),cx=cv.getContext('2d');
 let W,H,DPR=1;const MOB=matchMedia('(pointer:coarse)').matches||/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent); // 폰이면 가볍게
@@ -1444,7 +1446,7 @@ function reportCam(){
   else{S.san-=10;say('"이상 없습니다. 기록됩니다."','bad')}
 }
 // PC 조작키 안내 (근무 일지·이용 수칙 카드 맨 아래). 폰에서는 안 보임
-function keyGuide(box){if(MOB)return;const K=S.ch===2?[['클릭','플래시'],['A / D','고개 돌리기 (패널에선 통로 바꾸기)'],['Space','통로 패널'],['S','손전등 끄기/켜기'],['R','배터리 교체'],...(S.night>=5?[['우클릭 꾹','눈 감기 (Shift 꾹도 됨)']]:[]),['Esc','일시정지']]:[['클릭','물건 누르기 · 양옆 화살표로 고개 돌리기'],['Esc','일시정지 · 창 닫기']];
+function keyGuide(box){if(MOB)return;const kn=a=>keyName(keyOf(a)),K=S.ch===2?[[kn('flash'),'플래시'],[kn('left')+' / '+kn('right'),'고개 돌리기 (패널에선 통로 바꾸기)'],[kn('pnl'),'통로 패널'],[kn('torch'),'손전등 끄기/켜기'],[kn('batt'),'배터리 교체'],...(S.night>=5?[[kn('eyes')+' 꾹','눈 감기']]:[]),['Esc','일시정지 · 설정에서 키 바꾸기']]:[['클릭','물건 누르기 · 양옆 화살표로 고개 돌리기'],['Esc','일시정지 · 창 닫기']];
   const d=document.createElement('div');d.className='lg-keys';d.innerHTML=K.map(([k,t])=>`<span><kbd>${k}</kbd>${t}</span>`).join('');box.insertBefore(d,box.children[2]||null)} // 제목 바로 아래 (스크롤 안 해도 보이게)
 function openLog(){
   if(S.view!==1||S.mon)return;
@@ -3235,29 +3237,36 @@ $('bpBack').onclick=e=>{e.stopPropagation();if(S&&S.bp)closeBrk()};
 function setEyes(v){if(!S||S.ch!==2||S.over)return;if(v&&(S.log||mode!=='game'))return;if(S.eyes===v)return;S.eyes=v;if(EYEF)EYEF.frequency.setTargetAtTime(v?500:20000,AC.currentTime,.08);$('eyeBtn').classList.toggle('on',v)}
 function toggleTorch(){if(!S||S.ch!==2||S.over||S.dawn)return;S.torchOff=!S.torchOff;sfx(S.torchOff?700:1100,.03,'square',.05);buildUI()}
 {const b=$('eyeBtn');b.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();setEyes(true)});['pointerup','pointerleave','pointercancel'].forEach(k=>b.addEventListener(k,()=>setEyes(false)));b.addEventListener('contextmenu',e=>e.preventDefault())}
-// 눈 감기: Shift(또는 E)를 누르고 있는 동안. 한글 입력 상태에서도 되게 e.code로 봄
-const EYEK=c=>c==='ShiftLeft'||c==='ShiftRight'||c==='KeyE';
-addEventListener('keydown',e=>{if(EYEK(e.code)&&S&&S.ch===2)setEyes(true)});addEventListener('keyup',e=>{if(EYEK(e.code))setEyes(false)});
-addEventListener('blur',()=>{if(S&&S.eyes&&!PT.rb)setEyes(false)});
+// ===================== 챕터 2 키 (설정에서 바꿀 수 있음) =====================
+// 키보드는 e.code(한글 입력 상태에서도 같음), 마우스는 'Mouse0'(좌)·'Mouse1'(휠)·'Mouse2'(우)
+const KEY_ACT=[['flash','플래시'],['pnl','통로 패널'],['torch','손전등 끄기/켜기'],['batt','배터리 교체'],['eyes','눈 감기 (누르고 있는 동안)'],['left','왼쪽 보기 / 패널 통로 ←'],['right','오른쪽 보기 / 패널 통로 →']];
+const KEY_DEF={flash:'KeyF',pnl:'KeyQ',torch:'KeyT',batt:'KeyR',eyes:'KeyE',left:'KeyA',right:'KeyD'};
+const keyOf=a=>(SET.keys&&SET.keys[a])||KEY_DEF[a];
+const actOf=c=>KEY_ACT.map(x=>x[0]).find(a=>keyOf(a)===c);
+function keyName(c){if(!c)return'-';const M={Mouse0:'좌클릭',Mouse1:'휠 클릭',Mouse2:'우클릭',Space:'Space',ShiftLeft:'왼 Shift',ShiftRight:'오른 Shift',ControlLeft:'왼 Ctrl',ControlRight:'오른 Ctrl',AltLeft:'왼 Alt',AltRight:'오른 Alt',Tab:'Tab',Enter:'Enter',CapsLock:'Caps',Backquote:'`',ArrowLeft:'←',ArrowRight:'→',ArrowUp:'↑',ArrowDown:'↓'};
+  return M[c]||c.replace(/^Key/,'').replace(/^Digit/,'').replace(/^Numpad/,'숫자패드 ')}
+let KEYWAIT=null; // 설정에서 키 바꾸는 중이면 그 동작 이름
+function keyAct(a,down){if(!S||S.ch!==2||mode!=='game')return false;
+  if(a==='eyes'){setEyes(down);return true}if(!down)return true;
+  if(a==='flash')flash();else if(a==='pnl'){if(!S.over)toggleMon()}else if(a==='torch')toggleTorch();
+  else if(a==='batt'){if(S.swap){if(!SWAP[S.swap.step][1])swapTap()}else startSwap()}
+  else if(a==='left'||a==='right'){const d=a==='left'?-1:1;if(S.mon)setCam(Math.max(0,Math.min(2,S.cam+d)));else turn(d)}
+  return true}
+addEventListener('keydown',e=>{if(KEYWAIT||e.repeat)return;const a=actOf(e.code);if(a&&keyAct(a,true))e.preventDefault()});
+addEventListener('keyup',e=>{if(actOf(e.code)==='eyes')keyAct('eyes',false)});
+addEventListener('blur',()=>{if(S&&S.eyes)setEyes(false)});
 $('torchBtn').onclick=e=>{e.stopPropagation();toggleTorch()};
 $('pnlBtn').onclick=e=>{e.stopPropagation();if(S&&S.ch===2&&!S.over)toggleMon()};
 $('battBtn').onclick=e=>{e.stopPropagation();startSwap()};
 {const b=$('battAct'),hold=v=>{if(S&&S.swap)S.swap.hold=v};b.addEventListener('pointerdown',e=>{e.stopPropagation();hold(true)});['pointerup','pointerleave','pointercancel'].forEach(k=>b.addEventListener(k,()=>hold(false)));b.onclick=e=>{e.stopPropagation();swapTap()};$('battOv').addEventListener('pointerdown',e=>e.stopPropagation())}
 $('pnl').onclick=e=>{e.stopPropagation();const b=e.target.closest('button');if(!b||!S)return;if(b.classList.contains('x'))toggleMon();else setCam(+b.dataset.c)};
-// 챕터 2 PC 키: 왼손은 WASD 자리에 그대로, 플래시는 마우스 왼쪽 클릭 (반응 속도용)
-// A/D 고개 돌리기 (패널이 열려 있으면 통로 바꾸기) · Space 패널 · S 손전등 · R 배터리 · Shift/우클릭 꾹 눈 감기. 예전 키(F·Q·T)도 그대로 됨
-addEventListener('keydown',e=>{if(!S||S.ch!==2||mode!=='game'||e.repeat)return;const c=e.code;
-  if(c==='KeyA'||c==='ArrowLeft'||c==='KeyD'||c==='ArrowRight'){const d=c==='KeyA'||c==='ArrowLeft'?-1:1;if(S.mon)setCam(Math.max(0,Math.min(2,S.cam+d)));else turn(d)}
-  else if(c==='Space'||c==='KeyQ'){e.preventDefault();if(!S.over)toggleMon()}
-  else if(c==='KeyF')flash();
-  else if(c==='KeyS'||c==='KeyT')toggleTorch();
-  else if(c==='KeyR'){if(S.swap){if(!SWAP[S.swap.step][1])swapTap()}else startSwap()}});
+
 const isRot=()=>document.documentElement.classList.contains('rot');
 // 화면 속 물건을 직접 누름. 마우스·터치 공통 (돌린 화면이면 좌표도 돌려서 계산)
 const PT={x:-1,y:-1,touch:matchMedia('(hover: none)').matches,on:false,sx:0,sy:0};
 function gameXY(e){return isRot()?{x:e.clientY,y:H-e.clientX}:{x:e.clientX,y:e.clientY}}
 cv.addEventListener('pointerdown',e=>{PT.touch=e.pointerType!=='mouse';const p=gameXY(e);PT.fl=false;
-  if(e.pointerType==='mouse'&&e.button===0&&S&&S.ch===2&&mode==='game'&&!S.mon&&!S.log&&!S.swap&&canAct()&&!navZone(p)&&!hotAt(p)){PT.fl=true;flash();return} // 챕터 2 PC: 누르는 순간 바로 플래시
+  if(e.pointerType==='mouse'&&e.button===0&&actOf('Mouse0')&&S&&S.ch===2&&mode==='game'&&!S.log&&canAct()&&!navZone(p)&&!hotAt(p)){PT.fl=true;keyAct(actOf('Mouse0'),true);return} // 좌클릭에 동작을 배치했으면 누르는 순간 실행
   PT.on=true;PT.sx=PT.x=p.x;PT.sy=PT.y=p.y;if(S&&S.bp&&R3.ok&&S.bpA>.5&&S.lockT<=0&&bpHit(p)==='lever')S.holding=true});
 cv.addEventListener('pointermove',e=>{const p=gameXY(e);PT.x=p.x;PT.y=p.y;if(e.pointerType==='mouse')PT.touch=false});
 cv.addEventListener('pointerup',e=>{
@@ -3268,9 +3277,9 @@ cv.addEventListener('pointerup',e=>{
   const nz=navZone(p);if(nz){turn(nz);return}
   const h=hotAt(p);if(h)h.act();
 });
-cv.addEventListener('mousedown',e=>{if(e.button===2&&S&&S.ch===2&&mode==='game'){PT.rb=true;setEyes(true)}});
-addEventListener('mouseup',e=>{if(e.button===2&&PT.rb){PT.rb=false;setEyes(false)}});
-cv.addEventListener('contextmenu',e=>{if(S&&S.ch===2)e.preventDefault()});
+cv.addEventListener('mousedown',e=>{if(e.button!==0&&!KEYWAIT){const a=actOf('Mouse'+e.button);if(a&&keyAct(a,true))e.preventDefault()}}); // 휠·우클릭
+addEventListener('mouseup',e=>{if(actOf('Mouse'+e.button)==='eyes')keyAct('eyes',false)});
+cv.addEventListener('contextmenu',e=>{if(S&&S.ch===2&&actOf('Mouse2'))e.preventDefault()});
 cv.addEventListener('pointercancel',()=>{PT.on=false;PT.x=PT.y=-1;if(S)S.holding=false});
 cv.addEventListener('pointerleave',()=>{if(!PT.on)PT.x=PT.y=-1});
 // 배전반 레버 / 닫기
@@ -3328,8 +3337,10 @@ function applySet(){
   document.documentElement.style.setProperty('--sub',SET.sub);
   if(AC&&OUT){OUT.gain.setTargetAtTime(SET.vol,AC.currentTime,.05);master.gain.setTargetAtTime(.8*SET.sfx,AC.currentTime,.05);AMB.gain.setTargetAtTime(SET.amb,AC.currentTime,.05)}
   if(typeof R3!=='undefined'&&R3.rd)resize3D();
+  keyBadges();
 }
 function saveSet(){try{localStorage.setItem('awful_settings',JSON.stringify(SET))}catch(e){}applySet()}
+function keyBadges(){[['flashBtn','flash'],['torchBtn','torch'],['eyeBtn','eyes'],['pnlBtn','pnl'],['battBtn','batt']].forEach(([id,a])=>{const b=$(id);if(b)b.dataset.k=keyName(keyOf(a))})} // PC: 버튼 귀퉁이 키 표시
 function buildSet(){
   const box=$('setRows');box.innerHTML='';const two=W>=640;box.classList.toggle('two',two);box.parentElement.classList.toggle('two',two);
   SET_ROWS.forEach(r=>{const row=document.createElement('div');row.className='srow';const lab=document.createElement('div');lab.className='sl';lab.textContent=r.t;if(r.d){const sm=document.createElement('small');sm.textContent=r.d;lab.appendChild(sm)}row.appendChild(lab);
@@ -3338,10 +3349,19 @@ function buildSet(){
       const upd=()=>{val.textContent=r.f(+inp.value);inp.style.setProperty('--p',((inp.value-r.min)/(r.max-r.min)*100)+'%')};upd();
       inp.oninput=()=>{SET[r.k]=+inp.value;upd();applySet()};inp.onchange=()=>{saveSet();if(r.k!=='bright')sfx(700,.05,'sine',.05)};row.appendChild(inp);row.appendChild(val)}
     box.appendChild(row)});
+  if(!MOB){const h=document.createElement('div');h.className='skh';h.textContent='키 설정 · 챕터 2 (누르고 원하는 키나 마우스 버튼 입력, Esc 취소)';box.appendChild(h);
+    KEY_ACT.forEach(([a,t])=>{const row=document.createElement('div');row.className='srow';const lab=document.createElement('div');lab.className='sl';lab.textContent=t;row.appendChild(lab);
+      const b=document.createElement('button');b.className='kbtn'+(KEYWAIT===a?' wait':'');b.textContent=KEYWAIT===a?'입력 대기…':keyName(keyOf(a));
+      b.onclick=e=>{e.stopPropagation();KEYWAIT=a;buildSet()};b.oncontextmenu=e=>e.preventDefault();row.appendChild(b);box.appendChild(row)})}
 }
+// 키 바꾸기: 다음에 누른 키/마우스 버튼으로. 이미 다른 동작에 쓰던 키면 서로 맞바꿈
+function setKey(c){const a=KEYWAIT;KEYWAIT=null;if(c&&a){SET.keys=Object.assign({},KEY_DEF,SET.keys);const o=actOf(c);if(o&&o!==a)SET.keys[o]=SET.keys[a];SET.keys[a]=c;saveSet();sfx(900,.03,'square',.04)}buildSet()}
+addEventListener('keydown',e=>{if(!KEYWAIT)return;e.preventDefault();e.stopImmediatePropagation();setKey(e.code==='Escape'?null:e.code)},true);
+addEventListener('mousedown',e=>{if(!KEYWAIT)return;if(e.button===0&&e.target.closest&&e.target.closest('.kbtn'))return;e.preventDefault();e.stopImmediatePropagation();setKey('Mouse'+e.button)},true);
+addEventListener('contextmenu',e=>{if(KEYWAIT||$('settings').classList.contains('show'))e.preventDefault()},true);
 function openSettings(){buildSet();$('settings').classList.add('show')}
-function closeSettings(){$('settings').classList.remove('show')}
-$('sBack').onclick=closeSettings;$('sReset').onclick=()=>{SET=Object.assign({},SET_DEF);saveSet();buildSet()};
+function closeSettings(){KEYWAIT=null;$('settings').classList.remove('show')}
+$('sBack').onclick=closeSettings;$('sReset').onclick=()=>{KEYWAIT=null;SET=Object.assign({},SET_DEF);delete SET.keys;saveSet();buildSet()};
 $('mSet').onclick=openSettings;
 // ===================== 일시정지 (ESC, 화면 위 가운데 버튼) =====================
 const PAUSE={on:false,confirm:false};
