@@ -325,7 +325,7 @@ body[data-mode=game] #pauseBtn{display:flex}
 <script nomodule>window.THREE_ERR='nomodule'</script>
 <script>
 // ===================== 기본 =====================
-const VER='0.18.2'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
+const VER='0.19.0'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
 const $=id=>document.getElementById(id);
 const cv=$('cv'),cx=cv.getContext('2d');
 let W,H,DPR=1;const MOB=matchMedia('(pointer:coarse)').matches||/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent); // 폰이면 가볍게
@@ -918,7 +918,7 @@ function drawStalker(g,x,y,h,a,t,pose){
   g.restore();
 }
 // 응시자·그림자·복제자 AI 이미지
-const PIC={};[['rfull','runner_full'],['rside','runner_side'],['rclose','runner_close'],['sfull','static_full'],['speek','static_peek'],['sclose','static_close'],['sh1','shadow_1'],['sh2','shadow_2'],['sh3','shadow_3'],['cseat','clone_seat'],['cstand','clone_stand'],['cface','clone_face'],['sjfull','seojin_full'],['diver','diver'],['drowned','drowned'],['slider','slider']].forEach(([k,f])=>{const im=new Image();im.onload=()=>{PIC[k]=im};im.src='img/'+f+'.png'});
+const PIC={};[['rfull','runner_full'],['rside','runner_side'],['rclose','runner_close'],['sfull','static_full'],['speek','static_peek'],['sclose','static_close'],['sh1','shadow_1'],['sh2','shadow_2'],['sh3','shadow_3'],['cseat','clone_seat'],['cstand','clone_stand'],['cface','clone_face'],['sjfull','seojin_full'],['diver','diver'],['drowned','drowned'],['slider','slider'],['hstand','hum_stand'],['hside','hum_side']].forEach(([k,f])=>{const im=new Image();im.onload=()=>{PIC[k]=im};im.src='img/'+f+'.png'});
 [['sjbars','seojin_bars.jpg'],['sjup','seojin_up.jpg']].forEach(([k,f])=>{const im=new Image();im.onload=()=>{PIC[k]=im};im.src='img/'+f}); // 엔딩 서진 사진 컷
 // 교대자 AI 이미지 (img 폴더). 못 불러오면 코드로 그린 버전 사용
 const STK={},PEEK_EDGE=.2985; // peek 이미지에서 벽 모서리 위치(가로 비율)
@@ -1465,7 +1465,7 @@ function buildMap(){
   const lab=document.createElement('div');lab.className='mlab';lab.textContent='MAP';m.appendChild(lab);
 }
 function updMap(){if(!S)return;$('map').querySelectorAll('.cb').forEach((b,i)=>{b.classList.toggle('on',S.cam===i);b.classList.toggle('ex',EXIT_CAM[S.night-1]===i)})}
-function updMapDot(){const d=$('hd');if(!d)return;if(!(DEV.on&&DEV.info)){d.style.display='none';return}const n=S.hum.node,p=n===DOOR?[50,60]:MAPP[n];d.style.display='';d.setAttribute('cx',p[0]+(n===DOOR?0:S.hum.spot*3-3));d.setAttribute('cy',p[1]-6.5)}
+function updMapDot(){const d=$('hd');if(!d)return;if(!(DEV.on&&DEV.info)||S.ch===2){d.style.display="none";return}const n=S.hum.node,p=n===DOOR?[50,60]:MAPP[n];d.style.display='';d.setAttribute('cx',p[0]+(n===DOOR?0:S.hum.spot*3-3));d.setAttribute('cy',p[1]-6.5)}
 
 // ===================== 결과 =====================
 function scareOnly(c){ // 죽지 않는 점프스케어
@@ -2266,7 +2266,7 @@ function renderCut(dt){
     const A=CUT.areas[sh.scene];if(A)A.tick(C);
     if(sh.fx)sh.fx(u,t,C);
     R3.rd.setViewport(0,0,W,H);R3.rd.render(sc,C);cx.drawImage(R3.rd.domElement,0,0,W,H);
-    cx.save();cx.globalCompositeOperation='soft-light';cx.globalAlpha=.25;cx.fillStyle='#5c4a22';cx.fillRect(0,0,W,H);cx.restore();
+    cx.save();cx.globalCompositeOperation='soft-light';cx.globalAlpha=sh.scene==='pool'?.3:.25;cx.fillStyle=sh.scene==='pool'?'#1d4a50':'#5c4a22';cx.fillRect(0,0,W,H);cx.restore();
   }
   if(sh.pic&&PIC[sh.pic]){const im=PIC[sh.pic],iw=im.width,ih=im.height,sc2=Math.max(W/iw,H/ih)*(1.06+u*.09),dw=iw*sc2,dh=ih*sc2,fl=Math.random()<.06?.55:1; // 사진 컷: 천천히 다가가며 전구가 깜빡
     cx.save();cx.globalAlpha=fl;cx.drawImage(im,W/2-dw/2+rnd(-1.5,1.5),H/2-dh*(sh.pfy??.5)+rnd(-1.5,1.5),dw,dh);cx.restore();cx.save();cx.globalCompositeOperation='soft-light';cx.globalAlpha=.35;cx.fillStyle='#5c4a22';cx.fillRect(0,0,W,H);cx.restore()}
@@ -2274,10 +2274,13 @@ function renderCut(dt){
   cx.save();cx.globalAlpha=.08;cx.globalCompositeOperation='overlay';cx.translate(rnd(-128,0),rnd(-128,0));cx.fillStyle=NPm[ri(4)];cx.fillRect(0,0,W+128,H+128);cx.restore();
   cx.drawImage(VIG,0,0,W,H);
   if(sh.teal){const a=Math.min(1,Math.max(0,sh.teal(u)));if(a>0){cx.fillStyle=`rgba(30,110,120,${a})`;cx.fillRect(0,0,W,H)}} // 물속
+  if(sh.glow){const a=Math.min(1,Math.max(0,sh.glow(u)));if(a>0){const gx=W/2+Math.sin(t*1.3)*W*.01,gy=H*.2,gr=cx.createRadialGradient(gx,gy,0,gx,gy,H*.75);gr.addColorStop(0,`rgba(90,255,140,${.55*a})`);gr.addColorStop(.25,`rgba(40,200,120,${.22*a})`);gr.addColorStop(1,'rgba(20,120,90,0)');cx.save();cx.globalCompositeOperation='screen';cx.fillStyle=gr;cx.fillRect(0,0,W,H);cx.restore()}} // 물 위 초록 불빛이 번져 보임
   if(sh.white){const a=Math.min(1,Math.max(0,sh.white(u)));if(a>0){cx.fillStyle=`rgba(250,250,246,${a})`;cx.fillRect(0,0,W,H)}}
   const bar=H*.09;cx.fillStyle='#000';cx.fillRect(0,0,W,bar);cx.fillRect(0,H-bar,W,bar);
   let a=0;if(sh.fi)a=Math.max(a,1-t/sh.fi);if(sh.fo)a=Math.max(a,1-(sh.d-t)/sh.fo);if(sh.black)a=1;
   if(a>0){cx.fillStyle=`rgba(0,0,0,${Math.min(1,a)})`;cx.fillRect(0,0,W,H)}
+  if(sh.title){const k=Math.min(1,t/.9,(sh.d-t)/.7);cx.save();cx.globalAlpha=Math.max(0,k);cx.textAlign='center';cx.fillStyle='#d8e4e2';cx.font=`${Math.round(Math.min(W*.06,H*.1))}px 'Nanum Myeongjo',serif`;cx.fillText(sh.title,W/2+rnd(-.6,.6),H/2);
+    if(sh.sub){cx.fillStyle='rgba(150,200,205,.8)';cx.font=`${Math.round(Math.min(W*.022,H*.04))}px 'Nanum Gothic Coding',monospace`;cx.fillText(sh.sub,W/2,H/2+Math.min(W*.05,H*.08))}cx.restore()} // 챕터 제목
 }
 // 경비실 장면을 컷씬에서 쓸 때: 조명·모니터·창문을 게임 상태 대신 샷 설정으로
 function roomCut(o,u,t){
@@ -2457,14 +2460,17 @@ function poolCut(o,u,t,C){const P=R3.p2,f=(v,d)=>typeof v==='function'?v(u,t):v?
   const bg=L?0xb4c8ca:0x020405;R3.sc2.background.setHex(bg);P.fog.color.setHex(bg);P.fog.far=L?60:22;P.hemi.intensity=L?.8:.05;
   P.lamps.forEach(l=>{l.l.intensity=em?3.2:0;l.l.color.setHex(0x6fd8e0);l.box.material.color.setHex(em?0x6fd8e0:0x10282a)});
   if(o.exitD!==undefined&&P.exitG)P.exitG.position.z=P.Z1-f(o.exitD);
-  [P.hum,P.dvHead,P.slHand,P.wake].forEach(m=>{if(m)m.visible=false});if(P.drn)P.drn.material.opacity=0;
+  if(P.gate)P.gate.scale.x=Math.max(.06,1-f(o.gate,0));
+  if(o.under){const k=f(o.under);if(k>0){R3.sc2.background.setHex(0x0b3a40);P.fog.color.setHex(0x0b3a40);P.fog.near=0;P.fog.far=lerp(22,7,k)}else P.fog.near=5}
+  [P.hum,P.dvHead,P.slHand,P.wake,P.hmS,P.hmP].forEach(m=>{if(m)m.visible=false});if(P.drn)P.drn.material.opacity=0;
   const dirV=new R3.T.Vector3(0,0,-1).applyQuaternion(C.quaternion);P.torch.intensity=tr*9;P.torch.position.copy(C.position);P.torch.position.y-=.25;P.torch.target.position.copy(C.position).addScaledVector(dirV,8);P.flashL.intensity=0}
 const exD=k=>EXIT2[Math.max(0,Math.min(4,k))];
 const offAt=(u,a,b)=>1-Math.min(1,Math.max(0,(u-a)/(b-a))); // 불이 하나씩 꺼지는 비율
 CUTS.intro2={shots:[
-  {d:3.5,scene:'pool',fi:1.4,pool:{lit:1},cam:(u,t,C)=>shotCam(C,V(0,1.62,1.35),V(0,1.62,1.25),V(0,1.5,-6),V(0,1.4,-8),u),at:{.3:()=>{creak(0);nburst(1400,3,.6,.08,0)},1.6:()=>{thump(110,.3,.3,0);metal()}}}, // 엘리베이터 철창이 열림
-  {d:5.5,scene:'pool',cap:'물 냄새.',pool:{lit:1},cam:(u,t,C)=>{const Pp=walkPath([[0,1.25],[-1.4,.6],[-2.3,-1.3]]),e=ease(u),p=Pp.getPointAt(e),st=e*Pp.getLength()/.7;C.position.set(p.x,1.62+Math.sin(st*Math.PI)*.022,p.z);C.lookAt(0,1.4,-9)},at:{0:()=>footsteps(0,8,.12)}},
-  {d:4,scene:'pool',cap:'수로 끝에 초록 불이 있다.',pool:{lit:1,exitD:()=>exD(0)},cam:(u,t,C)=>shotCam(C,V(-2.3,1.62,-1.3),V(-2.2,1.62,-1.5),V(0,1.4,-9),V(0,2.3,-7-exD(0)),u,{te:true,ts:.1,tf:.8})},
+  {d:3.2,black:true,title:'CHAPTER 2',sub:'수영장',at:{.2:()=>{thump(40,1.2,.5,0);for(let k=0;k<6;k++)thump(36,.3,.1,0,.4+k*.45)}}}, // 내려가는 엘리베이터 소리 위로 제목
+  {d:4.2,scene:'pool',fi:1,pool:{lit:1,gate:(u,t)=>ease(Math.min(1,Math.max(0,(t-1.3)/1.3)))},cam:(u,t,C)=>{shotCam(C,V(.05,1.62,2.6),V(0,1.62,2.35),V(0,1.55,-6),V(0,1.45,-8),u);C.position.y+=Math.max(0,1-t/1.1)*Math.sin(t*40)*.006},at:{0:()=>{thump(48,.7,.6,0);metal()},1.25:()=>{creak(0);nburst(1400,3,.9,.08,0)},2.5:()=>{thump(110,.3,.3,0);metal()}}}, // 엘리베이터가 멈추고 철창이 접히며 열림
+  {d:5.5,scene:'pool',cap:'물 냄새.',pool:{lit:1,gate:1},cam:(u,t,C)=>{const Pp=walkPath([[0,2.35],[-.2,1.2],[-1.4,.2],[-2.3,-1.3]]),e=ease(u),p=Pp.getPointAt(e),st=e*Pp.getLength()/.7;C.position.set(p.x,1.62+Math.sin(st*Math.PI)*.022,p.z);C.lookAt(0,1.4,-9)},at:{0:()=>footsteps(0,8,.12)}},
+  {d:4.5,scene:'pool',cap:'수로 끝에 초록 불이 있다.',pool:{lit:1,gate:1,exitD:()=>exD(0)},cam:(u,t,C)=>{shotCam(C,V(-2.3,1.62,-1.3),V(-2.2,1.62,-1.5),V(0,1.4,-9),V(0,2.5,-7-exD(0)),u,{te:true,ts:.1,tf:.7});C.fov=lerp(C.fov,26,ease(Math.min(1,Math.max(0,(u-.3)/.7))));C.updateProjectionMatrix()},at:{2.2:()=>buzzClick()}}, // 천천히 당겨 봄
   {d:4.5,scene:'pool',cap:'',pool:{lit:u=>offAt(u,.45,.85)},cam:(u,t,C)=>{const e=ease(Math.min(1,u*1.6)),p=V(-2.2,1.62,-1.5).lerp(V(0,2.05,.45),e);C.position.copy(p);C.lookAt(0,1.6,-9)},at:{.4:()=>steps(3),2.0:()=>relay(),2.4:()=>relay(),2.8:()=>relay(),3.1:()=>relay(),3.4:()=>{relay();thump(50,.5,.4,0)},3.9:()=>buzzClick()}}, // 의자에 앉자 불이 하나씩 나감
   {d:2.6,scene:'pool',cap:'',pool:{lit:0,em:1,torch:u=>u>.35?1:0},cam:(u,t,C)=>shotCam(C,V(0,2.05,.45),V(0,2.05,.45),V(0,1.6,-9),V(0,1.5,-9),u),at:{.9:()=>sfx(1500,.03,'square',.06)}}]}; // 손전등 딸깍
 CUTS.night2_start={shots:[
@@ -2475,9 +2481,9 @@ CUTS.reset2={shots:[ // 6시: 불이 켜진 수영장, 수로 끝 비상구 불�
   {d:1,black:true}]};
 CUTS.ending2={shots:[ // 5일 차 6시: 수로 입구까지 온 초록 불 → 물로 걸어 들어감
   {d:3,scene:'pool',pool:{lit:1,exitD:()=>exD(4)},cam:(u,t,C)=>shotCam(C,V(0,2.05,.45),V(0,2.05,.3),V(0,1.6,-9),V(0,2.2,-7-exD(4)),u),cap:'초록 불이 수로 입구에 와 있다.'},
-  {d:4,scene:'pool',pool:{lit:1,exitD:()=>exD(4)},cap:'',cam:(u,t,C)=>{const Pp=walkPath([[0,.45],[-1.3,-.4],[-.5,-1.65]]),e=ease(u),p=Pp.getPointAt(e),st=e*Pp.getLength()/.7;C.position.set(p.x,lerp(2.05,1.62,Math.min(1,u*3))+Math.sin(st*Math.PI)*.02,p.z);C.lookAt(0,1.4,-9)},at:{.3:()=>steps(6)}},
-  {d:6,scene:'pool',pool:{lit:1,exitD:()=>exD(4)},cap:'물이 차갑지 않았다.',cam:(u,t,C)=>{const e=ease(u),z=lerp(-1.75,-7-exD(4)+1.2,e),y=lerp(1.62,.55,Math.min(1,u*4))+Math.sin(T_*1.6)*.03;C.position.set(Math.sin(u*3)*.15,y,z);C.lookAt(0,1.6,-7-exD(4)-2)},at:{.2:()=>{nburst(800,1,.6,.2,0);bubbles(0,.1)},1.5:()=>nburst(600,1,.8,.1,0),3:()=>nburst(700,1,.8,.1,0),4.5:()=>nburst(600,1,.8,.1,0)}},
-  {d:3.5,scene:'pool',pool:{lit:1,exitD:()=>exD(4)},teal:u=>u*1.1,white:u=>Math.max(0,(u-.6)/.4),cam:(u,t,C)=>{const z=-7-exD(4)+1.2-u*.8;C.position.set(0,lerp(.55,.05,ease(u)),z);C.lookAt(0,lerp(1.6,.2,u),z-3)},at:{.4:()=>{bubbles(0,.18);nburst(300,1,1.5,.15,0,0,'lowpass')}}}, // 물속으로
+  {d:4,scene:'pool',pool:{lit:1,exitD:()=>exD(4)},cap:'',cam:(u,t,C)=>{const Pp=walkPath([[0,.45],[-1.3,.25],[-1.5,-1.1],[-.6,-1.7]]),e=ease(u),p=Pp.getPointAt(e),st=e*Pp.getLength()/.7;C.position.set(p.x,lerp(2.05,1.62,Math.min(1,u*3))+Math.sin(st*Math.PI)*.02,p.z);C.lookAt(0,1.4,-9)},at:{.3:()=>steps(6)}},
+  {d:6,scene:'pool',pool:{lit:1,exitD:()=>exD(4)},cap:'물이 차갑지 않았다.',cam:(u,t,C)=>{const e=ease(u),z=lerp(-1.75,-7-exD(4)+1.2,e),y=lerp(1.62,WATER_Y+.16,ease(Math.min(1,u*3.2)))+Math.sin(T_*1.6)*.025;C.position.set(Math.sin(u*3)*.15,y,z);C.lookAt(0,1.6,-7-exD(4)-2)},at:{.2:()=>{nburst(800,1,.6,.2,0);bubbles(0,.1)},1.5:()=>nburst(600,1,.8,.1,0),3:()=>nburst(700,1,.8,.1,0),4.5:()=>nburst(600,1,.8,.1,0)}},
+  {d:4.5,scene:'pool',pool:{lit:1,exitD:()=>exD(4),under:u=>u>.12?1:0},teal:u=>u<.12?0:.32+u*.25,glow:u=>u<.12?0:Math.min(1,(u-.12)*2.2),white:u=>Math.max(0,(u-.72)/.28),cam:(u,t,C)=>{const z=-7-exD(4)+1.2-u*1.4,y=lerp(WATER_Y+.16,-1.25,ease(Math.min(1,u*1.5)));C.position.set(Math.sin(t*.9)*.05,y,z);C.lookAt(0,lerp(.4,2.4,ease(u)),z-4)},at:{.4:()=>{bubbles(0,.18);nburst(300,1,1.5,.15,0,0,'lowpass')}}}, // 물속으로
   {d:2,white:u=>1-u*.2,scene:null}]};
 CUTS.reset2d={shots:[{d:1.4,black:true,at:{0:()=>{relay();humTo(0,.05)},.35:()=>relay(),.65:()=>relay()}},{d:1.6,black:true,at:{.4:()=>drag(0,.25),1.3:()=>buzzClick()}}]}; // 3D가 안 될 때 6시 소등은 소리로만
 CUTS.ending_hard={area:'outro',prep(){CUT.areas.outro.dyn.phone.visible=true},shots:CUTS.ending.shots.slice(0,-1).concat([ // 하드: 물가에서 빨간 전화기가 울림
@@ -2509,7 +2515,7 @@ const DEATH2={'흥얼이':'눈을 뜨자, 바로 앞에서 웃고 있었다.','�
 // 챕터 2는 한 자리(안전요원석)에서 버팀. 가운데 수로 끝 초록 비상구 불빛이 매일 아침 다가옴
 const SPOT1={name:'안전요원석',eye:2.05,R:7,plat:true,slide:true,pool:[-4.6,4.6,-1.8]},SPOT2=[SPOT1,SPOT1,SPOT1,SPOT1,SPOT1];
 const EXIT2=[18,14.5,11,7.5,4]; // 수로 입구에서 비상구 불빛까지 거리 (밤마다)
-const SLIDE_EXIT=[1.5,.45,-2.5]; // 미끄럼틀 끝 (앞을 보면 오른쪽에 보임)
+const SLIDE_EXIT=[1.6,.5,-3.7],POOL_D=1.7,WATER_Y=-.14; // 미끄럼틀 끝 (앞을 보면 오른쪽에 보임)
 const DIRX=[-.8,0,.8]; // 왼쪽·앞·오른쪽 소리 방향
 function humInit2(h){h.dir=-1;h.st=0;h.node=-5;h.spot=0;h.timer=rnd(14,22)}
 const humStep2=()=>Math.max(3.5,rnd(6,9)-S.night*.6)*(S.hard?.75:1)*(hasMod('fast')?.8:1);
@@ -2609,16 +2615,16 @@ function poolMats(){if(C3.PM)return C3.PM;const k=o=>{const m=MS(o);m.userData.k
   C3.PM={wall:k({map:tx3(tileCv('w',15,10,B,G)),roughness:.22,metalness:.05}),floor:k({map:tx3(tileCv('f',9,3,B,G)),roughness:.16,metalness:.08,color:0xe2ecea}),ceil:k({map:tx3(tileCv('c',24,8,B,G)),roughness:.4,color:0xc8d2d0}),
     room:k({map:tx3(tileCv('r',10,10,B,G)),roughness:.2,metalness:.05}),roomD:k({map:tx3(tileCv('r',10,10,B,G)),roughness:.2,metalness:.05,side:R3.T.DoubleSide}),skirt:k({color:0x86a0a0,roughness:.3}),edge:k({color:0x5f7c7e,roughness:.3}),
     water:k({color:0x2f8596,roughness:.03,metalness:.4,transparent:true,opacity:.82}),waterS:k({color:0x6fb4be,roughness:.03,metalness:.3,transparent:true,opacity:.5}),
-    chrome:k({color:0xc8d2d4,roughness:.18,metalness:.85}),plastic:k({color:0xc8ccc8,roughness:.5}),locker:k({color:0x5f8288,roughness:.45,metalness:.3})};
+    chrome:k({color:0xc8d2d4,roughness:.18,metalness:.85}),dark:k({color:0x1c2426,roughness:.55,metalness:.3}),plastic:k({color:0xc8ccc8,roughness:.5}),locker:k({color:0x5f8288,roughness:.45,metalness:.3})};
   return C3.PM}
 function ladder3(sc,x,z,ry){const M=poolMats(),g=grp(x,0,z,ry,sc);[-.24,.24].forEach(dx=>{CYL(.022,.022,1.1,M.chrome,dx,.5,0,g,8);const t=mesh(new R3.T.TorusGeometry(.17,.022,6,12,Math.PI),M.chrome,dx,1.05,.17,g,false);t.rotation.y=PI2});for(let k=0;k<3;k++)BOX(.48,.03,.05,M.chrome,0,-.15-k*.3,0,g);return g}
 // 아치가 뚫린 벽 (평면 XY, 두께는 z). len·hgt=벽 크기, aw·ah=아치 폭·꼭대기 높이, au=아치 가운데 위치
 function archGeo(len,hgt,aw,ah,au=0,th=.3){const T3=R3.T,r=aw/2,s=new T3.Shape();s.moveTo(-len/2,0);s.lineTo(au-r,0);s.lineTo(au-r,ah-r);s.absarc(au,ah-r,r,Math.PI,0,true);s.lineTo(au+r,0);s.lineTo(len/2,0);s.lineTo(len/2,hgt);s.lineTo(-len/2,hgt);s.lineTo(-len/2,0);
   const g=new T3.ExtrudeGeometry(s,{depth:th,bevelEnabled:false,curveSegments:20});g.translate(0,0,-th/2);return g}
 // 둥근 천장 통로: 바닥 + 양쪽 벽 + 반원 천장. 로컬 -z 방향으로 len만큼 뻗음
-function vaultTun(par,M,w,hs,len,water){const T3=R3.T,g=grp(0,0,0,0,par),r=w/2,tu=(geo)=>{wUV(geo,2.6,2.6);const m=new T3.Mesh(geo,M.roomD);g.add(m);return m};
-  {const f=new T3.PlaneGeometry(w,len);f.rotateX(-PI2);f.translate(0,0,-len/2);tu(f)}
-  [-1,1].forEach(s=>{const p=new T3.PlaneGeometry(len,hs);p.rotateY(s<0?PI2:-PI2);p.translate(s*r,hs/2,-len/2);tu(p)});
+function vaultTun(par,M,w,hs,len,water,fy=0){const T3=R3.T,g=grp(0,0,0,0,par),r=w/2,tu=(geo)=>{wUV(geo,2.6,2.6);const m=new T3.Mesh(geo,M.roomD);g.add(m);return m};
+  {const f=new T3.PlaneGeometry(w,len);f.rotateX(-PI2);f.translate(0,fy,-len/2);tu(f)}
+  [-1,1].forEach(s=>{const p=new T3.PlaneGeometry(len,hs-fy);p.rotateY(s<0?PI2:-PI2);p.translate(s*r,(hs+fy)/2,-len/2);tu(p)});
   {const c=new T3.CylinderGeometry(r,r,len,24,1,true,-PI2,Math.PI);c.rotateX(-PI2);c.translate(0,hs,-len/2);tu(c)}
   if(water){const wp=mesh(new T3.PlaneGeometry(w,len),M.waterS,0,.04,-len/2,g,false);wp.rotation.x=-PI2}
   return g}
@@ -2644,7 +2650,7 @@ BP.p_canal=(r)=>{const w=3.2,L=14,Hs=2.4;return{Hc:Hs,tile:true,noCeil:true,lc:0
     [-1,1].forEach(s=>BOX(.8,.06,L+.6,PM.edge,s*(w-.4),.03,(.6-L)/2,sc)); // 양옆 좁은 턱
     const wp=mesh(new T3.PlaneGeometry(2*w-1.6,L+.6),PM.water,0,.02,(.6-L)/2,sc,false);wp.rotation.x=-PI2;
     mesh(new T3.PlaneGeometry(2*w,Hs+w),M.void,0,(Hs+w)/2,-L,sc,false);
-    if(S&&S.ch===2){const d=Math.min(L-.6,EXIT2[Math.min(4,S.night-1)]),ex=grp(0,0,-d,0,sc);mesh(new T3.PlaneGeometry(.5,.24),new T3.MeshBasicMaterial({map:exitTex(),fog:false}),0,2.2,0,ex,false);const gl=new T3.PointLight(0x40ff70,2,7,1.4);gl.position.set(0,1.9,.6);ex.add(gl)}}}}; // 수로 끝 비상구 불빛
+    if(S&&S.ch===2){const d=Math.min(L-.6,EXIT2[Math.min(4,S.night-1)]),ex=grp(0,0,-d,0,sc);mesh(new T3.PlaneGeometry(.5,.24),new T3.MeshBasicMaterial({map:exitTex(),fog:false}),0,2.2,0,ex,false);BOX(.58,.3,.06,PM.dark,0,2.2,-.04,ex);[-.22,.22].forEach(x=>CYL(.012,.012,Hs+w-2.35,PM.chrome,x,(Hs+w+2.35)/2,-.04,ex,6));const gl=new T3.PointLight(0x40ff70,2,7,1.4);gl.position.set(0,1.9,.6);ex.add(gl)}}}}; // 수로 끝 비상구 불빛
 // ---- 밤마다 앉는 자리 (넓은 방 + 크고 높은 아치 3개 + 둥근 천장 통로) ----
 // 단위 m. 내 자리 (0,eye,.4). 0=왼쪽 아치(-X), 1=앞 아치(-Z), 2=오른쪽 아치(+X), 뒤는 막힌 벽
 function disposeSc(sc){sc.traverse(o=>{if(o.geometry)o.geometry.dispose();const m=o.material;if(!m||m.userData.keep)return;(Array.isArray(m)?m:[m]).forEach(x=>{if(x.map&&!x.map.userData.keep)x.map.dispose();x.dispose()})})}
@@ -2656,29 +2662,38 @@ function build3D2(n){
   const BX=(w,h,d,x,y,z,m)=>{const g=new T3.BoxGeometry(w,h,d);g.translate(x,y,z);return add(g,m)};
   const Z0=1.6,Z1=-R,dep=Z0-Z1,c=(Z0+Z1)/2;
   // 바닥·천장·뒤 벽
-  {const f=new T3.PlaneGeometry(2*R,dep);f.rotateX(-PI2);f.translate(0,0,c);add(f,M.floor)}
+  P.wM=M.water.clone();P.wM.opacity=.66;P.wM.side=T3.DoubleSide;P.wM.userData.keep=false; // 풀 물: 조금 더 비치게 (바닥에 누운 익사자가 보이도록)
+  {const [x0,x1,z0]=sp.pool,fl=(w,d,x,z)=>{const f=new T3.PlaneGeometry(w,d);f.rotateX(-PI2);f.translate(x,0,z);add(f,M.floor)};
+   fl(2*R,Z0-z0,0,(Z0+z0)/2);fl(x0+R,z0-Z1,(x0-R)/2,(z0+Z1)/2);fl(R-x1,z0-Z1,(x1+R)/2,(z0+Z1)/2);
+   const D=POOL_D,wl=(geo)=>{wUV(geo,2.6,2.6);const o=new T3.Mesh(geo,M.wall);sc.add(o);return o};
+   {const g=new T3.PlaneGeometry(z0-Z1,D);g.rotateY(PI2);g.translate(x0,-D/2,(z0+Z1)/2);wl(g)}
+   {const g=new T3.PlaneGeometry(z0-Z1,D);g.rotateY(-PI2);g.translate(x1,-D/2,(z0+Z1)/2);wl(g)}
+   {const g=new T3.PlaneGeometry(x1-x0,D);g.rotateY(Math.PI);g.translate((x0+x1)/2,-D/2,z0);wl(g)}
+   {const g=new T3.PlaneGeometry(x1-x0,z0-Z1);g.rotateX(-PI2);g.translate((x0+x1)/2,-D,(z0+Z1)/2);wl(g)}
+   [[x0,-FW/2],[FW/2,x1]].forEach(([a,b])=>{const g=new T3.PlaneGeometry(b-a,D);g.translate((a+b)/2,-D/2,Z1);wl(g)}); // 앞 아치 아래 수조 벽
+   const ln=MS({color:0x1d3a40,roughness:.4});[-2.4,0,2.4].forEach(x=>{const q=mesh(new T3.PlaneGeometry(.22,z0-Z1-.8),ln,x,-D+.01,(z0+Z1)/2-.4,sc,false);q.rotation.x=-PI2})} // 레인 줄
   {const g=new T3.PlaneGeometry(2*R,dep);g.rotateX(PI2);g.translate(0,Hc,c);add(g,M.ceil)}
   {const b=new T3.PlaneGeometry(2*R,Hc);b.rotateY(Math.PI);b.translate(0,Hc/2,Z0);add(b)}
   // 아치 벽 3개 + 그 너머 둥근 천장 통로. 아치마다 위에 비상등 (교대자가 그 통로로 오면 깜빡이다 꺼짐)
   P.arch=[];
   [[-R,c,PI2,dep,c+.2],[0,Z1,0,2*R,0],[R,c,-PI2,dep,-.2-c]].forEach(([x,z,ry,len,au],i)=>{const aw=i===1?FW:AW,ah=i===1?FH:AH,g=archGeo(len,Hc,aw,ah,au,.35);g.rotateY(ry);g.translate(x,0,z);add(g);
-    const tx=i===1?0:x,tz=i===1?Z1:-.2,tg=grp(tx,0,tz,[PI2,0,-PI2][i],sc);vaultTun(tg,M,aw,ah-aw/2,i===1?20:14,sp.ankle&&i!==1);
-    if(i===1){const w=mesh(new T3.PlaneGeometry(aw,20),M.water,0,.02,-10,tg,false);w.rotation.x=-PI2;P.canal=w} // 가운데: 큰 물 수로 (걸어올 수 없음)
+    const tx=i===1?0:x,tz=i===1?Z1:-.2,tg=grp(tx,0,tz,[PI2,0,-PI2][i],sc);vaultTun(tg,M,aw,ah-aw/2,i===1?20:14,sp.ankle&&i!==1,i===1?-POOL_D:0);
+    if(i===1){const w=mesh(new T3.PlaneGeometry(aw,20),P.wM,0,WATER_Y,-10,tg,false);w.rotation.x=-PI2;P.canal=w} // 가운데: 큰 물 수로 (걸어올 수 없음)
     mesh(new T3.PlaneGeometry(aw+.2,ah+.2),new T3.MeshBasicMaterial({color:0x000000}),0,ah/2,i===1?-20:-14,tg,false);P.arch.push({x:tx,z:tz});
     const lg=grp(tx,0,tz,[PI2,0,-PI2][i],sc),box=mesh(new T3.BoxGeometry(.5,.16,.08),new T3.MeshBasicMaterial({color:0x6fd8e0}),0,(i===1?FH:AH)+.32,.22,lg,false),
       l=new T3.PointLight(0x6fd8e0,3.2,11,1.4);l.position.set(0,(i===1?FH:AH)-.2,1.0);lg.add(l);P.lamps.push({box,l})});
   // 둥근 기둥
   [[-R+.6,Z1+.6],[R-.6,Z1+.6]].forEach(([x,z])=>{const g=new T3.CylinderGeometry(.5,.5,Hc,24);g.translate(x,Hc/2,z);add(g)});
   // 가운데 큰 풀 (물속 괴물 자리) + 둘레 타일
-  {const [x0,x1,z0]=sp.pool,z1=Z1,pl=mesh(new T3.PlaneGeometry(x1-x0,z0-z1),M.water,(x0+x1)/2,.02,(z0+z1)/2,sc,false);pl.rotation.x=-PI2;P.pool=pl; // 풀은 앞 아치 너머 수로로 이어짐
-   [[x0,(z0+z1)/2,.16,z0-z1],[x1,(z0+z1)/2,.16,z0-z1],[(x0+x1)/2,z0,x1-x0,.16]].forEach(([x,z,w,d])=>BOX(w,.04,d,M.edge,x,.02,z,sc));
+  {const [x0,x1,z0]=sp.pool,z1=Z1,pl=mesh(new T3.PlaneGeometry(x1-x0,z0-z1),P.wM,(x0+x1)/2,WATER_Y,(z0+z1)/2,sc,false);pl.rotation.x=-PI2;P.pool=pl; // 풀은 앞 아치 너머 수로로 이어짐
+   [[x0-.08,(z0+z1)/2,.18,z0-z1],[x1+.08,(z0+z1)/2,.18,z0-z1],[(x0+x1)/2,z0+.08,x1-x0+.34,.18]].forEach(([x,z,w,d])=>BOX(w,.05,d,M.edge,x,.025,z,sc)); // 풀 가장자리 턱
    ladder3(sc,x0+.5,z0+.05,Math.PI);ladder3(sc,x1-.5,z0+.05,Math.PI)}
   if(sp.ankle){const a=mesh(new T3.PlaneGeometry(2*R,dep),M.waterS,0,.03,c,sc,false);a.rotation.x=-PI2}
   // 자리마다 다른 것
   const eye=sp.eye,lam=MS({color:0xdfe4e2,roughness:.4});
   if(sp.plat){BX(2,1,2.2,0,.5,.45);[-1,1].forEach(x=>[-.6,1.5].forEach(z=>CYL(.025,.025,.5,M.chrome,x,1.25,z,sc,8)))}
   if(sp.shower){for(let x=-R+1;x<R-.8;x+=1.3){if(Math.abs(x)<1.2)continue;CYL(.02,.02,1.4,M.chrome,x,1.8,Z0-.05,sc,8);const hd=CYL(.09,.05,.05,M.chrome,x,2.5,Z0-.24,sc,10);hd.rotation.x=.7}}
-  if(sp.slide){const V3=T3.Vector3,[ex,ey,ez]=SLIDE_EXIT,pts=[[R-.9,6.1,.9],[R-1.8,5.6,-1.2],[R-3.0,4.4,-3.4],[3.2,2.8,-4.2],[2.2,1.4,-3.6],[ex,ey,ez]].map(([x,y,z])=>new V3(x,y,z));mesh(new T3.TubeGeometry(new T3.CatmullRomCurve3(pts),90,.42,14,false),MS({color:0xdfe8ea,roughness:.25,side:T3.DoubleSide}),0,0,0,sc,false);[[R-1.8,-1.2],[R-3.0,-3.4],[3.2,-4.2]].forEach(([x,z])=>CYL(.07,.07,6.4,M.chrome,x,3.2,z,sc,8))} // 천장에서 풀로 내려오는 미끄럼틀
+  if(sp.slide){const V3=T3.Vector3,[ex,ey,ez]=SLIDE_EXIT,pts=[[R-.9,6.1,.9],[R-1.8,5.6,-1.2],[R-3.0,4.4,-3.4],[3.4,2.9,-5.2],[2.6,1.5,-4.7],[ex,ey,ez]].map(([x,y,z])=>new V3(x,y,z));mesh(new T3.TubeGeometry(new T3.CatmullRomCurve3(pts),90,.42,14,false),MS({color:0xdfe8ea,roughness:.25,side:T3.DoubleSide}),0,0,0,sc,false);[[R-1.8,-1.2],[R-3.0,-3.4],[3.4,-5.2]].forEach(([x,z])=>CYL(.07,.07,6.4,M.chrome,x,3.2,z,sc,8))} // 천장에서 풀로 내려오는 미끄럼틀
   if(sp.locker){[-1,1].forEach(s=>{for(let z=Z0-.6;z>Z1+1.2;z-=.46){if(Math.abs(z+.2)<1.8)continue;const g=grp(s*(R-.28),0,z,s<0?PI2:-PI2,sc);BOX(.44,1.9,.5,M.locker,0,.95,0,g);for(let k=0;k<4;k++)BOX(.25,.012,.01,M.edge,0,1.6+k*.05,.255,g)}})}
   if(!sp.plat){BOX(1.6,.06,.45,MS({color:0x8a6a44,roughness:.6}),0,.45,.75,sc);[-.6,.6].forEach(x=>BOX(.06,.43,.36,M.chrome,x,.22,.75,sc))} // 앉아 있는 벤치
   // 이용 수칙 카드: 내 앞 작은 선반
@@ -2694,24 +2709,36 @@ function build3D2(n){
   P.torch=new T3.SpotLight(0xfff2dc,0,22,.36,.55,1.2);sc.add(P.torch);sc.add(P.torch.target);
   P.flashL=new T3.PointLight(0xf4f8ff,0,18,1.1);sc.add(P.flashL);
   // 가운데 수로 끝 초록 비상구 불빛 (밤마다 가까워짐)
-  {const d=EXIT2[Math.min(4,n-1)],ex=grp(0,0,Z1-d,0,sc);P.exitG=ex;P.Z1=Z1;BOX(.6,.3,.08,M.dark,0,2.6,0,ex);mesh(new T3.PlaneGeometry(.5,.24),new T3.MeshBasicMaterial({map:exitTex(),fog:false}),0,2.6,.05,ex,false);const gl=new T3.PointLight(0x40ff70,2.2,8,1.4);gl.position.set(0,2.2,.6);ex.add(gl);P.exitL=gl}
+  {const d=EXIT2[Math.min(4,n-1)],ex=grp(0,0,Z1-d,0,sc);P.exitG=ex;P.Z1=Z1;BOX(.6,.3,.08,M.dark,0,2.6,0,ex);[-.24,.24].forEach(x=>CYL(.012,.012,FH-2.75,M.chrome,x,(FH+2.75)/2,0,ex,6));BOX(.7,.04,.12,M.dark,0,FH-.02,0,ex); /* 둥근 천장 꼭대기에 매달린 비상구 등 */mesh(new T3.PlaneGeometry(.5,.24),new T3.MeshBasicMaterial({map:exitTex(),fog:false}),0,2.6,.05,ex,false);const gl=new T3.PointLight(0x40ff70,2.2,8,1.4);gl.position.set(0,2.2,.6);ex.add(gl);P.exitL=gl}
   // 등 뒤 벽: 타고 내려온 화물 엘리베이터 (컷씬에서만 보임)
-  {const g=grp(0,0,Z0-.02,Math.PI,sc);BOX(1.6,2.6,.06,M.dark,0,1.3,.04,g);for(let k=0;k<9;k++)BOX(.025,2.3,.025,M.dark,-.6+k*.15,1.2,0,g);BOX(1.3,.04,.04,M.dark,0,2.36,0,g);mesh(new T3.SphereGeometry(.05,10,8),new T3.MeshBasicMaterial({color:0xffd9a0}),0,2.5,.3,g,false);P.elev=g}
+  {const g=grp(0,0,Z0,Math.PI,sc),cm=MS({color:0x3a4446,roughness:.5,metalness:.5}); // 로컬 -z = 벽 뒤 엘리베이터 칸
+   [-1,1].forEach(x=>{BOX(.14,2.75,.22,M.dark,x*.87,1.375,0,g);BOX(.04,2.7,1.6,cm,x*.89,1.35,-.82,g)});BOX(1.88,.16,.22,M.dark,0,2.82,0,g);
+   BOX(1.8,.04,1.6,cm,0,.02,-.82,g);BOX(1.8,.04,1.6,cm,0,2.72,-.82,g);BOX(1.8,2.7,.04,cm,0,1.35,-1.62,g);
+   mesh(new T3.SphereGeometry(.05,10,8),new T3.MeshBasicMaterial({color:0xffd9a0}),0,2.62,-.8,g,false);const bl=new T3.PointLight(0xffd9a0,1.6,4,1.5);bl.position.set(0,2.5,-.8);g.add(bl);
+   const gt=grp(.8,0,-.06,0,g);for(let k=0;k<11;k++)BOX(.026,2.5,.026,M.dark,-1.6+k*.16,1.3,0,gt);[.3,1.3,2.45].forEach(y=>BOX(1.62,.03,.03,M.dark,-.8,y,0,gt));P.gate=gt;P.elev=g} // 철창문: 오른쪽으로 접히며 열림
   // 익사자: 풀 바닥에 누워 있다가 수면 바로 밑까지 떠오름
   {const t=PIC.drowned?imgTex(PIC.drowned):ctx3(cvs(256,512,(q,w,h)=>{q.fillStyle='rgba(20,40,40,.0)';q.fillRect(0,0,w,h);q.fillStyle='rgba(15,20,18,.85)';for(let k=0;k<26;k++){q.beginPath();q.moveTo(w*.5,h*.14);q.quadraticCurveTo(w*(.5+Math.cos(k)*.5),h*(.1+Math.sin(k*1.7)*.08),w*(.5+Math.cos(k*1.3)*.45),h*(.02+Math.random()*.12));q.lineWidth=3;q.strokeStyle='rgba(10,14,12,.8)';q.stroke()}
      q.fillStyle='#c8d6cc';q.beginPath();q.ellipse(w*.5,h*.16,w*.13,h*.08,0,0,7);q.fill();q.fillRect(w*.36,h*.24,w*.28,h*.36);[-1,1].forEach(sd=>{q.save();q.translate(w*(.5+sd*.15),h*.26);q.rotate(sd*.5);q.fillRect(-w*.04,0,w*.08,h*.3);q.restore()});q.fillRect(w*.38,h*.58,w*.1,h*.36);q.fillRect(w*.52,h*.58,w*.1,h*.36);
      q.fillStyle='#050807';[-1,1].forEach(sd=>{q.beginPath();q.ellipse(w*(.5+sd*.05),h*.15,w*.03,h*.02,0,0,7);q.fill()});q.fillRect(w*.47,h*.2,w*.06,h*.012)}));
-   const m=mesh(new T3.PlaneGeometry(1.0,2.0),new T3.MeshBasicMaterial({map:t,transparent:true,opacity:0,depthWrite:false,color:0xa8d8d4}),-.3,.035,-4.2,sc,false);m.rotation.x=-PI2;m.rotation.z=.35;P.drn=m}
+   const dI=PIC.drowned,dh=1.75,m=mesh(new T3.PlaneGeometry(dI?dh*dI.width/dI.height:.9,dh),new T3.MeshBasicMaterial({map:t,transparent:true,opacity:0,depthWrite:false,color:0x406a6c}),-.3,-POOL_D+.08,-4.4,sc,false);m.rotation.x=-PI2;m.rotation.z=.35;m.renderOrder=-1;P.drn=m}
   // 잠수부: 물살(V자) → 수면 위 머리
   {const wk=ctx3(cvs(256,256,(q,w,h)=>{q.strokeStyle='rgba(220,250,255,.55)';q.lineWidth=5;for(let k=0;k<4;k++){q.beginPath();q.moveTo(w*.5,h*.15+k*18);q.lineTo(w*(.1+k*.04),h*.95);q.moveTo(w*.5,h*.15+k*18);q.lineTo(w*(.9-k*.04),h*.95);q.stroke()}}));
-   const m=mesh(new T3.PlaneGeometry(1.6,1.6),new T3.MeshBasicMaterial({map:wk,transparent:true,depthWrite:false,opacity:.8}),0,.04,-6,sc,false);m.rotation.x=-PI2;m.visible=false;P.wake=m;
+   const m=mesh(new T3.PlaneGeometry(1.6,1.6),new T3.MeshBasicMaterial({map:wk,transparent:true,depthWrite:false,opacity:.8}),0,WATER_Y+.02,-6,sc,false);m.rotation.x=-PI2;m.visible=false;P.wake=m;
    const ht=PIC.diver?imgTex(PIC.diver):ctx3(cvs(256,256,(q,w,h)=>{q.fillStyle='#07090a';q.beginPath();q.ellipse(w*.5,h*.55,w*.34,h*.45,0,0,7);q.fill();[-1,1].forEach(sd=>{const gx=w*(.5+sd*.15),gy=h*.48;q.fillStyle='#1a2a2e';q.beginPath();q.arc(gx,gy,w*.12,0,7);q.fill();q.fillStyle='rgba(190,240,250,.85)';q.beginPath();q.arc(gx-w*.03,gy-h*.03,w*.035,0,7);q.fill()});q.fillStyle='#b8c8c2';q.beginPath();q.ellipse(w*.5,h*.78,w*.14,h*.1,0,0,7);q.fill();q.fillStyle='#120606';q.beginPath();q.ellipse(w*.5,h*.8,w*.07,h*.06,0,0,7);q.fill()}));
    const dI=PIC.diver,dW=dI?2.1:1.1,dH=dI?dW*dI.height/dI.width:1.1,hd=mesh(new T3.PlaneGeometry(dW,dH),new T3.MeshBasicMaterial({map:ht,transparent:true,alphaTest:.05,side:T3.DoubleSide,color:0x7f9492}),0,.22,-2.1,sc,false);hd.visible=false;P.dvHead=hd;P.dvH=dH}
   // 미끄럼틀 끝에 걸친 손
   {const ht=PIC.slider?imgTex(PIC.slider):ctx3(cvs(256,256,(q,w,h)=>{q.fillStyle='#d4d8cc';for(let k=0;k<4;k++){q.save();q.translate(w*(.3+k*.13),h*.15);q.rotate(.1-k*.05);q.fillRect(-7,0,14,h*(.42+(k%2)*.08));q.fillStyle='#8a2a20';q.fillRect(-7,h*.4,14,10);q.fillStyle='#d4d8cc';q.restore()}q.fillRect(w*.24,h*.5,w*.5,h*.3)}));
-   const [ex,ey,ez]=SLIDE_EXIT,sI=PIC.slider,hm=mesh(new T3.PlaneGeometry(.72,sI?.72*sI.height/sI.width:.5),new T3.MeshBasicMaterial({map:ht,transparent:true,alphaTest:.05,side:T3.DoubleSide,color:0xb8c4be}),ex,ey+.3,ez+.15,sc,false);hm.visible=false;P.slHand=hm}
+   const V3=T3.Vector3,E=new V3(...SLIDE_EXIT),d=E.clone().sub(new V3(2.6,1.5,-4.7)).normalize(),dn=new V3(0,-1,0).addScaledVector(d,d.y).normalize(), // 출구 방향 d, 그에 수직인 아래 방향 dn
+     lip=E.clone().addScaledVector(dn,.3).addScaledVector(d,.02).add(new V3(.1,.03,0)),sI=PIC.slider,hw=.95,hh=sI?hw*sI.height/sI.width:.4,
+     hm=mesh(new T3.PlaneGeometry(hw,hh),new T3.MeshBasicMaterial({map:ht,transparent:true,alphaTest:.04,side:T3.DoubleSide,color:0xb8c4be,depthTest:false}),0,0,0,sc,false);hm.renderOrder=6;
+   {const hole=mesh(new T3.CircleGeometry(.4,24),new T3.MeshBasicMaterial({color:0x000000,side:T3.DoubleSide}),0,0,0,sc,false);hole.position.copy(E).addScaledVector(d,-.18);hole.lookAt(E.clone().add(d))} // 미끄럼틀 입구 안쪽은 깜깜
+   hm.geometry.translate(0,-(.5-.46)*hh,0); // 그림 속 미끄럼틀 턱 선(위에서 46%)을 원점에 → 손바닥은 위, 손가락은 턱 너머로 늘어짐
+   hm.position.copy(lip);hm.visible=false;P.slHand=hm;P.slLip=lip}
   // 5일 차: 앞 통로 끝에 초록 비상구 불빛
   if(sp.tunnel){const ex=grp(0,0,Z1,0,sc);mesh(new T3.PlaneGeometry(.42,.2),new T3.MeshBasicMaterial({map:exitTex(),fog:false}),0,2.1,-13.7,ex,false);const gl=new T3.PointLight(0x40ff70,1.8,7,1.5);gl.position.set(0,2,-13.2);ex.add(gl);ex.visible=false;P.exitG=ex}
+  // 흥얼이: 옆 아치 통로에 서서 다가옴(손전등에 보임) / 눈을 뜨고 있으면 바로 옆을 지나감
+  {const I1=PIC.hstand,I2=PIC.hside,mk=(im,em)=>{const m=mesh(new T3.PlaneGeometry(1,1),MS({map:im?imgTex(im):null,transparent:true,alphaTest:.06,side:T3.DoubleSide,roughness:.5,color:0xc8d4d0,emissive:em,emissiveMap:im?imgTex(im):null}),0,0,0,sc,false);m.visible=false;m.userData.ar=im?im.width/im.height:.4;return m};
+   P.hmS=mk(I1,0x101818);P.hmP=mk(I2,0x2a3634)}
   // 교대자 (빛을 받아야 보이는 판)
   P.hum=mesh(new T3.PlaneGeometry(1,1),MS({transparent:true,alphaTest:.05,side:T3.DoubleSide,roughness:1,color:0xd0d6d4,emissive:0x1e2626}),0,1,0,sc,false);P.hum.visible=false;
   return P;
@@ -2738,17 +2765,26 @@ function draw3D2(){
   let tI=torchOn()&&!lit?(S.power<20&&Math.random()<.12?1.5:9):0;if(fk>0)tI+=420*fk*fk;
   P.torch.intensity=tI;P.torch.position.copy(cam.position).addScaledVector(dirV,-.1);P.torch.position.y-=.25;P.torch.target.position.copy(cam.position).addScaledVector(dirV,8);
   P.flashL.intensity=fk>0?110*fk*fk:0;P.flashL.position.copy(cam.position).addScaledVector(dirV,.8);
-  if(P.pool)P.pool.position.y=.02+Math.sin(T_*.6)*.006;if(P.canal)P.canal.position.y=P.pool.position.y;
+  if(P.pool)P.pool.position.y=WATER_Y+Math.sin(T_*.6)*.006;if(P.canal)P.canal.position.y=P.pool.position.y;
   if(P.exitL)P.exitL.intensity=2.2*(Math.random()<.02?.3:1);
-  if(S.drn){const k=Math.max(0,(S.drn.p-45)/55);P.drn.material.opacity=lit?0:k*.75;P.drn.position.y=.035;P.drn.scale.setScalar(.9+k*.15)}
-  if(S.dv){const v=S.dv;P.wake.visible=!lit&&(v.st===1||v.st===2);if(P.wake.visible){const z=v.st===1?lerp(Z1C(P)-10,Z1C(P),1-Math.max(0,v.timer)/7):lerp(Z1C(P),-5.6,1-Math.max(0,v.timer)/6);P.wake.position.set(Math.sin(T_*.7)*.3,.045,z+.8)}
-    P.dvHead.visible=!lit&&v.st===3;if(P.dvHead.visible){const yH=P.dvH/2-.06+Math.sin(T_*1.3)*.03;P.dvHead.position.set(Math.sin(T_*.5)*.05,yH,-5.2);P.dvHead.lookAt(cam.position.x,yH,cam.position.z)}}
-  if(S.sl){const l=S.sl;P.slHand.visible=!lit&&l.st===1&&l.timer<=3;if(P.slHand.visible){P.slHand.lookAt(cam.position);P.slHand.position.y=SLIDE_EXIT[1]+.3+Math.sin(T_*20)*.01}}
+  if(S.drn){const k=Math.min(1,Math.max(0,(S.drn.p-15)/85)),e=k*k*(3-2*k),m=P.drn; // 바닥에 누워 있다가 수면 바로 밑까지 천천히 떠오름
+    m.material.opacity=lit||S.night<2?0:Math.min(.95,.25+e*.75);m.position.y=lerp(-POOL_D+.08,WATER_Y-.16,e);m.rotation.z=.35+Math.sin(T_*.37)*.07;
+    m.scale.set(1+Math.sin(T_*2.1)*.025,1+Math.sin(T_*1.7+1)*.02,1);m.material.color.setRGB(lerp(.2,.62,e),lerp(.34,.8,e),lerp(.35,.78,e))} // 물에 일렁이는 굴절·깊을수록 어두운 청록
+  if(S.dv){const v=S.dv;P.wake.visible=!lit&&(v.st===1||v.st===2);if(P.wake.visible){const z=v.st===1?lerp(Z1C(P)-10,Z1C(P),1-Math.max(0,v.timer)/7):lerp(Z1C(P),-5.6,1-Math.max(0,v.timer)/6);P.wake.position.set(Math.sin(T_*.7)*.3,WATER_Y+.025,z+.8)}
+    P.dvHead.visible=!lit&&v.st===3;if(P.dvHead.visible){const yH=WATER_Y+P.dvH/2-.1+Math.sin(T_*1.3)*.03;P.dvHead.position.set(Math.sin(T_*.5)*.05,yH,-5.2);P.dvHead.lookAt(cam.position.x,yH,cam.position.z)}}
+  if(S.sl){const l=S.sl;P.slHand.visible=!lit&&l.st===1&&l.timer<=3;if(P.slHand.visible){P.slHand.position.copy(P.slLip);P.slHand.position.y+=Math.sin(T_*20)*.004;P.slHand.lookAt(cam.position);P.slHand.rotateZ(-.3)}}
   // 교대자: 아치에 서 있다가 바로 앞까지
   {const im=STK.full,v=h.dir>=0&&h.st>=2&&!!im&&!dw;P.hum.visible=v;
    if(v){if(P.hum.userData.im!==im){P.hum.material.map=P.hum.material.emissiveMap=imgTex(im);P.hum.material.needsUpdate=true;P.hum.userData.im=im}
      const a=P.arch[h.dir],to=new T3.Vector3(a.x,0,a.z),me=new T3.Vector3(0,0,.45),dir=to.clone().sub(me).normalize(),dist=h.st===2?to.distanceTo(me)+.5:lerp(3.2,1.6,1-Math.max(0,h.timer)/humNear2()),hh=2.1;
      const p=me.clone().addScaledVector(dir,dist);P.hum.scale.set(hh*im.width/im.height,hh,1);P.hum.position.set(p.x+Math.sin(T_*1.7)*.02,hh/2,p.z);P.hum.lookAt(cam.position.x,hh/2,cam.position.z)}}
+  if(P.hmS){const m=S.hm,on=m&&!dw&&S.night>=5;P.hmS.visible=on&&m.st===1;P.hmP.visible=on&&m.st===2&&!S.eyes;
+    if(P.hmS.visible){const a=P.arch[m.side],sx=Math.sign(a.x),k=1-Math.max(0,m.timer)/9,d=lerp(9,.6,k*k),hh=1.78; // 통로 깊은 곳에서 아치 입구까지
+      P.hmS.scale.set(hh*P.hmS.userData.ar,hh,1);P.hmS.position.set(a.x+sx*d,hh/2+.01,a.z+Math.sin(T_*.8)*.04);P.hmS.lookAt(cam.position.x,hh/2,cam.position.z)}
+    if(P.hmP.visible){const sp=m.side===0?-1:1,k=1-Math.max(0,m.timer)/7.5,th=sp*Math.cos(k*Math.PI)*1.25, // 의자 둘레를 도는 중 (눈을 떴다면 바로 옆을 스쳐 감)
+      fw=new T3.Vector3();cam.getWorldDirection(fw);fw.y=0;fw.normalize();const rt=new T3.Vector3(-fw.z,0,fw.x),hh=1.05,r=1.2,
+      p=cam.position.clone().addScaledVector(fw,Math.cos(th)*r).addScaledVector(rt,Math.sin(th)*r);
+      P.hmP.scale.set(hh*P.hmP.userData.ar*(sp<0?1:-1),hh,1);P.hmP.position.set(p.x,cam.position.y-.28*hh+Math.sin(T_*3)*.02,p.z);P.hmP.lookAt(cam.position.x,P.hmP.position.y,cam.position.z)}}
   R3.rd.render(R3.sc2,cam);
   cx.drawImage(R3.rd.domElement,0,0,W,H);
   if(fk>.55){cx.fillStyle=`rgba(245,250,255,${(fk-.55)*1.6})`;cx.fillRect(0,0,W,H)} // 팍
@@ -2988,7 +3024,7 @@ function renderStatic(){
   cx.drawImage(VIG,0,0,W,H);
 }
 // 점프스케어: 확 덮쳤다가(펀치) 흔들리며 다가옴. 중간중간 암전 + 더 가까운 얼굴 컷이 번쩍, 끝엔 아래로 쏟아지며 암전
-const JD=1.5,JALT={};[['잠수부','diver_close.jpg'],['익사자','drowned_close.jpg'],['미끄럼틀','slider_close.jpg']].forEach(([k,f])=>{const im=new Image();im.onload=()=>{JALT[k]=im};im.src='img/'+f});
+const JD=1.5,JALT={};[['잠수부','diver_close.jpg'],['익사자','drowned_close.jpg'],['미끄럼틀','slider_close.jpg'],['흥얼이','hummer_close.jpg']].forEach(([k,f])=>{const im=new Image();im.onload=()=>{JALT[k]=im};im.src='img/'+f});
 function drawJump(){
   const t=JD-jump,soft=SET.scare==='soft',main=JIMG[jumpType]||JUMP[jumpType]||JUMP['교대자'],alt=JALT[jumpType]||(jumpType==='교대자'&&STK.close)||null;
   cx.fillStyle='#000';cx.fillRect(0,0,W,H);
