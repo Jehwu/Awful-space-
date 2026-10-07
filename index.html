@@ -123,6 +123,7 @@ body[data-mode=cut] #camOff,body[data-mode=cut] #camRep{display:none!important}
 .hb svg{display:block;width:56%;height:56%;margin:auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 2px rgba(0,0,0,.9))}
 .hb span{position:absolute;left:50%;top:100%;transform:translateX(-50%) rotate(-2deg);margin-top:3px;white-space:nowrap;font:17px/1 'Nanum Pen Script',cursive;color:rgba(226,218,192,.78);text-shadow:0 0 4px #000,0 0 2px #000;pointer-events:none}
 .hb:active{transform:translateY(1px) scale(.96)}
+body.hands .hb{display:none!important} /* 손으로 조작할 땐 버튼 숨김 */
 #flashBtn{right:20px;bottom:30px;width:84px;height:84px;color:#e6eee9;border:none;background:radial-gradient(circle at 40% 34%,rgba(255,255,255,.07),transparent 38%),radial-gradient(circle,#101414 0 61%,transparent 62%),conic-gradient(rgba(214,226,218,.8) calc(var(--c,1)*360deg),rgba(40,46,46,.7) 0);box-shadow:inset 0 0 0 5px rgba(0,0,0,.55),0 0 0 2px rgba(0,0,0,.6),0 6px 18px rgba(0,0,0,.75)}
 #flashBtn svg{width:46%;height:46%;opacity:calc(.3 + var(--c,1)*.7)}
 #flashBtn.ready{animation:hbReady 2.6s infinite}@keyframes hbReady{0%,100%{filter:none}48%{filter:brightness(1.25) drop-shadow(0 0 8px rgba(200,230,220,.35))}50%{filter:brightness(.8)}52%{filter:brightness(1.2)}}
@@ -338,7 +339,7 @@ body[data-mode=game] #pauseBtn{display:flex}
 <script nomodule>window.THREE_ERR='nomodule'</script>
 <script>
 // ===================== 기본 =====================
-const VER='0.19.4'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
+const VER='0.20.0'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
 const $=id=>document.getElementById(id);
 const cv=$('cv'),cx=cv.getContext('2d');
 let W,H,DPR=1;const MOB=matchMedia('(pointer:coarse)').matches||/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent); // 폰이면 가볍게
@@ -2761,6 +2762,86 @@ function build3D2(n){
   return P;
 }
 const Z1C=P=>-P.R; // 가운데 수로 입구 z
+// ===================== 챕터 2: 1인칭 3D 손 (설정 '손으로' 조작) =====================
+// 오른손: 손전등을 쥠 (손전등 누르기 = 끄기/켜기, 꼬리 뚜껑 = 배터리 교체). 왼손: 무릎 위 (꾹 = 눈 가리기). 팔걸이 모니터 = 통로 패널. 나머지 화면 누르기 = 플래시
+const handsOn=()=>SET.ctrl!=='buttons';
+const HND={sc:null};
+function buildHands(){const T3=R3.T,sc=new T3.Scene(),cam=new T3.PerspectiveCamera(50,1,.01,5);HND.sc=sc;HND.cam=cam;
+  const skin=new T3.MeshStandardMaterial({color:0xc4b8a8,roughness:.42,metalness:0}),nail=new T3.MeshStandardMaterial({color:0xb09a90,roughness:.3}),
+    cloth=new T3.MeshStandardMaterial({color:0x1b2326,roughness:.9}),metal=new T3.MeshStandardMaterial({color:0x2c3134,roughness:.35,metalness:.7}),rub=new T3.MeshStandardMaterial({color:0x111416,roughness:.8}),
+    hid=new T3.MeshBasicMaterial({visible:false}),M=(g,m,p,par)=>{const o=new T3.Mesh(g,m);if(p)o.position.set(...p);par.add(o);return o},
+    cap=(r,l)=>new T3.CapsuleGeometry(r,l,6,14),sph=r=>new T3.SphereGeometry(r,28,20),G=()=>new T3.Group();
+  // 소매 (팔목 이음새를 가림): a에서 b로 뻗는 원통
+  const sleeve=(par,a,b,r)=>{const A=new T3.Vector3(...a),B=new T3.Vector3(...b),L=A.distanceTo(B),o=M(new T3.CylinderGeometry(r,r*1.15,L,14,1,true),cloth,null,par);o.position.copy(A).add(B).multiplyScalar(.5);o.quaternion.setFromUnitVectors(new T3.Vector3(0,1,0),B.clone().sub(A).normalize());return o};
+  // ---- 손전등 + 오른손 ----
+  const R=G();sc.add(R);const fl=G();R.add(fl);
+  M(new T3.CylinderGeometry(.0175,.0175,.19,20),metal,null,fl).rotation.x=PI2;fl.children[0].position.z=.01;   // 몸통 (z축)
+  {const h=M(new T3.CylinderGeometry(.026,.019,.05,22),metal,[0,0,-.105],fl);h.rotation.x=PI2}                  // 머리
+  HND.lens=M(new T3.CircleGeometry(.023,22),new T3.MeshBasicMaterial({color:0xfff2d0}),[0,0,-.1305],fl);HND.lens.rotation.y=Math.PI;
+  for(let k=0;k<6;k++){const r=M(new T3.TorusGeometry(.018,.0018,6,20),rub,[0,0,.07+k*.006],fl)}                 // 손잡이 홈
+  HND.tail=M(new T3.CylinderGeometry(.019,.019,.022,20),rub,[0,0,.115],fl);HND.tail.rotation.x=PI2;                // 꼬리 뚜껑 (배터리)
+  HND.sw=M(new T3.BoxGeometry(.011,.006,.016),rub,[0,.019,-.045],fl);                                                // 스위치
+  const fing=[];[[-.03,3.5,.0098],[-.007,3.6,.0102],[.017,3.5,.0098],[.039,3.2,.0088]].forEach(([z,arc,t])=>{const rr=.0175+t;
+    const a=M(new T3.TorusGeometry(rr,t,8,22,arc),skin,[0,0,z],fl);a.rotation.z=-arc;fing.push(a);                     // 손전등을 감싼 손가락 (오른쪽→아래→왼쪽 위)
+    const tip=M(sph(t*1.02),skin,[Math.cos(-arc)*rr,Math.sin(-arc)*rr,z],fl);const n=M(sph(t*.7),nail,[Math.cos(-arc)*(rr+t*.45),Math.sin(-arc)*(rr+t*.45),z],fl);n.scale.set(1,1,.6)});
+  {const p=M(sph(1),skin,[.03,-.004,.012],fl);p.scale.set(.016,.034,.05)}                                           // 손바닥·손등
+  [-.03,-.007,.017,.039].forEach(z=>M(sph(.0105),skin,[.028,-.005,z],fl));                                            // 손가락 뿌리 마디
+  HND.th=G();HND.th.position.set(.024,.016,.03);fl.add(HND.th);{const t=M(cap(.0095,.05),skin,[0,0,-.03],HND.th);t.rotation.x=PI2;t.rotation.z=.15;M(sph(.0075),nail,[-.004,.008,-.058],HND.th).scale.set(1,.5,1.3)}HND.th.rotation.y=.42; // 엄지 → 스위치
+  sleeve(fl,[.03,-.006,.075],[.05,-.2,.24],.029);
+  HND.pTorch=M(new T3.BoxGeometry(.09,.08,.22),hid,[.01,0,-.02],fl);
+  // 여분 배터리: 오른손 옆 팔걸이 위에 놓여 있음 (누르면 교체)
+  {const b=G();sc.add(b);const bc=M(new T3.CylinderGeometry(.012,.012,.05,18),new T3.MeshStandardMaterial({color:0x2a5a3a,roughness:.4,metalness:.3}),null,b);bc.rotation.z=PI2;
+   M(new T3.CylinderGeometry(.0122,.0122,.012,18),new T3.MeshStandardMaterial({color:0x9a9488,roughness:.3,metalness:.8}),[.022,0,0],b).rotation.z=PI2;M(new T3.CylinderGeometry(.004,.004,.006,10),metal,[.03,0,0],b).rotation.z=PI2;
+   HND.pBatt=M(new T3.BoxGeometry(.11,.07,.08),hid,null,b);HND.bat=b}
+  HND.R=R;HND.fl=fl;
+  // ---- 왼손 ----
+  const Lh=G();Lh.rotation.order='YXZ';sc.add(Lh);const lp=G();Lh.add(lp);
+  {const p=M(sph(1),skin,[0,0,0],lp);p.scale.set(.044,.013,.05)}
+  HND.lf=[];[[-.03,.92],[-.01,1],[.01,.96],[.03,.82]].forEach(([x,k])=>{const f=G();f.position.set(x,-.002,-.045);lp.add(f);M(cap(.0086,.034*k),skin,[0,0,-.02*k],f).rotation.x=PI2; // 손가락은 손바닥 앞(-z)으로 뻗음, x 회전 음수 = 아래로 굽힘
+    const j=G();j.position.set(0,0,-.04*k);f.add(j);M(cap(.0078,.024*k),skin,[0,0,-.014*k],j).rotation.x=PI2;M(sph(.0068),nail,[0,.004,-.028*k],j).scale.set(1,.5,1.3);f.userData.j=j;HND.lf.push(f)});
+  {const t=G();t.position.set(.042,0,-.005);lp.add(t);M(cap(.0105,.035),skin,[0,-.022,0],t);t.rotation.set(-1.2,0,-.9);HND.lth=t}
+  sleeve(lp,[0,.002,.045],[-.01,-.03,.33],.029);
+  HND.pEye=M(new T3.BoxGeometry(.13,.06,.16),hid,[0,0,-.01],lp);HND.L=Lh;HND.lp=lp;
+  // ---- 팔걸이 모니터 ----
+  const mo=G();sc.add(mo);M(new T3.BoxGeometry(.15,.1,.016),rub,null,mo);
+  {const c=mk(128,84),q=c.getContext('2d');q.fillStyle='#071012';q.fillRect(0,0,128,84);for(let y=0;y<84;y+=3){q.fillStyle=`rgba(90,200,210,${.05+Math.random()*.06})`;q.fillRect(0,y,128,1)}q.fillStyle='rgba(160,230,235,.5)';q.font='11px monospace';q.fillText('CAM',8,16);
+   const tx=new T3.CanvasTexture(c);HND.scr=M(new T3.PlaneGeometry(.13,.084),new T3.MeshBasicMaterial({map:tx,color:0x6a8a8c}),[0,0,.0085],mo)}
+  HND.led=M(sph(.004),new T3.MeshBasicMaterial({color:0xff2a20}),[.062,.043,.009],mo);
+  HND.pMon=M(new T3.BoxGeometry(.19,.14,.05),hid,null,mo);HND.mo=mo;
+  // ---- 빛: 아치 비상등(청록 역광), 손전등 머리 빛, 플래시 ----
+  HND.hemi=new T3.HemisphereLight(0x6fa8b0,0x080c0d,.35);sc.add(HND.hemi);
+  HND.rim=new T3.DirectionalLight(0x6fd8e0,.7);HND.rim.position.set(-1,1.2,-1.5);sc.add(HND.rim);
+  HND.key=new T3.PointLight(0xffe8c8,0,1.2,1.6);sc.add(HND.key);HND.fx=new T3.PointLight(0xf4f8ff,0,2,1.2);sc.add(HND.fx);
+  HND.cov=0;HND.aim=0;HND.aimX=0;HND.aimY=0;HND.thP=0}
+// 매 프레임: 화면 비율에 맞춰 손 위치, 숨쉬기 흔들림, 눈 가리기, 빛
+function drawHands(fk,lit,warn){if(!HND.sc)buildHands();const T3=R3.T,cam=HND.cam,A=W/H;cam.aspect=A;cam.updateProjectionMatrix();
+  const hw=Math.tan(25*Math.PI/180)*A*.45,t=T_,lag=(S.view-S.camX)*.06,br=Math.sin(t*1.3)*.003;
+  HND.cov+=((S.eyes?1:0)-HND.cov)*(S.eyes?.3:.18);HND.aim=Math.max(0,HND.aim-1/60*2.2);HND.thP=Math.max(0,HND.thP-1/60*5);
+  // 오른손 + 손전등 (클릭한 쪽으로 잠깐 겨눔)
+  const xr=Math.min(hw*.62,.34),ak=ease(Math.min(1,HND.aim));HND.R.position.set(xr+lag,-.112+br,-.4);HND.bat.position.set(xr*.62+lag,-.15,-.44);HND.bat.rotation.set(.3,.5,.05);HND.bat.visible=(S.spare??1)>0&&!S.swap&&!S.dawn;
+  HND.fl.rotation.set(.06+ak*HND.aimY*.35+Math.sin(t*.9)*.01,.16-ak*HND.aimX*.45,-.05);
+  HND.th.position.y=.016-HND.thP*.004;HND.lens.material.color.setHex(torchOn()&&!lit?0xfff2d0:0x2a2a26);
+  // 왼손: 무릎 위 → 눈앞
+  const c=ease(Math.min(1,HND.cov)),xl=-Math.min(hw*.36,.21);
+  HND.L.position.set(lerp(xl-lag,.015,c),lerp(-.125+br*.8,-.075,c),lerp(-.42,-.15,c));HND.L.rotation.set(lerp(.45,PI2-.05,c),lerp(-.35,Math.PI,c),lerp(.2,.05,c)); // 가릴 땐 손바닥이 얼굴 쪽
+  HND.lf.forEach((f,i)=>{f.rotation.x=lerp(-.85,-.08,c);f.rotation.z=lerp((i-1.5)*.03,(i-1.5)*.2,c);f.userData.j.rotation.x=lerp(-.9,-.05,c)}); // 가릴 땐 손가락을 펴고 살짝 벌림 (틈으로 빛이 샘)
+  HND.mo.position.set(-Math.min(hw*.95,.56),-.17,-.62);HND.mo.rotation.set(-.55,.5,.08);HND.mo.visible=c<.5;
+  HND.led.material.color.setHex(S.mon||T_%1.4<.7?0xff2a20:0x300604);
+  // 빛
+  HND.hemi.intensity=lit?1.1:.3;HND.rim.color.setHex(warn?0xff3020:0x6fd8e0);HND.rim.intensity=lit?.6:warn?(Math.sin(T_*14)>0?1.1:.1):.7;
+  const head=new T3.Vector3(0,0,-.17);HND.fl.localToWorld(head);HND.key.position.copy(head);HND.key.intensity=torchOn()&&!lit?.9:0;
+  HND.fx.position.copy(head);HND.fx.intensity=fk>0?6*fk*fk:0;
+  const rd=R3.rd;rd.autoClear=false;rd.clearDepth();rd.render(HND.sc,cam);rd.autoClear=true}
+// 누른 곳의 손 물건: 'torch'|'batt'|'eye'|'mon'|null
+function handHit(p){if(!HND.sc||!handsOn())return null;const T3=R3.T,rc=new T3.Raycaster();rc.setFromCamera(new T3.Vector2(p.x/W*2-1,-(p.y/H*2-1)),HND.cam);
+  const L=[...(HND.bat.visible?[[HND.pBatt,'batt']]:[]),[HND.pTorch,'torch'],[HND.pEye,'eye'],[HND.pMon,'mon']].filter(([o,k])=>k!=='mon'||HND.mo.visible);let best=null,bd=1e9;
+  L.forEach(([o,k])=>{const h=rc.intersectObject(o,false)[0];if(h&&h.distance<bd){bd=h.distance;best=k}});return best}
+function handFlash(p){HND.aim=1;HND.aimX=p.x/W*2-1-.3;HND.aimY=-(p.y/H*2-1)-.2;flash()}
+// 처음 몇 초: 손 물건마다 손글씨 이름표
+function handLabels(){if(!HND.sc||S.t>18||S.dawn)return;const a=Math.min(1,(18-S.t)/3)*.85,P=(o,dx,dy,txt)=>{const v=new R3.T.Vector3();o.getWorldPosition(v);v.project(HND.cam);const x=(v.x+1)/2*W+dx,y=(1-v.y)/2*H+dy;cx.fillText(txt,x,y)};
+  cx.save();cx.globalAlpha=a;cx.font=`${Math.round(Math.max(18,H*.042))}px 'Nanum Pen Script',cursive`;cx.textAlign='center';cx.fillStyle='rgba(230,222,196,.95)';cx.shadowColor='#000';cx.shadowBlur=6;
+  P(HND.pTorch,-10,-H*.12,'손전등 누르기: 끄기/켜기');if(HND.bat.visible)P(HND.pBatt,0,H*.07,'여분 배터리');P(HND.mo,-W*.03,-H*.11,'모니터: 통로 패널');
+  if(S.night>=5)P(HND.pEye,W*.05,-H*.06,'왼손 꾹: 눈 감기');cx.font=`${Math.round(Math.max(20,H*.05))}px 'Nanum Pen Script',cursive`;cx.fillText('화면 누르기: 플래시',W/2,H*.3);cx.restore()}
 function draw3D2(){
   if(!R3.sc2||R3.p2.n!==S.night)build3D2(S.night);
   const T3=R3.T,P=R3.p2,cam=R3.cam,eye=P.sp.eye;
@@ -2803,9 +2884,11 @@ function draw3D2(){
       p=cam.position.clone().addScaledVector(fw,Math.cos(th)*r).addScaledVector(rt,Math.sin(th)*r);
       P.hmP.scale.set(hh*P.hmP.userData.ar*(sp<0?1:-1),hh,1);P.hmP.position.set(p.x,cam.position.y-.28*hh+Math.sin(T_*3)*.02,p.z);P.hmP.lookAt(cam.position.x,P.hmP.position.y,cam.position.z)}}
   R3.rd.render(R3.sc2,cam);
+  if(handsOn())drawHands(fk,lit,(h.dir===0||h.dir===2)&&h.st===1&&!dw);
   cx.drawImage(R3.rd.domElement,0,0,W,H);
+  if(handsOn())handLabels();
   if(fk>.55){cx.fillStyle=`rgba(245,250,255,${(fk-.55)*1.6})`;cx.fillRect(0,0,W,H)} // 팍
-  S.eyeA=Math.max(0,Math.min(1,(S.eyeA||0)+(S.eyes?.12:-.18)));if(S.eyeA>0){cx.fillStyle=`rgba(0,0,0,${.97*S.eyeA})`;cx.fillRect(0,0,W,H);if(S.eyes){cx.fillStyle='rgba(120,30,30,.06)';cx.fillRect(0,0,W,H)}} // 눈 감음
+  S.eyeA=handsOn()?Math.max(0,Math.min(1,(HND.cov-.55)/.45)):Math.max(0,Math.min(1,(S.eyeA||0)+(S.eyes?.12:-.18))); // 손으로: 손이 눈앞을 덮은 다음 깜깜해짐if(S.eyeA>0){cx.fillStyle=`rgba(0,0,0,${.97*S.eyeA})`;cx.fillRect(0,0,W,H);if(S.eyes){cx.fillStyle='rgba(120,30,30,.06)';cx.fillRect(0,0,W,H)}} // 눈 감음
   // 화면 가장자리 빨간 빛: 교대자가 오는 쪽 (왼쪽/오른쪽). 아치에 서면 더 진하게 깜빡
   if(h.dir===0||h.dir===2){const rel=h.dir-S.camX,side=rel<-.3?-1:rel>.3?1:0,a=h.st>=2?.32+.2*Math.sin(T_*10):h.st===1?.14+.08*Math.sin(T_*6):0;
     if(a>0&&!dw){if(side){const x0=side<0?0:W,gw=W*.16,gr=cx.createLinearGradient(x0,0,x0-side*gw,0);gr.addColorStop(0,`rgba(255,30,20,${a})`);gr.addColorStop(1,'rgba(255,30,20,0)');cx.fillStyle=gr;cx.fillRect(side<0?0:W-gw,0,gw,H)}
@@ -3266,6 +3349,10 @@ const isRot=()=>document.documentElement.classList.contains('rot');
 const PT={x:-1,y:-1,touch:matchMedia('(hover: none)').matches,on:false,sx:0,sy:0};
 function gameXY(e){return isRot()?{x:e.clientY,y:H-e.clientX}:{x:e.clientX,y:e.clientY}}
 cv.addEventListener('pointerdown',e=>{PT.touch=e.pointerType!=='mouse';const p=gameXY(e);PT.fl=false;
+  if(handsOn()&&S&&S.ch===2&&mode==='game'&&!S.log&&!S.over&&!PAUSE.on&&(e.pointerType!=='mouse'||e.button===0)){const k=handHit(p); // 손 조작: 손에 든 물건
+    if(k==='eye'){PT.eyeId=e.pointerId;setEyes(true);return}
+    if(k==='torch'){HND.thP=1;toggleTorch();return}if(k==='batt'){if(S.swap){if(!SWAP[S.swap.step][1])swapTap()}else startSwap();return}if(k==='mon'){toggleMon();return}
+    if(e.pointerType==='mouse'&&canAct()&&!navZone(p)&&!hotAt(p)){PT.fl=true;handFlash(p);return}} // 마우스는 누르는 순간 플래시 (터치는 뗄 때: 밀어서 고개 돌리기와 구분)
   if(e.pointerType==='mouse'&&e.button===0&&actOf('Mouse0')&&S&&S.ch===2&&mode==='game'&&!S.log&&canAct()&&!navZone(p)&&!hotAt(p)){PT.fl=true;keyAct(actOf('Mouse0'),true);return} // 좌클릭에 동작을 배치했으면 누르는 순간 실행
   PT.on=true;PT.sx=PT.x=p.x;PT.sy=PT.y=p.y;if(S&&S.bp&&R3.ok&&S.bpA>.5&&S.lockT<=0&&bpHit(p)==='lever')S.holding=true});
 cv.addEventListener('pointermove',e=>{const p=gameXY(e);PT.x=p.x;PT.y=p.y;if(e.pointerType==='mouse')PT.touch=false});
@@ -3275,11 +3362,12 @@ cv.addEventListener('pointerup',e=>{
   if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.3){turn(dx>0?-1:1);return} // 밀어서 고개 돌리기
   if(Math.hypot(dx,dy)>16||!canAct())return;
   const nz=navZone(p);if(nz){turn(nz);return}
-  const h=hotAt(p);if(h)h.act();
+  const h=hotAt(p);if(h)h.act();else if(handsOn()&&PT.touch&&S&&S.ch===2&&mode==='game')handFlash(p);
 });
 cv.addEventListener('mousedown',e=>{if(e.button!==0&&!KEYWAIT){const a=actOf('Mouse'+e.button);if(a&&keyAct(a,true))e.preventDefault()}}); // 휠·우클릭
 addEventListener('mouseup',e=>{if(actOf('Mouse'+e.button)==='eyes')keyAct('eyes',false)});
 cv.addEventListener('contextmenu',e=>{if(S&&S.ch===2&&actOf('Mouse2'))e.preventDefault()});
+addEventListener('pointerup',e=>{if(PT.eyeId!=null&&e.pointerId===PT.eyeId){PT.eyeId=null;setEyes(false)}});addEventListener('pointercancel',e=>{if(PT.eyeId!=null&&e.pointerId===PT.eyeId){PT.eyeId=null;setEyes(false)}});
 cv.addEventListener('pointercancel',()=>{PT.on=false;PT.x=PT.y=-1;if(S)S.holding=false});
 cv.addEventListener('pointerleave',()=>{if(!PT.on)PT.x=PT.y=-1});
 // 배전반 레버 / 닫기
@@ -3319,7 +3407,7 @@ function openAch(){const g=$('achGrid');g.innerHTML='';let got=0;
   $('achCnt').textContent=`${got} / ${ACH.length}`;$('achBox').classList.add('show')}
 $('mAch').onclick=openAch;$('achBack').onclick=()=>$('achBox').classList.remove('show');
 // ===================== 설정 =====================
-const SET_DEF={bright:1,vol:.9,sfx:1,amb:1,shake:true,grain:1,vib:true,scare:'full',sub:1,quality:'auto'};
+const SET_DEF={bright:1,vol:.9,sfx:1,amb:1,shake:true,grain:1,vib:true,scare:'full',sub:1,quality:'auto',ctrl:'hands'};
 let SET=Object.assign({},SET_DEF);try{Object.assign(SET,JSON.parse(localStorage.getItem('awful_settings')||'{}'))}catch(e){}
 const SET_ROWS=[
   {k:'bright',t:'밝기',d:'화면만 밝아짐. 괴물 판정은 그대로',min:.8,max:1.3,step:.05,f:v=>Math.round(v*100)+'%'},
@@ -3331,13 +3419,14 @@ const SET_ROWS=[
   {k:'grain',t:'필름 노이즈',opts:[[0,'끄기'],[.5,'약하게'],[1,'보통']]},
   {k:'vib',t:'진동',d:'모바일에서 죽을 때',opts:[[true,'켜기'],[false,'끄기']]},
   {k:'sub',t:'자막 크기',opts:[[.85,'작게'],[1,'보통'],[1.2,'크게']]},
-  {k:'quality',t:'그래픽',d:'느리면 낮음',opts:[['auto','자동'],['low','낮음'],['high','높음']]}];
+  {k:'quality',t:'그래픽',d:'느리면 낮음',opts:[['auto','자동'],['low','낮음'],['high','높음']]},
+  {k:'ctrl',t:'챕터 2 조작',d:'손으로: 손에 든 손전등·왼손·모니터를 직접 누름 / 버튼: 화면 버튼',opts:[['hands','손으로'],['buttons','버튼']]}];
 function applySet(){
   cv.style.filter=SET.bright===1?'':`brightness(${SET.bright}) contrast(${(1+(SET.bright-1)*.3).toFixed(3)})`;
   document.documentElement.style.setProperty('--sub',SET.sub);
   if(AC&&OUT){OUT.gain.setTargetAtTime(SET.vol,AC.currentTime,.05);master.gain.setTargetAtTime(.8*SET.sfx,AC.currentTime,.05);AMB.gain.setTargetAtTime(SET.amb,AC.currentTime,.05)}
   if(typeof R3!=='undefined'&&R3.rd)resize3D();
-  keyBadges();
+  keyBadges();document.body.classList.toggle('hands',SET.ctrl!=='buttons');
 }
 function saveSet(){try{localStorage.setItem('awful_settings',JSON.stringify(SET))}catch(e){}applySet()}
 function keyBadges(){[['flashBtn','flash'],['torchBtn','torch'],['eyeBtn','eyes'],['pnlBtn','pnl'],['battBtn','batt']].forEach(([id,a])=>{const b=$(id);if(b)b.dataset.k=keyName(keyOf(a))})} // PC: 버튼 귀퉁이 키 표시
