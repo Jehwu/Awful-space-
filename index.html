@@ -348,11 +348,12 @@ body[data-mode=game] #pauseBtn{display:flex}
 <div id="achToast"><img id="achTI" alt=""><div><div class="k">기록 추가</div><div class="n" id="achTN"></div></div></div>
 <div id="cap"></div><button id="skip">건너뛰기</button>
 
+<script type="importmap">{"imports":{"three":"./lib/three.module.min.js"}}</script>
 <script type="module">import('./lib/three.module.min.js').then(m=>{window.THREE=m},e=>{window.THREE_ERR=String(e&&e.message||e)}).then(()=>dispatchEvent(new Event('three')))</script>
 <script nomodule>window.THREE_ERR='nomodule'</script>
 <script>
 // ===================== 기본 =====================
-const VER='0.25.0'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
+const VER='0.26.0'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
 const $=id=>document.getElementById(id);
 const cv=$('cv'),cx=cv.getContext('2d');
 let W,H,DPR=1;const MOB=matchMedia('(pointer:coarse)').matches||/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent); // 폰이면 가볍게
@@ -1644,7 +1645,7 @@ function init3D(){
     R3.hot={};R3.dyn={};build3D();resize3D();
     C3.menu=buildCam3D({kind:'endless',seed:4242,ox:0,oy:0});if(S)buildCams3D(); // CCTV 복도도 3D
   }catch(e){console.error(e);try{rd.dispose();rd.forceContextLoss()}catch(_){}R3.rd=R3.T=null;R3.hot={};R3.dyn={};C3.cams=[];C3.menu=null;C3.M=null;C3.tx={};C3.key='';return fail3D('3D 장면 오류: '+(e&&e.message||e),true)}
-  R3.ok=true;R3.state='ok';VIEWS=[];updFoot(); // 2D 방은 이제 필요 없으니 메모리 비움
+  R3.ok=true;R3.state='ok';VIEWS=[];updFoot();monLoad(['stalker']); // 2D 방은 이제 필요 없으니 메모리 비움
 }
 function resize3D(){if(!R3.rd)return;R3.rd.setPixelRatio(Math.min(DPR,SET.quality==='low'?.75:SET.quality==='high'?2:MOB?.9:(R3.spot&&!R3.spot.castShadow?1:1.5)));R3.rd.setSize(W,H,false);R3.cam.aspect=W/H;R3.cam.fov=W/H<1.5?74:W/H>1.95?62:68;R3.cam.updateProjectionMatrix()}
 // ---- 화면 질감 (리썰컴퍼니 느낌): 낮은 해상도로 그려 픽셀 그대로 키우고, 색을 몇 단계로 끊고(점무늬 디더링), 물체 테두리에 어두운 외곽선 ----
@@ -1673,6 +1674,80 @@ void main(){vec2 px=1./res,cell=floor(vUv*res),uv=(cell+.5)*px;vec3 c=texture2D(
     FX.sc=new T.Scene();const q=new T.Mesh(new T.PlaneGeometry(2,2),FX.m);q.frustumCulled=false;FX.sc.add(q);FX.cam=new T.OrthographicCamera(-1,1,1,-1,0,1)}
   const u=FX.m.uniforms;u.tC.value=FX.rt.texture;u.tD.value=FX.rt.depthTexture;u.res.value.set(FX.rt.width,FX.rt.height);u.cn.value=cam.near;u.cf.value=cam.far;u.lv.value=SET.fx>=2?7:11;
   rd.setViewport(0,0,W,H);const ac=rd.autoClear;rd.autoClear=true;rd.render(FX.sc,FX.cam);rd.autoClear=ac}
+// ---- 3D 괴물 (model/m_*.glb, 뼈·애니메이션 포함): 처음 필요할 때 불러와 원본으로 두고, 쓰는 곳마다 복제 ----
+// h: 서 있을 때 키(m), em: 어두워도 형체가 보이게 살짝 스스로 빛남, still: 애니메이션 없이 통째로 움직임
+const MON={def:{stalker:{h:2.1,em:.05},hermit:{h:2.15,em:.05},runner:{h:.95,em:.1,still:1},diver:{h:1.9,em:.16},slider:{h:1.95,em:.45},hummer:{h:1.38,em:.06},drowned:{h:1.68,em:.08,still:1}},tpl:{},list:[],ld:null};
+function monLoad(keys){if(!R3.T)return;
+  if(!MON.ld)MON.ld=Promise.all([import('./lib/GLTFLoader.js'),import('./lib/SkeletonUtils.js')]).then(([a,b])=>{MON.GL=new a.GLTFLoader();MON.SU=b}).catch(e=>{console.warn('3D 괴물 불러오기 실패',e);MON.fail=1});
+  keys.forEach(k=>{if(k in MON.tpl)return;MON.tpl[k]=null;MON.ld.then(()=>MON.fail?null:MON.GL.loadAsync('model/m_'+k+'.glb?v='+VER)).then(g=>{if(!g)return;const T=R3.T,d=MON.def[k];
+    g.scene.traverse(o=>{if(o.isMesh){o.castShadow=true;o.frustumCulled=false;const m=o.material;if(m.map){m.emissiveMap=m.map;m.emissive=new T.Color(0xffffff);m.emissiveIntensity=d.em}m.roughness=.85;m.metalness=0}});
+    g.scene.updateMatrixWorld(true);const b=new T.Box3();g.scene.traverse(o=>{if(o.isSkinnedMesh){o.computeBoundingBox();b.union(o.boundingBox.clone().applyMatrix4(o.matrixWorld))}else if(o.isMesh){b.expandByObject(o)}});
+    const hh=b.max.y-b.min.y;g.sc=d.h/hh;g.y0=-b.min.y;g.clip={};g.animations.forEach(a=>g.clip[a.name]=a);MON.tpl[k]=g}).catch(e=>console.warn('괴물 모델',k,e))})}
+function monReady(k){return !!MON.tpl[k]}
+// 복제 하나: I.g를 장면에 넣고 위치·방향만 잡으면 됨 (발이 I.g 원점, 얼굴은 +z)
+function monNew(k){const t=MON.tpl[k];if(!t)return null;const T=R3.T,o=MON.SU.clone(t.scene),g=new T.Group();o.scale.setScalar(t.sc);o.position.y=t.y0*t.sc;g.add(o);
+  const I={k,g,o,mx:t.animations.length?new T.AnimationMixer(o):null,acts:{},cur:null};g.userData.mon=I;MON.list.push(I);return I}
+// 동작 바꾸기: 부드럽게 넘어감. once면 한 번 하고 마지막 자세로 멈춤
+function monPlay(I,name,o={}){if(!I||!I.mx)return;I.seen=MON.f;const t=MON.tpl[I.k],c=t.clip[name];if(!c)return;let a=I.acts[name];if(!a){a=I.acts[name]=I.mx.clipAction(c)}
+  a.timeScale=o.speed??1;if(I.cur===name)return a;a.reset();a.setLoop(o.once?R3.T.LoopOnce:R3.T.LoopRepeat,Infinity);a.clampWhenFinished=!!o.once;if(o.at!=null)a.time=o.at*c.duration;a.play();
+  const p=I.cur&&I.acts[I.cur];if(p&&p!==a&&(o.fade??.3)>0)a.crossFadeFrom(p,o.fade??.3,false);else if(p&&p!==a)p.stop();I.cur=name;I.mx.update(0);return a} // 바로 자세를 잡음 (한 프레임이라도 T자 자세가 보이지 않게)
+// 벽 모서리 뒤에서 내다보기: 몸 대부분은 벽 뒤(모서리 cx 바깥), 반쪽만 보이게. side 1이면 좌우 뒤집음
+// 문틀(모서리 cx) 안쪽에 서서 몸을 기울여 얼굴만 통로로 내밂. 몸은 진짜 벽에 가려짐
+function monPeek(g,k,clip,o={}){const u=g.userData;if(!monOnBB(g,k,clip))return false;const I=u.mon,hd=u.side?1:-1,H=MON.def[k].h,ang=o.ang??.32;
+  if(I.pk==null)I.pk=g.position.z;g.position.x=u.cx+hd*(Math.sin(ang)*H*.8+.06);g.position.z=I.pk-(o.dz??.3);I.g.rotation.z=hd*ang+Math.sin(T_*.9)*.015;return true}
+// 수영장: 위에서 계산한 판 그림(위치·보임)을 그대로 쓰고, 3D 모델이 있으면 판 대신 모델을 보여 줌
+function m2(P,key,k){let I=P['m3'+key];if(!I){if(!monReady(k))return null;I=P['m3'+key]=monNew(k);if(!I)return null;R3.sc2.add(I.g);I.g.rotation.order='YXZ'}I.g.visible=true;return I}
+function m2off(P,key){const I=P['m3'+key];if(I&&I.g.visible){I.g.visible=false;if(I.mx)I.mx.stopAllAction();I.cur=null}} // 다음에 나올 땐 동작을 처음부터
+function faceTo(I,x,z,cam){I.g.rotation.y=Math.atan2(cam.position.x-x,cam.position.z-z)}
+// 뼈를 세상 기준 위쪽 축으로 돌림 (머리를 플레이어 쪽으로)
+function boneYaw(I,name,a){let b=null;I.o.traverse(o=>{if(!b&&o.isBone&&o.name.endsWith(name))b=o});if(!b||!a)return;const T=R3.T;b.updateWorldMatrix(true,false);
+  const pw=new T.Quaternion();b.parent.getWorldQuaternion(pw);const bw=pw.clone().multiply(b.quaternion);bw.premultiply(new T.Quaternion().setFromAxisAngle(new T.Vector3(0,1,0),a));b.quaternion.copy(pw.invert().multiply(bw))}
+function mon2(P,cam,lit){const T3=R3.T,h=S.hum;
+  // 교대자: 아치에 서 있음
+  if(P.hum.visible&&m2(P,'hum','stalker')){const I=P.m3hum;P.hum.visible=false;I.g.position.set(P.hum.position.x,0,P.hum.position.z);faceTo(I,I.g.position.x,I.g.position.z,cam);I.g.rotation.x=I.g.rotation.z=0;monPlay(I,'idle')}
+  else if(P.humPk.visible&&m2(P,'hum','stalker')){const I=P.m3hum;P.humPk.visible=false; // 의자 옆 난간 너머에서 몸을 꺾어 얼굴을 들이밂
+    const sd=h.dir===0?-1:1,k=1-Math.max(0,h.timer)/humNear2(),lean=ease(Math.max(0,Math.min(1,k*1.6))),a=lerp(.08,.42,lean),Hh=MON.def.stalker.h*.93, // 얼굴이 올 자리(그림과 같은 곳)에서 거꾸로 발 위치를 구함
+      hx=sd*lerp(1.4,1.12,lean),hz=lerp(.02,.24,lean),hy=P.sp.eye-.2,fx=cam.position.x-hx,fz=cam.position.z-hz,fl=Math.hypot(fx,fz),x=hx-fx/fl*Hh*Math.sin(a),z=hz-fz/fl*Hh*Math.sin(a);
+    I.g.position.set(x,hy-Hh*Math.cos(a),z);faceTo(I,x,z,cam);I.g.rotation.x=a+Math.sin(T_*2.3)*.01;I.g.rotation.z=0;monPlay(I,'idle')}
+  else m2off(P,'hum');
+  // 흥얼이: 옆 통로를 걸어옴 → 의자 둘레를 돌며 지나감 (고개는 나를 봄)
+  if(P.hmS&&P.hmS.visible&&m2(P,'hm','hummer')){const I=P.m3hm;if(I.ei!==MON.def.hummer.em){I.ei=MON.def.hummer.em;I.o.traverse(o=>{if(o.isMesh)o.material.emissiveIntensity=I.ei})}const m=S.hm,a=P.arch[m.side],sx=Math.sign(a.x);P.hmS.visible=false;I.g.position.set(P.hmS.position.x,0,P.hmS.position.z);I.g.rotation.set(0,-sx*PI2,0);monPlay(I,'walk',{speed:1.15})}
+  else if(P.hmP&&P.hmP.visible&&m2(P,'hm','hummer')){const I=P.m3hm,m=S.hm,sp=m.side===0?-1:1,k=1-Math.max(0,m.timer)/7.5;P.hmP.visible=false;
+    const fw=new T3.Vector3();cam.getWorldDirection(fw);fw.y=0;fw.normalize();const rt=new T3.Vector3(-fw.z,0,fw.x),r=.62,th=sp*Math.cos(k*Math.PI)*1.25,dth=-sp*Math.sin(k*Math.PI); // 도는 방향
+    const p=cam.position.clone().addScaledVector(fw,Math.cos(th)*r).addScaledVector(rt,Math.sin(th)*r),tg=fw.clone().multiplyScalar(-Math.sin(th)).addScaledVector(rt,Math.cos(th)).multiplyScalar(Math.sign(dth)||1);
+    {const ei=MON.def.hummer.em+.5*(S.eyeA||0);if(I.ei!==ei){I.ei=ei;I.o.traverse(o=>{if(o.isMesh)o.material.emissiveIntensity=ei})}} // 눈 가린 채 손가락 틈으로 볼 때 더 또렷이
+    I.g.position.set(p.x,P.TY-.55,p.z);I.g.rotation.set(0,Math.atan2(tg.x,tg.z),0);monPlay(I,'walk',{speed:1.3});I.mx.update(0); // 안전요원석 바닥 위를 걸음
+    const want=Math.atan2(cam.position.x-p.x,cam.position.z-p.z);let dA=want-I.g.rotation.y;dA=Math.atan2(Math.sin(dA),Math.cos(dA));dA=Math.max(-1.5,Math.min(1.5,dA));boneYaw(I,'Neck',dA*.45);boneYaw(I,'Head',dA*.55)}
+  else m2off(P,'hm');
+  // 잠수부: 물 밑을 헤엄쳐 옴 → 물에서 천천히 일어섬 → (손전등을 끄고 버티면) 가라앉음
+  const v=S.dv;
+  if(v&&P.wake.visible&&m2(P,'dv','diver')){const I=P.m3dv;I.g.position.set(P.wake.position.x,WATER_Y-.6,P.wake.position.z-.5);I.g.rotation.set(0,0,0);monPlay(I,'swim',{speed:1.3,fade:0});I.dark=1}
+  else if(v&&P.dvBody.visible&&m2(P,'dv','diver')){const I=P.m3dv;P.dvBody.visible=false;const down=ease(Math.min(1,Math.max(0,(v.off||0)-2.2)/.8));
+    const up=ease(Math.min(1,(v.t3||0)/.9)); // 물 밑에서 쑥 올라와 허벅지까지 드러냄 (안전요원석 높이에서도 보이게)
+    I.g.position.set(P.dvBody.position.x,-.5+lerp(-1.15,0,up)-down*1.5,P.dvBody.position.z+.5);faceTo(I,I.g.position.x,I.g.position.z,cam);I.dark=0;
+    const ra=I.acts.rise;if(!I.cur||I.cur==='swim')monPlay(I,'rise',{once:1,fade:0});if(down>0)monPlay(I,'sink',{once:1,fade:.25});else if(I.cur==='rise'&&ra&&ra.time>=MON.tpl.diver.clip.rise.duration*.5)monPlay(I,'stare',{fade:.6})} // 일어서는 동작을 끝까지 한 뒤 노려봄
+  else m2off(P,'dv');
+  if(P.m3dv&&P.m3dv.g.visible){const I=P.m3dv;if(I.dk!==I.dark){I.dk=I.dark;I.o.traverse(o=>{if(o.isMesh){o.material.color.setHex(I.dark?0x24383a:0xffffff);o.material.emissiveIntensity=I.dark?0:MON.def.diver.em}})}}
+  // 미끄럼틀: 미끄럼틀 끝에서 거꾸로 매달린 채 손부터 → 얼굴까지 쑥 나옴
+  const l=S.sl;
+  if(l&&P.slHand.visible&&m2(P,'sl','slider')){const I=P.m3sl;P.slHand.visible=false;P.slFace.visible=false;
+    if(!P.slQ){const E=new T3.Vector3(...SLIDE_EXIT),d=E.clone().sub(new T3.Vector3(2.6,1.5,-4.7)).normalize(),y=d.clone().negate(),c=cam.position.clone().sub(E),z=c.sub(y.clone().multiplyScalar(c.dot(y))).normalize(),x=y.clone().cross(z);
+      P.slQ=new T3.Quaternion().setFromRotationMatrix(new T3.Matrix4().makeBasis(x,y,z));P.slD=d;P.slE=E}
+    const k=ease(Math.min(1,Math.max(0,(3-l.timer)/2.4))); // 처음엔 늘어뜨린 손만(출구 밖 ~25cm), 끝엔 거꾸로 된 얼굴까지
+    I.g.quaternion.copy(P.slQ);I.g.position.copy(P.slE).addScaledVector(P.slD,lerp(.45,1.75,k));I.g.position.y+=Math.sin(T_*20)*.003;monPlay(I,'hang')}
+  else m2off(P,'sl');
+  // 익사자: 바닥에 누워 있다가 수면 바로 밑까지 떠오름 (그림과 같은 투명도·물빛)
+  if(P.drn&&P.drn.material.opacity>.01&&m2(P,'drn','drowned')){const I=P.m3drn,m=P.drn;if(!I.bm){I.bm=1;I.o.traverse(o=>{if(o.isMesh){o.material=new T3.MeshBasicMaterial({map:o.material.map,transparent:true,depthWrite:false});o.renderOrder=-1}})}
+    I.o.traverse(o=>{if(o.isMesh){o.material.opacity=m.material.opacity;o.material.color.copy(m.material.color)}});m.visible=false;
+    I.g.position.set(m.position.x,m.position.y+.05,m.position.z+.85);I.g.rotation.set(-PI2,0,m.rotation.z,'XYZ');I.g.rotation.order='XYZ';I.g.scale.set(1+Math.sin(T_*2.1)*.02,1,1)}
+  else{m2off(P,'drn');if(P.drn)P.drn.visible=true}
+}
+function monShown(I){let o=I.g;while(o){if(!o.visible)return false;o=o.parent}return true}
+function monUpdate(dt){MON.f=(MON.f||0)+1;for(const I of MON.list)if(I.mx&&MON.f-(I.seen||-9)<=2&&monShown(I))I.mx.update(dt)} // 지금 그리고 있는 것만 (지난 밤 CCTV에 쓰던 복제는 쉼)
+// 2D 판(bb3)에 3D 괴물을 겹침: 모델이 준비되면 판 그림은 숨기고 모델을 보여 줌
+function monOnBB(g,k,clip,o={}){const u=g.userData;if(!u.mon){if(!monReady(k))return false;const I=monNew(k);if(!I)return false;u.mon=I;g.add(I.g);if(o.s)I.g.scale.setScalar(o.s);
+    if(o.op<1)I.o.traverse(m=>{if(m.isMesh){m.material=m.material.clone();m.material.transparent=true;m.material.opacity=o.op;m.material.depthWrite=false}})}
+  const I=u.mon;u.m.visible=false;I.g.visible=true;if(clip)monPlay(I,clip,o);return true}
 // ---- 재료/도형 도우미 ----
 function tx3(img,rx=1,ry=1,srgb=true){const T3=R3.T,t=new T3.Texture(img),src=R3.src||(R3.src=new Map());if(srgb)t.colorSpace=T3.SRGBColorSpace;t.wrapS=t.wrapT=T3.RepeatWrapping;t.repeat.set(rx,ry);t.anisotropy=8;
   if(src.has(img)){t.source=src.get(img);t.version++}else{src.set(img,t.source);t.needsUpdate=true}return t} // 같은 그림은 GPU에 한 번만 올림 (경비실·복도가 같이 씀)
@@ -1946,7 +2021,7 @@ function draw3D(){
   const led=(m,c)=>{if(m)m.material.color.setHex(c)};
   led(D.monLed,P?0x33cc33:0x0a1a0a);led(D.camLed,P&&T_%2<1?0xee2222:0x200404);led(D.radioLed,!P?0x0a1a0a:(S.night>=2&&S.stat.duct>=0&&Math.random()<.3+S.stat.duct*.6)?0xff3322:0x33cc33);led(D.phoneLed,!P?0x200404:S.ring>0?(T_%.5<.25?0xff4444:0x400808):0xcc2222);
   if(D.store){const v=D.store,r=S.run,on=S.night>=3;const a=on?(r.phase?1:r.open):0,sl=r&&r.slam>0?r.slam/.35:0;v.hinge.rotation.y=-(a*1.15)*(1-sl)+(sl?Math.sin(T_*60)*.01:0); // 안쪽(방 쪽)으로 열림
-    if(a>.01||v.lastA>.01){drawStoreHall(v.C,a,r,on);v.T.needsUpdate=true}v.lastA=a}
+    if(a>.01||v.lastA>.01){runner3D(v,r,on);drawStoreHall(v.C,a,r,on);v.T.needsUpdate=true}else if(v.ov)v.ov.visible=false;v.lastA=a}
   if(D.vent){const v=D.vent,st=S.stat,at=S.night>=2&&st.duct>=1;const kk=Math.min(1,(T_-(v.lt??T_))*12);v.lt=T_;v.shut.position.y+=((S.vent?0:.39)-v.shut.position.y)*kk;v.shut.position.x=at&&S.vent&&st.bangT>.9?rnd(-.01,.01):0;
     v.face.visible=at&&!S.vent&&!!PIC.sclose;if(v.face.visible&&v.face.userData.im!==PIC.sclose){v.face.material.map=imgTex(PIC.sclose);v.face.material.needsUpdate=true;v.face.userData.im=PIC.sclose}
     if(v.face.visible){v.face.position.z=.082+Math.min(.04,st.wait*.015);v.face.position.x=Math.sin(T_*9)*.004}}
@@ -2246,6 +2321,9 @@ function drawCam3D(g,C,i,menu,t){
    D.far2.visible=st===0&&!!PIC.sfull;D.mid2.visible=st===1&&!!PIC.speek;if(D.mid2.visible&&S.stat.enter>0)D.mid2.position.y=Math.min(.6,S.stat.enter*.12);else D.mid2.position.y=0} // 환풍구로 올라가는 중이면 몸이 위로 끌려 올라감
   const fk=!menu&&S.fake.cam===i;D.fakeH.visible=fk&&S.fake.type==='hum'&&!!STK.full;D.fakeC.visible=fk&&S.fake.type!=='hum'&&!!PIC.cstand;
   [D.fakeH,D.fakeC].forEach(o=>{if(o.visible)o.position.x=o.userData.x0+rnd(-.04,.04)});
+  // 3D 괴물이 준비됐으면 판 그림 대신 (교대자: 서 있기·벽 뒤에서 내다보기, 은둔자: 웅크림·벽 뒤)
+  if(D.far.visible)monOnBB(D.far,'stalker','idle');if(D.fakeH.visible)monOnBB(D.fakeH,'stalker','idle',{op:.7});if(D.far2.visible)monOnBB(D.far2,'hermit','crouch');
+  if(D.mid.visible)monPeek(D.mid,'stalker','idle');if(D.mid2.visible)monPeek(D.mid2,'hermit','walk',{ang:.42,speed:.15});
   const exOn=!!C.exit&&(menu?C.k==='endless':EXIT_CAM[S.night-1]===i);if(C.exit)C.exit.visible=exOn;
   if(D.hand){const off=!menu&&S.night>=D.handNight;D.hand.position.y=off?-.36:.08;D.hand.rotation.z=off?Math.sin(t*1.3)*.3:0} // 4일 차부터 벽 전화 수화기가 내려가 흔들림
   // 이상 현상
@@ -2294,7 +2372,7 @@ function panels3(par,pts,Hc){
 // 샷 목록을 시간 순서대로 재생. 샷 = {d:길이(초), scene:'room'|'intro'|'outro'|null, cam(u,t,C), room:{경비실 연출값}, fx(u,t,C), cap:자막, at:{초:함수}, fi/fo:페이드, white(u):흰 화면}
 // 3D가 안 되면 검은 화면에 자막만 나옴. 화면을 누르면 건너뛰기 버튼이 잠깐 나타남
 const CUT={id:null,areas:{}};
-function playCut(id,done,n){
+function playCut(id,done,n){monLoad(['stalker']);
   const def=CUTS[id];if(!def){if(done)done();return}
   initAudio();if(staticG)staticG.gain.setTargetAtTime(0,AC.currentTime,.1);
   Object.assign(CUT,{id,def,done,n:n||(S?S.night:1),t:0,i:-1,fired:{},cap:null,lastN:-1});
@@ -2469,7 +2547,7 @@ const CUTS={
     {d:6,scene:'intro',fi:1,cam:(u,t,C)=>shotCam(C,V(0,1.62,1),V(.3,1.62,-3.2),V(0,1.5,-10),V(2.29,1.9,-3.0),u,{walk:true,te:true,ts:.45,tf:.9}),at:{0:()=>steps(10)}},
     {d:5,scene:'intro',cap:'아까 붙인 거다.',cam:(u,t,C)=>{const a=V(2.29,1.9,-3.0),b=V(-2.29,1.5,-3.0),c=V(-2.29,1.5,-7.4),tg=u<.55?a.clone().lerp(b,ease(Math.min(1,u/.4))):b.clone().lerp(c,ease((u-.55)/.45));shotCam(C,V(.3,1.62,-3.2),V(-.1,1.62,-3.3),tg,tg,u)},at:{1.5:()=>drip(0)}},
     {d:7,scene:'intro',cap:'',cam:(u,t,C)=>{const P=walkPath([[-.1,-3.3],[0,-8.6],[0,-10.6],[0,-13.0]]),e=ease(u),p=P.getPointAt(e),st=e*P.getLength()/.7;C.position.set(p.x+Math.sin(st*Math.PI/2)*.012,1.62+(u<.86?Math.sin(st*Math.PI)*.022:0),p.z+(u>.9?(u-.9)*3:0));C.lookAt(0,1.5,-18)},
-      fx:(u,t,C)=>{const A=CUT.areas.intro,f=t>4.8&&t<5.3;A.dyn.fig.visible=t>3.2&&t<4.8;cutPanels(A,()=>f);A.lights.forEach(l=>l.userData.cutI=f?.3:6)},at:{0:()=>steps(13),4.8:()=>humTo(0,.01),5.3:()=>humTo(.55,.05)}},
+      fx:(u,t,C)=>{const A=CUT.areas.intro,f=t>4.8&&t<5.3;A.dyn.fig.visible=t>3.2&&t<4.8;if(A.dyn.fig.visible)monOnBB(A.dyn.fig,'stalker','idle');cutPanels(A,()=>f);A.lights.forEach(l=>l.userData.cutI=f?.3:6)},at:{0:()=>steps(13),4.8:()=>humTo(0,.01),5.3:()=>humTo(.55,.05)}},
     {d:3,scene:'intro',cam:(u,t,C)=>shotCam(C,V(0,1.62,-12.7),V(0,1.62,-12.7),V(0,1.5,-18),V(1.1,1.45,-14.2),u,{te:true,ts:.3,tf:.9}),at:{.6:()=>ringTone(),2.4:()=>ringTone()}},
     {d:6,scene:'intro',cam:(u,t,C)=>{const P=walkPath([[0,-12.7],[.5,-14.2],[2.6,-14.4]]),p=P.getPointAt(ease(u)),st=u*P.getLength()/.7;C.position.set(p.x,1.62+Math.sin(st*Math.PI)*.022,p.z);const a=V(4,2.3,-11.6),b=V(7.3,2.4,-11.7),c=V(7.45,1.3,-14.5);C.lookAt(u<.55?a.lerp(b,ease(u/.55)):b.lerp(c,ease((u-.55)/.45)))},
       fx:(u,t)=>{const D=CUT.areas.intro.dyn;D.camLed.visible=t%1<.5},at:{0:()=>steps(8),1.2:()=>ringTone(),3.6:()=>ringTone()}},
@@ -3007,6 +3085,7 @@ function draw3D2(){
       fw=new T3.Vector3();cam.getWorldDirection(fw);fw.y=0;fw.normalize();const rt=new T3.Vector3(-fw.z,0,fw.x),hh=.95,r=.62,
       p=cam.position.clone().addScaledVector(fw,Math.cos(th)*r).addScaledVector(rt,Math.sin(th)*r);
       P.hmP.scale.set(hh*P.hmP.userData.ar*(sp<0?1:-1),hh,1);P.hmP.material.emissiveIntensity=1+2.2*(S.eyeA||0); /* 눈 가린 채 손가락 틈으로 볼 때 더 또렷이 */P.hmP.position.set(p.x,cam.position.y-.28*hh+Math.sin(T_*3)*.02,p.z);P.hmP.lookAt(cam.position.x,P.hmP.position.y,cam.position.z)}}
+  mon2(P,cam,lit);
   // 통로 패널: 테이블 위 모니터를 눈앞으로 들어 올림. 화면엔 CCTV 영상 (내려놓았을 땐 가끔만 갱신)
   if(P.mon){const e=ease(Math.min(1,S.monA));P.monLed.material.color.setHex(S.mon||T_%1.4<.7?0xff2a20:0x300604);
     if(e>.001){cam.updateMatrixWorld();const fw=new T3.Vector3(0,0,-1).applyQuaternion(cam.quaternion),up=new T3.Vector3(0,1,0).applyQuaternion(cam.quaternion),th=Math.tan(cam.fov*Math.PI/360)*cam.aspect,d=.24/(2*th*.7);
@@ -3311,6 +3390,14 @@ function initAudio(){
   {const rs=AC.createBufferSource();rs.buffer=NB;rs.loop=true;const f=AC.createBiquadFilter();f.type='bandpass';f.frequency.value=1700;f.Q.value=2.5;const am=AC.createGain(),lfo=AC.createOscillator(),lg=AC.createGain();lfo.type='square';lfo.frequency.value=13;lg.gain.value=0;am.gain.value=.5;lfo.connect(lg);lg.connect(am.gain);radioG=AC.createGain();radioG.gain.value=0;const pn=AC.createStereoPanner?AC.createStereoPanner():null;rs.connect(f);f.connect(am);am.connect(radioG);if(pn){pn.pan.value=-.35;radioG.connect(pn);pn.connect(master)}else radioG.connect(master);rs.start();lfo.start()} // 책상 무전기 잡음 (잡음이 덕트 안에 있을 때)
   applySet();
 }
+// ---- 창고 통로의 3D 질주자: 통로 안쪽을 따로 그린 그림(렌더 타깃)을 문 안 그림 위에 겹침. 멀리 서 있다가 → 네 발로 달려옴 ----
+function runner3D(v,r,on){const T=R3.T,run=on&&r.phase===1,k=run?1-r.runT/(S.hard?2.6:3.4):0,show=on&&(run||r.open>.6)&&(!run||k<.9)&&monReady('runner');v.m3on=show;
+  if(!show){if(v.ov)v.ov.visible=false;return}
+  if(!v.rs){v.rt=new T.WebGLRenderTarget(256,512);const sc=new T.Scene();sc.fog=new T.Fog(0x000000,4,13);sc.add(new T.HemisphereLight(0xfff0d0,0x201810,1.4));const L=new T.PointLight(0xffe8c0,14,14,1);L.position.set(0,1.8,.5);sc.add(L);
+    const cam=new T.PerspectiveCamera(42,.8/2.02,.1,30);cam.position.set(0,1.05,0);cam.setViewOffset(256,512,0,26,256,512);v.rs=sc;v.rc=cam;const I=monNew('runner');sc.add(I.g);v.rI=I;
+    v.ov=PLN(.8,2.02,new T.MeshBasicMaterial({map:v.rt.texture,transparent:true,depthWrite:false}),0,1.04,-.002,v.hinge.parent);v.ov.renderOrder=2}
+  const I=v.rI,d=run?lerp(9,1.3,k):9.5,t=T_;I.g.position.set(Math.sin(t*23)*.02*(run?1:0),run?Math.abs(Math.sin(t*15))*.07:0,-d);I.g.rotation.set(run?Math.sin(t*15)*.06:0,run?Math.sin(t*7.5)*.1:Math.sin(t*.7)*.05,run?Math.sin(t*11)*.05:0);
+  v.ov.visible=true;const rd=R3.rd,pc=rd.getClearColor(new T.Color()),pa=rd.getClearAlpha(),prt=rd.getRenderTarget();rd.setRenderTarget(v.rt);rd.setClearColor(0x000000,0);rd.clear();rd.render(v.rs,v.rc);rd.setRenderTarget(prt);rd.setClearColor(pc,pa)}
 // ---- 창고 통로: 문틈 너머 그림. 달려올 때 형체가 점점 커짐 ----
 function drawStoreHall(c,a,r,on){const g=c.getContext('2d'),w=c.width,h=c.height;
   const bg=g.createRadialGradient(w*.5,h*.45,4,w*.5,h*.45,h*.6);bg.addColorStop(0,'#000');bg.addColorStop(.25,'#060504');bg.addColorStop(1,'#1a1610');g.fillStyle=bg;g.fillRect(0,0,w,h);
@@ -3318,7 +3405,8 @@ function drawStoreHall(c,a,r,on){const g=c.getContext('2d'),w=c.width,h=c.height
   if(!on)return;const run=r.phase===1,k=run?1-r.runT/(S.hard?2.6:3.4):0;
   if(run||r.open>.6){const z=run?.12+k*.95:.06,cx2=w*.5+Math.sin(T_*23)*w*.02*z,fy=h*.45+h*.5*z,fh=h*(.15+z*.95);
     const im=!run?(PIC.rside||PIC.rfull):z>.8&&PIC.rclose?PIC.rclose:PIC.rfull; // 서서 노려봄 → 달려옴 → 문 앞에서 거꾸로 된 얼굴
-    if(im){const fw=fh*im.width/im.height;g.globalAlpha=Math.min(1,.3+z);g.drawImage(im,cx2-fw/2,fy-fh,fw,fh);g.globalAlpha=1}
+    if(R3.dyn.store&&R3.dyn.store.m3on){} // 3D 질주자가 달려오는 중 (마지막 순간엔 그림의 거꾸로 된 얼굴)
+    else if(im){const fw=fh*im.width/im.height;g.globalAlpha=Math.min(1,.3+z);g.drawImage(im,cx2-fw/2,fy-fh,fw,fh);g.globalAlpha=1}
     else{g.save();g.translate(cx2,fy);g.scale(fh/200,fh/200);g.fillStyle='#050403';g.beginPath();g.ellipse(0,-60,40,26,0,0,7);g.fill(); // 임시 형체: 네 발로 꺾인 몸
       [[-36,-55,-60,0],[36,-55,60,0],[-20,-50,-40,-110],[20,-50,40,-110]].forEach(([x0,y0,x1,y1])=>{g.lineWidth=9;g.strokeStyle='#050403';g.beginPath();g.moveTo(x0,y0);g.lineTo((x0+x1)/2+(x1>0?14:-14),(y0+y1)/2-30);g.lineTo(x1,y1);g.stroke()});
       g.beginPath();g.ellipse(0,-98,20,24,0,0,7);g.fill();g.fillStyle='rgba(240,236,220,.9)';[-1,1].forEach(s3=>{g.beginPath();g.arc(s3*7,-102,3,0,7);g.fill()});g.fillStyle='#2a0404';g.beginPath();g.ellipse(0,-86,9,12,0,0,7);g.fill();g.restore()}}
@@ -3624,7 +3712,7 @@ function toMenu(){
   $('play').classList.remove('show');
   setMode('menu');if(staticG)staticG.gain.setTargetAtTime(.009,AC.currentTime,.6);
 }
-function startGame(n,dev,hard=false,ch=1){initAudio();setChapter(ch);DEV.on=dev;HARD=dev?DEV.hard:hard;DEV.speed=1;if(staticG)staticG.gain.setTargetAtTime(0,AC.currentTime,.1);newNight(n);buildDbg()}
+function startGame(n,dev,hard=false,ch=1){initAudio();setChapter(ch);monLoad(ch===2?['stalker','diver','slider','hummer','drowned']:['stalker','hermit','runner']);DEV.on=dev;HARD=dev?DEV.hard:hard;DEV.speed=1;if(staticG)staticG.gain.setTargetAtTime(0,AC.currentTime,.1);newNight(n);buildDbg()}
 // 3D 엔진(700KB)이 아직 오는 중이면 잠깐 기다렸다 시작. 안 그러면 느린 폰 회선에서 2D 방으로 시작됨
 let going=false;
 function go(fn){
@@ -3707,6 +3795,7 @@ if(/[?&]test/.test(location.search))$('devp').classList.add('show');
 // ===================== 루프 =====================
 function loop(ts){
   const dt=Math.min(.05,(ts-last)/1000||0);last=ts;T_=ts/1000;
+  if(MON.list.length)monUpdate(PAUSE.on?0:dt);
   if(mode==='menu')renderMenu(dt);
   else if(mode==='game'&&S){
     if(!S.paused&&!PAUSE.on)update(dt*(DEV.on?DEV.speed:1));
