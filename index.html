@@ -352,7 +352,7 @@ body[data-mode=game] #pauseBtn{display:flex}
 <script nomodule>window.THREE_ERR='nomodule'</script>
 <script>
 // ===================== 기본 =====================
-const VER='0.24.0'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
+const VER='0.24.1'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
 const $=id=>document.getElementById(id);
 const cv=$('cv'),cx=cv.getContext('2d');
 let W,H,DPR=1;const MOB=matchMedia('(pointer:coarse)').matches||/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent); // 폰이면 가볍게
@@ -2839,7 +2839,9 @@ function buildHands(){const T3=R3.T,sc=new T3.Scene(),cam=new T3.PerspectiveCame
   HND.cov=0;HND.aim=0;HND.aimX=0;HND.aimY=0;HND.thP=0;HND.swK=0;HND.swS=-1;HND.swT=0}
 // ---- 리깅한 두 팔 모델 ----
 // model/hands.json(뼈: 이름·부모·위치) + hands.bin(양자화한 정점·UV·가중치·인덱스) + 색/노멀 텍스처. 모델 축: 손가락=+y, 손등=+z
-const HSC=.3; // 모델 1 = 0.3m
+const HSC=.3;
+// 손전등을 쥔 손: 원통 축이 지나는 점 c(모델 좌표)와 손 가로선에서 기운 각 a, 손가락마다 원통에 닿는 데까지만 굽힌 값 f (손전등을 뚫지 않게 미리 계산)
+const GRIP={R:{c:[.411,1.2747,-.1506],a:0,ph:1.6,f:[.99,1.53,.81,.888,1.372,.726,.845,1.306,.691,.727,1.022,.541]},L:{c:[-.4015,1.2701,-.1462],a:.2,f:[.82,1.048,.774,.898,1.147,.848,.905,1.156,.855,.884,1.13,.835]}}; // 모델 1 = 0.3m
 async function loadHands(){const T=R3.T,base='model/hands';try{
   const J=await (await fetch(base+'.json?v='+VER)).json(),ab=await (await fetch(base+'.bin?v='+VER)).arrayBuffer(),n=J.n,[oP,oN,oU,oI,oW,oX]=J.offs;
   const pq=new Uint16Array(ab,oP,n*3),pos=new Float32Array(n*3);for(let i=0;i<n*3;i++)pos[i]=J.lo[i%3]+pq[i]/65535*J.sc[i%3];
@@ -2859,20 +2861,15 @@ function makeRig(H){const T=R3.T,P=n=>new T.Vector3(...H.J.bones.find(b=>b.name=
   for(const sd of ['L','R'])for(const f of ['index','middle','ring','pinky']){const a=P(`${sd}_${f}1`),b=P(`${sd}_${f}2`);R.ang[sd+f]=Math.atan2(b.x-a.x,b.y-a.y)}
   const B=(x,y,z)=>new T.Quaternion().setFromRotationMatrix(new T.Matrix4().makeBasis(new T.Vector3(...x),new T.Vector3(...y),new T.Vector3(...z)));
   // 손전등을 쥔 손: 모델 x(검지→새끼)를 손전등 축(+z)에, 손등은 손전등 아래 오른쪽(phi)
-  {const ph=.7,zb=[Math.sin(ph),-Math.cos(ph),0],xb=[0,0,1],yb=new T.Vector3(...zb).cross(new T.Vector3(...xb)).toArray();R.qGrip=B(xb,yb,zb)}
+  {const ph=GRIP.R.ph??.7,zb=[Math.sin(ph),-Math.cos(ph),0],xb=[0,0,1],yb=new T.Vector3(...zb).cross(new T.Vector3(...xb)).toArray();R.qGrip=B(xb,yb,zb).multiply(new T.Quaternion().setFromAxisAngle(new T.Vector3(0,0,1),-GRIP.R.a))}
   R.qRest=B([1,0,0],[0,0,-1],[0,1,0]).premultiply(new T.Quaternion().setFromEuler(new T.Euler(0,.3,0))); // 무릎 위: 손등이 위, 손가락이 앞
   R.qCov=B([0,1,0],[1,0,0],[0,0,-1]); // 눈 가리기: 손가락이 오른쪽(가로), 손바닥이 얼굴 쪽
   R.cPalm=P('L_hand').lerp(P('L_middle1'),.55);
-  // 쥔 상태의 원통 중심 (모델 좌표)
-  H.HR=R;HND.rig=R;poseFingers('R',[1.3,1.5,1.1],.4,[.3,.6,.4]);H.root.updateMatrixWorld(true);
-  const W=n=>{const v=new T.Vector3();H.by[n].getWorldPosition(v);return H.root.worldToLocal(v)},F=['index','middle','ring','pinky'];
-  R.cGrip=F.map(f=>W('R_'+f+'1')).reduce((a,b)=>a.add(b),new T.Vector3()).divideScalar(4).lerp(F.map(f=>W('R_'+f+'3')).reduce((a,b)=>a.add(b),new T.Vector3()).divideScalar(4),.45);
-  {const lb=new T.Vector3(...(HND.SV?HND.SV.lb:[-.7,0,0])).normalize(),xb=new T.Vector3(0,0,-1),yb=lb.clone().cross(xb);R.qGripL=new T.Quaternion().setFromRotationMatrix(new T.Matrix4().makeBasis(xb,yb,lb))} // 왼손이 꼬리 뚜껑을 쥠: 엄지 쪽이 손전등 머리 방향
-  poseFingers('L',[1.15,1.35,1],.4,[.3,.5,.4]);H.root.updateMatrixWorld(true);
-  R.cGripL=F.map(f=>W('L_'+f+'1')).reduce((a,b)=>a.add(b),new T.Vector3()).divideScalar(4).lerp(F.map(f=>W('L_'+f+'3')).reduce((a,b)=>a.add(b),new T.Vector3()).divideScalar(4),.45);
+  H.HR=R;HND.rig=R;R.cGrip=new T.Vector3(...GRIP.R.c);R.cGripL=new T.Vector3(...GRIP.L.c);
+  {const lb=new T.Vector3(...(HND.SV?HND.SV.lb:[-.7,0,0])).normalize(),xb=new T.Vector3(0,0,-1),yb=lb.clone().cross(xb);R.qGripL=new T.Quaternion().setFromRotationMatrix(new T.Matrix4().makeBasis(xb,yb,lb)).multiply(new T.Quaternion().setFromAxisAngle(new T.Vector3(0,0,1),-GRIP.L.a))} // 왼손이 꼬리 뚜껑을 쥠: 엄지 쪽이 손전등 머리 방향
   return R}
 function poseFingers(sd,curl,spread,thumb){const H=HND.H,R=HND.rig,mid=R.ang[sd+'middle'];
-  ['index','middle','ring','pinky'].forEach((f,i)=>{const a=R.ang[sd+f],tgt=mid+(a-mid)*spread;H.by[`${sd}_${f}1`].rotation.set(-curl[0]*(i===3?1.1:1),0,a-tgt);H.by[`${sd}_${f}2`].rotation.set(-curl[1],0,0);H.by[`${sd}_${f}3`].rotation.set(-curl[2],0,0)});
+  ['index','middle','ring','pinky'].forEach((f,i)=>{const a=R.ang[sd+f],tgt=mid+(a-mid)*spread;const c=curl.length>=12?curl.slice(i*3,i*3+3):[curl[0]*(i===3?1.1:1),curl[1],curl[2]];H.by[`${sd}_${f}1`].rotation.set(-c[0],0,a-tgt);H.by[`${sd}_${f}2`].rotation.set(-c[1],0,0);H.by[`${sd}_${f}3`].rotation.set(-c[2],0,0)}); // curl: 세 마디 공통 [3] 또는 손가락마다 [12]
   const sg=sd==='L'?1:-1;H.by[`${sd}_thumb1`].rotation.set(thumb[0],0,0);H.by[`${sd}_thumb2`].rotation.set(0,sg*thumb[1],0);H.by[`${sd}_thumb3`].rotation.set(0,sg*thumb[2],0)}
 // 손 자세 qh(장면 회전)로 손의 모델 점 c를 장면 위치 pos에 놓고, 팔뚝은 foreDir(팔꿈치→손목) 쪽으로
 function placeArm(sd,qh,c,pos,foreDir){const T=R3.T,H=HND.H,R=HND.rig,arm=H.by[sd+'_arm'],hand=H.by[sd+'_hand'],sc=arm.scale.x||1;
@@ -2890,7 +2887,7 @@ function drawHands(fk,lit,warn){if(!HND.sc)buildHands();const T3=R3.T,cam=HND.ca
   HND.swK+=((sw?1:0)-HND.swK)*.14;const k=ease(Math.min(1,HND.swK)),xr=Math.min(hw*.62,.34),ak=ease(Math.min(1,HND.aim));
   HND.R.visible=(handsOn()||HND.swK>.02)&&S.monA<.4;
   // 교체: 손전등을 세워 들고(머리 위, 꼬리 아래) 왼손이 꼬리 뚜껑을 돌려 엶 → 헌 배터리가 아래로 빠짐 → 새 배터리를 밀어 넣음 → 뚜껑을 다시 돌려 닫음
-  const SV=HND.SV||(HND.SV={tq:[-.6,-.78,.1],rp:[.1,.05,-.47],rg:-.015,rf:[-1,.3,-.45],lb:[-.7,0,0],lf:[.55,.75,-.6],off:[-.17,-.27,-.25]});
+  const SV=HND.SV||(HND.SV={tq:[-.6,-.78,.1],rp:[.1,.05,-.47],rg:.03,rf:[-1,.3,-.45],lb:[-.7,0,0],lf:[.55,.75,-.6],off:[-.17,-.27,-.25]});
   if(!HND.qSw){const zt=new T3.Vector3(...SV.tq).normalize(),ref=new T3.Vector3(0,0,1),yt=ref.sub(zt.clone().multiplyScalar(ref.dot(zt))).normalize(),xt=yt.clone().cross(zt);HND.qSw=new T3.Quaternion().setFromRotationMatrix(new T3.Matrix4().makeBasis(xt,yt,zt))}
   HND.R.position.set(lerp(xr+lag,SV.rp[0],k),lerp(-.098+br,SV.rp[1],k),lerp(-.4,SV.rp[2],k));
   HND.fl.quaternion.setFromEuler(new T3.Euler(.06+ak*HND.aimY*.35+Math.sin(t*.9)*.01,.16-ak*HND.aimX*.45,-.05)).slerp(HND.qSw,k);
@@ -2910,15 +2907,15 @@ function drawHands(fk,lit,warn){if(!HND.sc)buildHands();const T3=R3.T,cam=HND.ca
   const showR=(handsOn()||HND.swK>.02)&&S.monA<.4,showL=(handsOn()||HND.cov>.01||HND.swK>.02)&&(S.monA<.4||HND.cov>.01);HND.R.visible=showR;HND.L.visible=showL;
   if(Hm){const Rg=HND.rig;HND.fl.updateMatrixWorld(true);const qT=HND.fl.getWorldQuaternion(new T3.Quaternion());
     Hm.by.R_arm.scale.setScalar(showR?1:0);const CV=HND.CV||(HND.CV={x:-.08,y:.011,z:-.125,sp:.5,s:1.45,cu:.02,r:-.3});Hm.by.L_arm.scale.setScalar(showL?lerp(1,CV.s,c):0);
-    if(showR){poseFingers('R',[1.3,1.5,1.1],.4,[.3,.6,.4]);
+    if(showR){poseFingers('R',GRIP.R.f,.4,[.3,.5,.05]);
       placeArm('R',qT.clone().multiply(Rg.qGrip),Rg.cGrip,FW(0,0,lerp(.03,SV.rg,k)),new T3.Vector3(lerp(-.8,SV.rf[0],k),lerp(.3,SV.rf[1],k),lerp(-1,SV.rf[2],k)))}
     if(showL){const swL=lT&&c<.5,L=HND.Ls||(HND.Ls={}),f=swL||HND.swK>.03?.3:1; // 왼손: 무릎 위 / 눈 가리기 / 교체 (사이를 부드럽게)
       let fg,q,pos,cP,fd;
-      if(swL){fg=[1.15,1.35,1,.4,.3,.5,.4];q=qT.clone().multiply(new T3.Quaternion().setFromAxisAngle(new T3.Vector3(0,0,1),-tw)).multiply(Rg.qGripL);pos=lT;cP=Rg.cGripL;fd=new T3.Vector3(...SV.lf)}
-      else{fg=[lerp(.35,CV.cu,c),lerp(.45,CV.cu,c),lerp(.3,CV.cu*.5,c),lerp(.55,CV.sp,c),lerp(0,CV.t0||.1,c),lerp(.2,CV.t1||0,c),lerp(.2,CV.t1||0,c)];
+      if(swL){fg=[...GRIP.L.f,.4,.3,.5,.4];q=qT.clone().multiply(new T3.Quaternion().setFromAxisAngle(new T3.Vector3(0,0,1),-tw)).multiply(Rg.qGripL);pos=lT;cP=Rg.cGripL;fd=new T3.Vector3(...SV.lf)}
+      else{const k3=[lerp(.35,CV.cu,c),lerp(.45,CV.cu,c),lerp(.3,CV.cu*.5,c)];fg=[...k3,...k3,...k3,k3[0]*1.1,k3[1],k3[2],lerp(.55,CV.sp,c),lerp(0,CV.t0||.1,c),lerp(.2,CV.t1||0,c),lerp(.2,CV.t1||0,c)];
         q=Rg.qRest.clone().slerp(Rg.qCov.clone().premultiply(new T3.Quaternion().setFromAxisAngle(new T3.Vector3(0,0,1),CV.r||0)),c);pos=new T3.Vector3(lerp(xl-lag,CV.x,c),lerp(-.17+br*.8,CV.y,c),lerp(-.46,CV.z,c));cP=Rg.cPalm;fd=new T3.Vector3(lerp(.35,.25,c),lerp(.15,1,c),lerp(-1,-.35,c))}
       if(!L.q||f>=1){L.q=q.clone();L.p=pos.clone();L.fd=fd.clone();L.fg=fg.slice();L.c=cP.clone()}else{L.q.slerp(q,f);L.p.lerp(pos,f);L.fd.lerp(fd,f);L.fg=L.fg.map((v,i)=>lerp(v,fg[i],f));L.c.lerp(cP,f)}
-      poseFingers('L',L.fg.slice(0,3),L.fg[3],L.fg.slice(4));placeArm('L',L.q,L.c,L.p,L.fd);
+      poseFingers('L',L.fg.slice(0,12),L.fg[12],L.fg.slice(13));placeArm('L',L.q,L.c,L.p,L.fd);
       const v=new T3.Vector3();Hm.by.L_hand.getWorldPosition(v);HND.pEye.position.copy(v).lerp(new T3.Vector3(0,0,-.088),c);HND.pEye.position.y+=.02*(1-c)}}
   // 빛
   HND.hemi.intensity=lit?1.1:.3+.45*c;HND.rim.color.setHex(warn?0xff3020:0x6fd8e0);HND.rim.intensity=lit?.6:warn?(Math.sin(T_*14)>0?1.1:.1):.7;
