@@ -352,7 +352,7 @@ body[data-mode=game] #pauseBtn{display:flex}
 <script nomodule>window.THREE_ERR='nomodule'</script>
 <script>
 // ===================== 기본 =====================
-const VER='0.24.1'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
+const VER='0.25.0'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
 const $=id=>document.getElementById(id);
 const cv=$('cv'),cx=cv.getContext('2d');
 let W,H,DPR=1;const MOB=matchMedia('(pointer:coarse)').matches||/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent); // 폰이면 가볍게
@@ -1647,6 +1647,32 @@ function init3D(){
   R3.ok=true;R3.state='ok';VIEWS=[];updFoot(); // 2D 방은 이제 필요 없으니 메모리 비움
 }
 function resize3D(){if(!R3.rd)return;R3.rd.setPixelRatio(Math.min(DPR,SET.quality==='low'?.75:SET.quality==='high'?2:MOB?.9:(R3.spot&&!R3.spot.castShadow?1:1.5)));R3.rd.setSize(W,H,false);R3.cam.aspect=W/H;R3.cam.fov=W/H<1.5?74:W/H>1.95?62:68;R3.cam.updateProjectionMatrix()}
+// ---- 화면 질감 (리썰컴퍼니 느낌): 낮은 해상도로 그려 픽셀 그대로 키우고, 색을 몇 단계로 끊고(점무늬 디더링), 물체 테두리에 어두운 외곽선 ----
+const FX={rt:null};
+function fxBegin(){const rd=R3.rd;if(!rd||!(SET.fx>0))return false;const T=R3.T,ih=Math.min(Math.round(H*rd.getPixelRatio()),SET.fx>=2?250:380),iw=Math.max(2,Math.round(ih*W/H));
+  if(!FX.rt||FX.rt.width!==iw||FX.rt.height!==ih){if(FX.rt)FX.rt.dispose();const hf=rd.extensions.has('EXT_color_buffer_float')||rd.extensions.has('EXT_color_buffer_half_float');
+    FX.rt=new T.WebGLRenderTarget(iw,ih,{type:hf?T.HalfFloatType:T.UnsignedByteType,minFilter:T.NearestFilter,magFilter:T.NearestFilter,depthTexture:new T.DepthTexture(iw,ih)});FX.rt.texture.generateMipmaps=false}
+  rd.setRenderTarget(FX.rt);return true}
+function fxEnd(cam){const T=R3.T,rd=R3.rd;rd.setRenderTarget(null);
+  if(!FX.m){FX.m=new T.ShaderMaterial({uniforms:{tC:{value:null},tD:{value:null},res:{value:new T.Vector2()},cn:{value:.1},cf:{value:50},lv:{value:16},ol:{value:.92}},depthTest:false,depthWrite:false,toneMapped:true,
+      vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}',
+      fragmentShader:`uniform sampler2D tC,tD;uniform vec2 res;uniform float cn,cf,lv,ol;varying vec2 vUv;
+float iw(vec2 u){float z=texture2D(tD,u).r*2.-1.;return (cf+cn-z*(cf-cn))/(2.*cn*cf);} // 1/거리 (평면이면 화면에서 일정하게 변함)
+float b2(vec2 a){a=floor(a);return fract(dot(a,vec2(.5,a.y*.75)));}
+float b4(vec2 a){return b2(.5*a)*.25+b2(a);}
+void main(){vec2 px=1./res,cell=floor(vUv*res),uv=(cell+.5)*px;vec3 c=texture2D(tC,uv).rgb;
+  vec3 nb=texture2D(tC,uv+vec2(px.x,0.)).rgb+texture2D(tC,uv-vec2(px.x,0.)).rgb+texture2D(tC,uv+vec2(0.,px.y)).rgb+texture2D(tC,uv-vec2(0.,px.y)).rgb;c=max(c+(c-nb*.25)*.6,0.); // 또렷하게
+  float w=iw(uv),e=(abs(iw(uv+vec2(px.x,0.))+iw(uv-vec2(px.x,0.))-2.*w)+abs(iw(uv+vec2(0.,px.y))+iw(uv-vec2(0.,px.y))-2.*w))/w;
+  float edge=smoothstep(.07,.22,e);
+  #ifdef TONE_MAPPING
+  c=toneMapping(c);
+  #endif
+  c=linearToOutputTexel(vec4(c,1.)).rgb;
+  c=floor(c*lv+b4(cell))/lv; // 색 단계 + 점무늬
+  c*=1.-edge*ol;gl_FragColor=vec4(c,1.);}`});
+    FX.sc=new T.Scene();const q=new T.Mesh(new T.PlaneGeometry(2,2),FX.m);q.frustumCulled=false;FX.sc.add(q);FX.cam=new T.OrthographicCamera(-1,1,1,-1,0,1)}
+  const u=FX.m.uniforms;u.tC.value=FX.rt.texture;u.tD.value=FX.rt.depthTexture;u.res.value.set(FX.rt.width,FX.rt.height);u.cn.value=cam.near;u.cf.value=cam.far;u.lv.value=SET.fx>=2?7:11;
+  rd.setViewport(0,0,W,H);const ac=rd.autoClear;rd.autoClear=true;rd.render(FX.sc,FX.cam);rd.autoClear=ac}
 // ---- 재료/도형 도우미 ----
 function tx3(img,rx=1,ry=1,srgb=true){const T3=R3.T,t=new T3.Texture(img),src=R3.src||(R3.src=new Map());if(srgb)t.colorSpace=T3.SRGBColorSpace;t.wrapS=t.wrapT=T3.RepeatWrapping;t.repeat.set(rx,ry);t.anisotropy=8;
   if(src.has(img)){t.source=src.get(img);t.version++}else{src.set(img,t.source);t.needsUpdate=true}return t} // 같은 그림은 GPU에 한 번만 올림 (경비실·복도가 같이 씀)
@@ -1941,7 +1967,7 @@ function draw3D(){
   {const sh=D.shadow,sp=S.shadow.p;if(S.night>=3&&sp>25&&PIC.sh1){const im=sp<55?PIC.sh1:sp<80?PIC.sh2:PIC.sh3;if(sh.material.map?.image!==im){sh.material.map=new T3.Texture(im);sh.material.map.colorSpace=T3.SRGBColorSpace;sh.material.map.needsUpdate=true;sh.material.needsUpdate=true}
     const spots=[[-1.55,-1.0],[-1.55,-1.0],[1.55,.95]],s0=spots[S.view],near=sp>=80?.5:0,hgt=sp<55?1.85:sp<80?1.35:1.9,x=lerp(s0[0],cam.position.x,near),z=lerp(s0[1],cam.position.z,near);
     sh.visible=true;sh.scale.set(hgt*im.width/im.height,hgt,1);sh.position.set(x+Math.sin(T_*1.3)*.01,hgt/2-(sp>=80?.4:0),z);sh.lookAt(cam.position.x,sh.position.y,cam.position.z);sh.material.opacity=Math.min(1,(sp-25)/40)}else sh.visible=false}
-  R3.rd.render(R3.sc,cam);
+  const fx1=fxBegin();R3.rd.render(R3.sc,cam);if(fx1)fxEnd(cam);
   cx.drawImage(R3.rd.domElement,0,0,W,H);
   // 느린 기기면 화질을 단계적으로 낮춤 (해상도 → 그림자)
   {const now=performance.now();if(R3.lt){const ft=now-R3.lt;R3.fa=(R3.fa||16)*.95+Math.min(ft,200)*.05;R3.fn=(R3.fn||0)+1;if(SET.quality==='auto'&&R3.fn>120&&R3.fa>38){R3.fn=0;if(R3.rd.getPixelRatio()>1){R3.rd.setPixelRatio(1);R3.rd.setSize(W,H,false)}else if(R3.spot.castShadow){R3.spot.castShadow=false;R3.rd.shadowMap.enabled=false;R3.sc.traverse(o=>{if(o.material)o.material.needsUpdate=true})}}}R3.lt=now}
@@ -2300,7 +2326,7 @@ function renderCut(dt){
     if(sh.scene==='pool')poolCut(sh.pool||{},u,t,C);
     const A=CUT.areas[sh.scene];if(A)A.tick(C);
     if(sh.fx)sh.fx(u,t,C);
-    R3.rd.setViewport(0,0,W,H);R3.rd.render(sc,C);cx.drawImage(R3.rd.domElement,0,0,W,H);
+    R3.rd.setViewport(0,0,W,H);const fxc=fxBegin();R3.rd.render(sc,C);if(fxc)fxEnd(C);cx.drawImage(R3.rd.domElement,0,0,W,H);
     cx.save();cx.globalCompositeOperation='soft-light';cx.globalAlpha=sh.scene==='pool'?.3:.25;cx.fillStyle=sh.scene==='pool'?'#1d4a50':'#5c4a22';cx.fillRect(0,0,W,H);cx.restore();
   }
   if(sh.pic&&PIC[sh.pic]){const im=PIC[sh.pic],iw=im.width,ih=im.height,sc2=Math.max(W/iw,H/ih)*(1.06+u*.09),dw=iw*sc2,dh=ih*sc2,fl=Math.random()<.06?.55:1; // 사진 컷: 천천히 다가가며 전구가 깜빡
@@ -2988,8 +3014,8 @@ function draw3D2(){
     else{P.mon.position.copy(P.monRestP);P.mon.quaternion.copy(P.monRestQ)}
     P.monT-=1/60;if(e>.001||P.monT<=0){if(e<=.001)P.monT=.5;renderCam(S.cam,false);P.monTex.needsUpdate=true}
     P.batW.visible=(S.spare??1)>0&&!S.swap}
-  R3.rd.render(R3.sc2,cam);
-  drawHands(fk,lit,(h.dir===0||h.dir===2)&&h.st===1&&!dw);
+  const fx2=fxBegin();R3.rd.render(R3.sc2,cam);
+  drawHands(fk,lit,(h.dir===0||h.dir===2)&&h.st===1&&!dw);if(fx2)fxEnd(cam);
   cx.drawImage(R3.rd.domElement,0,0,W,H);
   if(handsOn())handLabels();
   if(fk>.55){cx.fillStyle=`rgba(245,250,255,${(fk-.55)*1.6})`;cx.fillRect(0,0,W,H)} // 팍
@@ -3527,7 +3553,7 @@ function openAch(){const g=$('achGrid');g.innerHTML='';let got=0;
   $('achCnt').textContent=`${got} / ${ACH.length}`;$('achBox').classList.add('show')}
 $('mAch').onclick=openAch;$('achBack').onclick=()=>$('achBox').classList.remove('show');
 // ===================== 설정 =====================
-const SET_DEF={bright:1,vol:.9,sfx:1,amb:1,shake:true,grain:1,vib:true,scare:'full',sub:1,quality:'auto',ctrl:'hands'};
+const SET_DEF={bright:1,vol:.9,sfx:1,amb:1,shake:true,grain:1,vib:true,scare:'full',sub:1,quality:'auto',ctrl:'hands',fx:1};
 let SET=Object.assign({},SET_DEF);try{Object.assign(SET,JSON.parse(localStorage.getItem('awful_settings')||'{}'))}catch(e){}
 const SET_ROWS=[
   {k:'bright',t:'밝기',d:'화면만 밝아짐. 괴물 판정은 그대로',min:.8,max:1.3,step:.05,f:v=>Math.round(v*100)+'%'},
@@ -3539,6 +3565,7 @@ const SET_ROWS=[
   {k:'grain',t:'필름 노이즈',opts:[[0,'끄기'],[.5,'약하게'],[1,'보통']]},
   {k:'vib',t:'진동',d:'모바일에서 죽을 때',opts:[[true,'켜기'],[false,'끄기']]},
   {k:'sub',t:'자막 크기',opts:[[.85,'작게'],[1,'보통'],[1.2,'크게']]},
+  {k:'fx',t:'화면 질감',d:'저화질 픽셀·외곽선 (리썰컴퍼니 느낌)',opts:[[1,'보통'],[2,'강하게'],[0,'끄기']]},
   {k:'quality',t:'그래픽',d:'느리면 낮음',opts:[['auto','자동'],['low','낮음'],['high','높음']]},
   {k:'ctrl',t:'챕터 2 조작',d:'손으로: 손에 든 손전등·왼손·모니터를 직접 누름 / 버튼: 화면 버튼',opts:[['hands','손으로'],['buttons','버튼']]}];
 function applySet(){
