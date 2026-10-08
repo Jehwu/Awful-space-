@@ -140,7 +140,7 @@ body:not([data-mode=game]) #bpBack,.scare #bpBack{display:none!important}
 #battOv{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);width:min(360px,86vw);display:none;flex-direction:column;gap:8px;z-index:4;padding:12px 14px;background:rgba(8,12,14,.92);border:1px solid rgba(140,210,225,.35)}#battOv.show{display:flex}
 #battOv .row{display:flex;align-items:center;gap:10px}#battStep{color:#8ab;font-size:13px}#battAct{flex:1;font-size:16px;padding:10px;color:#e6eee9;background:radial-gradient(circle at 30% 30%,#283032,#0a0d0d 85%);border:1px solid rgba(200,210,205,.3);border-radius:4px;touch-action:none}
 #battOv .bar{height:5px;background:#1a2428}#battBar{display:block;height:100%;width:0;background:#9fe8f0}
-#battPic{width:100%;height:auto}#battPic .tube{fill:#2c3438;stroke:#5a6a70}#battPic .head{fill:#3a4448}#battPic .lens{fill:#555}#battPic .cap{fill:#4a5458;transition:transform .3s}
+#battPic{display:none} /* 교체 모습은 3D 손전등으로 보여 줌 */#battPic .tube{fill:#2c3438;stroke:#5a6a70}#battPic .head{fill:#3a4448}#battPic .lens{fill:#555}#battPic .cap{fill:#4a5458;transition:transform .3s}
 #battPic .old{fill:#7a3a30;transition:transform .3s,opacity .3s}#battPic .new{fill:#3a8a50;opacity:0;transition:opacity .3s}
 #battPic[data-s="1"] .cap,#battPic[data-s="2"] .cap,#battPic[data-s="3"] .cap{transform:translateX(30px)}#battPic[data-s="2"] .old,#battPic[data-s="3"] .old{transform:translateX(120px);opacity:0}#battPic[data-s="3"] .new{opacity:1}
 #pnl button{font:18px/1 'Nanum Pen Script',cursive;color:#c4cec9;background:radial-gradient(circle at 30% 30%,#232a2c,#0a0d0d 80%);border:1px solid rgba(200,210,205,.18);border-radius:4px;padding:7px 16px;box-shadow:inset 0 0 8px #000,0 4px 10px rgba(0,0,0,.6)}
@@ -340,7 +340,7 @@ body[data-mode=game] #pauseBtn{display:flex}
 <script nomodule>window.THREE_ERR='nomodule'</script>
 <script>
 // ===================== 기본 =====================
-const VER='0.21.2'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
+const VER='0.22.0'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
 const $=id=>document.getElementById(id);
 const cv=$('cv'),cx=cv.getContext('2d');
 let W,H,DPR=1;const MOB=matchMedia('(pointer:coarse)').matches||/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent); // 폰이면 가볍게
@@ -815,7 +815,7 @@ function panelBase(g,G,I){
   {const x=bx+bw*.04,y=by+bh*.2,ww=bw*.2,hh=bh*.8;wallShadow(g,x,y,ww,hh,.25);texRect(g,T.metal,x,y,ww,hh,.45);grain(g,x,y,ww,hh,.25,2);topLight(g,x,y,ww,hh,.35);g.fillStyle='rgba(0,0,0,.25)';g.fillRect(x,y,ww,hh);
    [0,1].forEach(k=>{const dx2=x+k*ww/2;g.strokeStyle='#111';g.lineWidth=2;g.strokeRect(dx2+2,y+2,ww/2-4,hh-4);g.fillStyle='#0c0c0b';for(let j=0;j<5;j++)g.fillRect(dx2+ww*.12,y+hh*(.06+j*.025),ww*.26,hh*.008);g.fillStyle='#8a8a80';g.fillRect(dx2+ww*.4,y+hh*.45,ww*.04,hh*.08)});
    g.fillStyle='#050505';g.save();g.translate(x+ww*.98,y);g.transform(1,0,-.05,1,0,0);g.fillRect(0,0,ww*.06,hh);g.restore(); // 살짝 열린 틈
-   txt(g,'강서진',x+ww*.08,y+hh*.13,hh*.035,'#d8d2c0',ww*.3);txt(g,'물',x+ww*.58,y+hh*.13,hh*.035,'#d8d2c0',ww*.3)}
+   txt(g,'——',x+ww*.08,y+hh*.13,hh*.035,'#d8d2c0',ww*.3);txt(g,'물',x+ww*.58,y+hh*.13,hh*.035,'#d8d2c0',ww*.3)}
   // 선반과 상자 (테이프·라벨·찌그러짐)
   {const x=bx+bw*.62,y=by+bh*.18,ww=bw*.2,U=bh/100;wallShadow(g,x,y,ww,bh*.015,.5);g.fillStyle='#3a3a34';g.fillRect(x,y,ww,bh*.015);g.fillStyle='rgba(255,255,240,.15)';g.fillRect(x,y,ww,1);
    [.05,.9].forEach(f=>{g.fillStyle='#2a2a26';polyG(g,[[x+ww*f,y+bh*.015],[x+ww*f+bw*.006,y+bh*.015],[x+ww*f+bw*.006,y+bh*.05],[x+ww*f,y+bh*.03]])});
@@ -934,7 +934,7 @@ function drawStalker(g,x,y,h,a,t,pose){
 }
 // 응시자·그림자·복제자 AI 이미지
 const PIC={};[['rfull','runner_full'],['rside','runner_side'],['rclose','runner_close'],['sfull','static_full'],['speek','static_peek'],['sclose','static_close'],['sh1','shadow_1'],['sh2','shadow_2'],['sh3','shadow_3'],['cseat','clone_seat'],['cstand','clone_stand'],['cface','clone_face'],['sjfull','seojin_full'],['diver','diver'],['drowned','drowned'],['slider','slider'],['hstand','hum_stand'],['hside','hum_side']].forEach(([k,f])=>{const im=new Image();im.onload=()=>{PIC[k]=im};im.src='img/'+f+'.png'});
-[['sjbars','seojin_bars.jpg'],['sjup','seojin_up.jpg']].forEach(([k,f])=>{const im=new Image();im.onload=()=>{PIC[k]=im};im.src='img/'+f}); // 엔딩 서진 사진 컷
+/* (엔딩 사진 컷 없음) */ // 사진 컷
 // 교대자 AI 이미지 (img 폴더). 못 불러오면 코드로 그린 버전 사용
 const STK={},PEEK_EDGE=.2985; // peek 이미지에서 벽 모서리 위치(가로 비율)
 ['full','peek','close'].forEach(k=>{const im=new Image();im.onload=()=>{STK[k]=im};im.src='img/stalker_'+k+'.png'});
@@ -1084,24 +1084,24 @@ function buildJumps(){
 }
 
 // ===================== 이야기 =====================
-// 노란 방에서 길을 잃은 플레이어가 전화벨을 따라 누군가 만들어 둔 경비실을 찾음. 일지는 먼저 있던 강서진이 씀
+// 노란 방에서 길을 잃은 플레이어가 전화벨을 따라 누군가 만들어 둔 경비실을 찾음. 일지와 전화 녹음은 먼저 있던 근무자가 남김 (이름 없음)
 // 6시마다 노란 방 불이 다 나갔다 들어오고 배치가 바뀜. 그때마다 비상구 표시등이 한 칸씩 경비실로 옴 (H→G→D→B→A)
-// 5일 차 일지 빨간 줄은 서진이 쓴 게 아님 (서진 흉내 내는 괴물이 씀)
+// 5일 차 일지 빨간 줄은 그 근무자가 쓴 게 아님 (흉내 내는 괴물이 씀)
 let EXIT_CAM=[7,6,3,1,0];
-const ANOM_TXT=['여기 아까 왔음','왼쪽 말고','불 켜 줘','문 열어','나 여기 있어','6시','서진','→']; // 밤마다 비상구가 보이는 구역
+const ANOM_TXT=['여기 아까 왔음','왼쪽 말고','불 켜 줘','문 열어','나 여기 있어','6시','열어 줘','→']; // 밤마다 비상구가 보이는 구역
 const BASE_RULES='여기 들어왔으면 이것부터 읽어.\n6시까지만 버티면 돼.\n비상구가 하루에 한 칸씩 와. 닷새째 6시면 문 앞이야.\n그 전엔 절대 밖에 나가지 마.\n전기 아껴. 차단기 떨어지면 바로 올려.\n누가 뭐라고 하든 형광등 소리 끊기면 문 잠가.';
 const ANOM_RULE='화면이 가끔 이상하게 바뀌어도 신경 쓰지 마. 여기가 원래 그래.';
-// 하드 모드: 서진이 그런 밤을 겪고 일지 맨 위에 남긴 메모
+// 하드 모드: 먼저 있던 근무자가 그런 밤을 겪고 일지 맨 위에 남긴 메모
 const MODS={cold:['추위','난로 틀어 놨어. 전기 빨리 닳아.'],wire:['낡은 배선','배선에서 탄내 나. 차단기 자주 떨어져.'],fog:['습기','렌즈에 김 서려. 화면 자주 끊겨.'],
   quiet:['작은 소리','형광등 소리가 작아. 잘 들어.'],calls:['전화','전화 많이 와.'],fast:['발소리','복도에서 뛰는 소리 들려.'],black:['정전','새벽에 한 번 다 꺼져.']};
 const hasMod=id=>S.mods.includes(id);
-// 서진의 전화. 빈 줄은 말없이 지나가는 시간
+// 경비실 전화: 먼저 있던 근무자가 남긴 녹음. 밤마다 한 번 벨이 울리고, 받으면 그 밤의 녹음이 재생됨. 빈 줄은 말없이 지나가는 시간
 const CALLS=[
-  ['"어, 받았네. 벨 울린 거 나야."','"형광등 소리 끊기면 문부터 잠가. 생각하지 말고."','"6시까지만 버텨. 그때 불이 한 번 다 나가."','"제일 어두운 화면에 초록 불 보이지? 비상구야."','"그리고 기억해. 내가 문 잠그지 말라고 하는 일은 절대 없어."','"그런 말 들리면 그건 내가 아니야."'],
-  ['"살았네. 6시에 불 다 나가는 거 봤지?"','"그리고 무전기에서 지직거리는 소리 나면 환풍구 닫아. 그건 문으로 안 와."','"초록 불 한 칸 왔지? 하루에 한 칸씩 와."','"벽 얼룩은 오래 보지 마. 눈 떠."','"화면이 가끔 이상하게 바뀌어도 신경 쓰지 마. 여기가 원래 그래."','"나? 기다리는 중이야. 너 오기를."'],
-  ['"불 끄지 마."','"배전반 옆 창고 문, 오늘부터 열려. 틈 보이면 닫아. 뛰는 소리 나면 그냥 닫아."','"불 나간 칸에 뭐가 서 있어. 어두우면 그게 와."','"차단기 내려가면 바로 올려. 바로."','"...잠깐. 여기 형광등 소리가 멈췄어."','','"......갔다. 괜찮아."','"넌 꼭 끝까지 버텨야 돼. 꼭."'],
-  ['"오늘은 화면에 네가 앉아 있을 거야."','"보이면 바로 신고해. 그거 너 아니야."','"이틀 남았네. 잘하고 있어."','"초록 불 따라와. 내가 거기서 기다릴게."'],
-  ['"오늘 마지막이야. 초록 불 문 앞 복도까지 왔지?"','"일지 마지막 줄, 빨간 글씨. 그거 내가 안 썼어. 믿지 마."','"소리 끊기면 잠가. 6시 되면 문은 알아서 열려."','"열리면 그냥 타. 아무 생각 하지 말고."','"조금만 더. ...우리 둘 다."','','"......잠그지 마. 나야. 데리러 왔어."']];
+  ['(딸깍. 녹음된 목소리가 나온다)','"이거 듣고 있으면, 너도 여기 들어온 거야."','"형광등 소리 끊기면 문부터 잠가. 생각하지 말고."','"6시까지만 버텨. 그때 불이 한 번 다 나가."','"제일 어두운 화면에 초록 불 보이지? 비상구야."','"그리고 기억해. 문 잠그지 말라는 말은 절대 믿지 마."','"그런 말이 들리면, 그건 사람이 아니야."'],
+  ['(딸깍. 같은 목소리, 다음 녹음이다)','"이틀째지. 6시에 불 다 나가는 거 봤지?"','"무전기에서 지직거리는 소리 나면 환풍구 닫아. 그건 문으로 안 와."','"초록 불 한 칸 왔지? 하루에 한 칸씩 와."','"벽 얼룩은 오래 보지 마."','"화면이 가끔 이상하게 바뀌어도 신경 쓰지 마. 여기가 원래 그래."'],
+  ['(딸깍. 잡음이 심한 녹음이다)','"불 끄지 마."','"배전반 옆 창고 문, 오늘부터 열려. 틈 보이면 닫아. 뛰는 소리 나면 그냥 닫아."','"불 나간 칸에 뭐가 서 있어. 어두우면 그게 와."','"차단기 내려가면 바로 올려."','"...잠깐. 여기 형광등 소리가 멈췄어."','','"......갔다."','"이거 듣는 사람은, 꼭 끝까지 버텨."'],
+  ['(딸깍. 녹음)','"오늘은 화면에 네가 앉아 있을 거야."','"보이면 바로 신고해. 그거 너 아니야."','"나도 봤어. 화면 속에서 내가 날 보고 있는 거."','"초록 불 따라가. 그게 유일한 길이야."'],
+  ['(딸깍. 마지막 녹음이다)','"마지막 날이야. 초록 불 문 앞 복도까지 왔지?"','"일지 마지막 줄, 빨간 글씨. 그거 내가 안 썼어. 믿지 마."','"소리 끊기면 잠가. 6시 되면 문은 알아서 열려."','"열리면 그냥 타. 아무 생각 하지 말고."','"......난 못 탔어."','(녹음이 끝났다. 그런데 수화기 너머가 조용하지 않다)','"......잠그지 마. 나야. 열어 줘."']];
 const RULES=[ // [몇 일 차부터, 내용] — 번호는 순서대로 붙음
   [1,'형광등 소리 끊기면 바로 문 잠가. 소리 돌아오면 열고.'],
   [2,'화면 속 얼룩이 커지면 바로 다른 화면으로 넘겨.'],
@@ -1327,7 +1327,7 @@ function ambient(dt){
   else if(r<.63&&S.hum.node!==DOOR){S.peek={type:'window',t:0};footsteps(-.7,3)}
   else if(r<.73)S.peek={type:'face',t:0};
   else if(r<.8)flicker(rnd(.4,1.3));
-  else if(r<.86){const m=['근무자 2명','출입문 개방 요청','CAM H 응답 없음','근무자 확인: 강서진','비상구 위치 갱신','CAM E 수화기 내려감','문 열어 둘 것','뒤'];S.monMsg={t:0,txt:m[ri(m.length)]};nburst(3000,1,.2,.06,0)}
+  else if(r<.86){const m=['근무자 2명','출입문 개방 요청','CAM H 응답 없음','근무자 확인: 0명','비상구 위치 갱신','CAM E 수화기 내려감','문 열어 둘 것','뒤'];S.monMsg={t:0,txt:m[ri(m.length)]};nburst(3000,1,.2,.06,0)}
   else if(r<.9){S.clockRev=rnd(2,4)} // 시계가 거꾸로 돈다
   else if(r<.93&&S.night>=2)musicBoxFar();
   else if(S.san<60)whisper();
@@ -1433,7 +1433,7 @@ function renderBrk(){const box=$('bsw');box.innerHTML='';S.sw.forEach((on,i)=>{c
 function report(){
   if(S.ring>0){answerCall();return}
   if(S.call){S.call=null;say('딸깍. 전화를 끊었다.');sfx(300,.06,'square',.06);return}
-  if(S.missed){S.missed=false;const L=CALLS[S.night-1].slice();if(S.night===1)L[0]='"안 받네. 벨 울린 거 나야."';startCall(['(음성 메시지 1통)'].concat(L),S.night===5);return}
+  if(S.missed){S.missed=false;const L=CALLS[S.night-1].slice();startCall(['(자동응답기에 녹음 1통)'].concat(L),S.night===5);return}
   if(!powered()){say('수화기 너머로 아무 소리도 없다');return}
   sfx(700,.08,'square',.1);
   const r=Math.random();if(S.night>=3&&r<.25){say('뚜. 뚜. 신호음 사이로 숨소리가 들린다.','bad');S.san-=3;setTimeout(()=>{if(S&&!S.over)breathe(.4,.2)},500)}else say('뚜. 뚜. 아무도 안 받는다.');
@@ -1454,9 +1454,9 @@ function openLog(){
   if(S.view!==1||S.mon)return;
   const box=$('logText');box.innerHTML='';const el=(c,t)=>{const d=document.createElement('div');d.className=c;d.textContent=t;box.appendChild(d)};
   if(S.ch===2){el('lg-h','수영장 이용 수칙');el('lg-sub','안전요원 근무 수칙');S.mods.forEach(m=>el('lg-m',MODS[m][1]));POOL_RULES.forEach(([d,t],i)=>{if(d<=S.night)el('lg-r'+(d===S.night&&d>1?' new':''),`${i+1}. ${t}`)});keyGuide(box);S.log=true;$('log').classList.add('show');buildUI();return}
-  el('lg-h','근무 일지');el('lg-sub','근무자: 강서진');S.mods.forEach(m=>el('lg-m',MODS[m][1]));el('lg-base',BASE_RULES+(S.night>=2?'\n'+ANOM_RULE:''));
-  RULES.forEach(([d,t],i)=>{if(d>S.night)return;if(d===5){el('lg-sig','— 강서진');el('lg-r lie',`${i+1}. ${t}`);return}el('lg-r'+(d===S.night?' new':''),`${i+1}. ${t}`)})
-  if(S.night<5)el('lg-sig','— 강서진'); // 5일 차 줄은 서명 아래에 덧붙여 씀
+  el('lg-h','근무 일지');el('lg-sub','근무자: (이름이 긁혀 지워져 있다)');S.mods.forEach(m=>el('lg-m',MODS[m][1]));el('lg-base',BASE_RULES+(S.night>=2?'\n'+ANOM_RULE:''));
+  RULES.forEach(([d,t],i)=>{if(d>S.night)return;if(d===5){el('lg-sig','— 먼저 있던 사람');el('lg-r lie',`${i+1}. ${t}`);return}el('lg-r'+(d===S.night?' new':''),`${i+1}. ${t}`)})
+  if(S.night<5)el('lg-sig','— 먼저 있던 사람'); // 5일 차 줄은 서명 아래에 덧붙여 씀
   keyGuide(box);
   S.log=true;$('log').classList.add('show');buildUI();
 }
@@ -1585,7 +1585,7 @@ function tapeLabel(t,cxp,y,a,red){ // 마스킹테이프에 펜으로 쓴 이름
   cx.shadowColor='transparent';cx.fillStyle=red?'#7a0e08':'#1e1a30';cx.textAlign='center';cx.textBaseline='middle';cx.fillText(t,0,1);cx.restore()}
 // 가리키는 물건: 떨리는 손그림 테두리 + 테이프 이름표 + 은은한 빛. 터치 화면이거나 밤 시작 직후엔 모든 물건에 희미하게
 function drawHints(ox){
-  if(!canAct()||Math.abs(S.view-S.camX)>.15)return;
+  if(!canAct()||Math.abs(S.view-S.camX)>.15)return;if(S.ch===2&&(S.monA>.05||S.swap||(HND.cov||0)>.05))return; // 패널을 들었거나 교체·눈 가리는 중엔 이름표 없음
   const hv=hotAt(PT),hint=PT.touch||S.t<10;
   hots(S.view).forEach(h=>{if(!h.r)return;const on=!!hv&&hv.k===h.k,ring=S.ring>0&&h.k==='phone';if(!on&&!hint&&!ring)return;if(h.k==='door'&&!on)return;
     const r=h.r,a=on?.95:ring?.5+.45*Math.sin(T_*14):.3+.14*Math.sin(T_*3),l=Math.min(18,r.w*.3,r.h*.3),x=ox+r.x-5,y=r.y-5,w=r.w+10,hh=r.h+10,j=()=>on?(Math.random()-.5)*1.4:0;
@@ -1771,7 +1771,7 @@ function build3D(){
   {const g=onWall('W',-1.25,1.62,.0);BOX(.36,.05,.03,woodM,0,.25,.015,g);[-.12,0,.12].forEach(x=>CYL(.006,.006,.06,greyM,x,.22,.05,g).rotation.x=Math.PI/2);
    const jc=cvs(256,420,(q,w,h)=>{const lin2=(x0,x1,st)=>{const gg=q.createLinearGradient(x0,0,x1,0);st.forEach((c,i)=>gg.addColorStop(i/(st.length-1),c));return gg};q.fillStyle=lin2(0,w,['#0c0f16','#283044','#1c2232','#2c3448','#0a0d14']);q.beginPath();q.moveTo(w*.48,8);q.quadraticCurveTo(w*.25,14,w*.12,50);q.lineTo(w*.06,h*.95);q.lineTo(w*.94,h*.95);q.lineTo(w*.88,50);q.quadraticCurveTo(w*.75,14,w*.52,8);q.closePath();q.fill();
      for(let k=0;k<7;k++){const fx=w*(.15+k*.12);const gg=q.createLinearGradient(fx-10,0,fx+10,0);gg.addColorStop(0,'rgba(0,0,0,0)');gg.addColorStop(.5,'rgba(0,0,0,.35)');gg.addColorStop(1,'rgba(0,0,0,0)');q.fillStyle=gg;q.fillRect(fx-10,60,20,h*.85)}
-     q.fillStyle='#b8b8ae';q.fillRect(w*.06,h*.55,w*.88,12);q.strokeStyle='#05070b';q.lineWidth=3;q.beginPath();q.moveTo(w/2,30);q.lineTo(w/2,h*.95);q.stroke();q.fillStyle='#d8cfa8';q.fillRect(w*.14,h*.22,w*.3,28);q.fillStyle='#1a1a2a';q.font=`24px ${PEN}`;q.fillText('강서진',w*.16,h*.22+21)});
+     q.fillStyle='#b8b8ae';q.fillRect(w*.06,h*.55,w*.88,12);q.strokeStyle='#05070b';q.lineWidth=3;q.beginPath();q.moveTo(w/2,30);q.lineTo(w/2,h*.95);q.stroke();q.fillStyle='#d8cfa8';q.fillRect(w*.14,h*.22,w*.3,28);q.fillStyle='#1a1a2a';q.font=`24px ${PEN}`;q.fillText('——',w*.16,h*.22+21)});
    const jk=PLN(.32,.52,MS({map:ctx3(jc),transparent:true,alphaTest:.3,roughness:.95}),0,-.04,.04,g);jk.castShadow=true;R3.dyn.jacket=jk;
    const cap=mesh(new T3.SphereGeometry(.06,16,8,0,Math.PI*2,0,Math.PI/2),MS({color:0x141820,roughness:.8}),-.12,.17,.06,g);
    const cc=cvs(128,170,(q,w,h)=>{q.fillStyle='#5a4228';q.fillRect(0,0,w,h);q.fillStyle='#d8d2bc';q.fillRect(8,14,w-16,h-22);q.fillStyle='rgba(30,30,60,.55)';for(let k=0;k<10;k++)q.fillRect(16,30+k*12,w-36,2)});const cb2=onWall('W',-.78,1.38,.01);PLN(.16,.22,MS({map:ctx3(cc),roughness:.8}),0,0,0,cb2)}
@@ -1841,7 +1841,7 @@ function night3D(){
    if(n>=5){g.strokeStyle='rgba(215,25,15,.95)';g.lineWidth=4;const [x,y]=P[0];g.beginPath();g.moveTo(x,y+h*.05);g.lineTo(G[0],G[1]-h*.05);g.stroke();g.beginPath();g.moveTo(G[0],G[1]-h*.05);g.lineTo(G[0]-w*.02,G[1]-h*.1);g.moveTo(G[0],G[1]-h*.05);g.lineTo(G[0]+w*.02,G[1]-h*.1);g.stroke()}
    D.wbT.needsUpdate=true}
   // 일지: 왼쪽 장에 서진의 첫 메모, 5일 차엔 오른쪽 장에 덜 마른 잉크로 거짓 줄
-  {const g=D.logC.getContext('2d'),w=D.logC.width,h=D.logC.height;g.drawImage(D.logBase,0,0);g.fillStyle='rgba(216,208,178,.92)';g.fillRect(w*.04,h*.06,w*.44,h*.4);g.fillStyle='#1d2a6a';g.font=`${h*.075}px ${PEN}`;g.textBaseline='top';g.fillText('근무자: 강서진',w*.06,h*.08);g.font=`${h*.07}px ${PEN}`;g.fillText('여기 들어왔으면',w*.06,h*.2);g.fillText('이것부터 읽어.',w*.06,h*.3);
+  {const g=D.logC.getContext('2d'),w=D.logC.width,h=D.logC.height;g.drawImage(D.logBase,0,0);g.fillStyle='rgba(216,208,178,.92)';g.fillRect(w*.04,h*.06,w*.44,h*.4);g.fillStyle='#1d2a6a';g.font=`${h*.075}px ${PEN}`;g.textBaseline='top';g.fillText('근무자: ——',w*.06,h*.08);g.font=`${h*.07}px ${PEN}`;g.fillText('여기 들어왔으면',w*.06,h*.2);g.fillText('이것부터 읽어.',w*.06,h*.3);
    if(n>=5){g.fillStyle='rgba(216,208,178,.95)';g.fillRect(w*.53,h*.5,w*.44,h*.34);g.fillStyle='#120c2a';g.font=`${h*.075}px ${PEN}`;g.fillText('6시 전에 데리러 갈게.',w*.55,h*.54);g.fillText('문 열어 둬.',w*.55,h*.66)}D.logT.needsUpdate=true}
   // 벽지에 그은 正: 여러 사람의 줄, 다 채운 줄은 없음. 서진은 네 획. 맨 아래가 내 줄 (6시를 넘길 때마다 한 획)
   tally3(n-1);
@@ -1860,7 +1860,7 @@ function night3D(){
 // 벽지의 正 표시. mine = 내 줄에 그을 획 수 (0~5)
 function tally3(mine){
   const D=R3.dyn;if(!D.calC)return;const g=D.calC.getContext('2d'),w=D.calC.width,h=D.calC.height,r=mulberry(77);g.clearRect(0,0,w,h);
-  const rows=[[3,'#2a2a6a'],[2,'#3a2a1a'],[4,'#5a1a1a'],[1,'#1a3a2a'],[4,'#1a1a1a','서진'],[mine,'#2a2a2a']],ch=h/rows.length*.7;
+  const rows=[[3,'#2a2a6a'],[2,'#3a2a1a'],[4,'#5a1a1a'],[1,'#1a3a2a'],[4,'#1a1a1a'],[mine,'#2a2a2a']],ch=h/rows.length*.7;
   rows.forEach(([cnt,col,nm],k)=>{const y=h*.04+k*(h/rows.length),x0=w*.06+r()*w*.05;g.strokeStyle=col;g.lineWidth=k===5?4:3;g.lineCap='round';tallyStrokes(g,x0,y,ch,Math.min(5,cnt),r);if(nm){g.fillStyle=col;g.font=`${ch*.8}px ${PEN}`;g.textBaseline='top';g.fillText(nm,x0+ch*1.4,y)}});
   D.calT.needsUpdate=true;
 }
@@ -2268,7 +2268,7 @@ function endCut(){
   if(R3.ok){outLight(1);R3.leak.color.setHex(0xffe49a);R3.hemi.color.setHex(0xf3e6bf);R3.dyn.spillF.material.color.setHex(0xffffff);R3.dyn.hinge.rotation.y=0;tally3(S?S.night-1:0);if(S)night3D()}
   if(humG&&!S)humG.gain.setTargetAtTime(0,AC.currentTime,.2);if(d)d();
 }
-function cutScene(n){if(n==='room')return R3.sc;if(n==='pool'){if(!R3.sc2||R3.p2.n!==CUT.n)build3D2(CUT.n);return R3.sc2}const A=CUT.areas[n];return A?A.sc:null}
+function cutScene(n){if(n==='room')return R3.sc;if(n==='pool'){const pn=CUT.def.poolN||CUT.n;if(!R3.sc2||R3.p2.n!==pn)build3D2(pn);return R3.sc2}const A=CUT.areas[n];return A?A.sc:null}
 function renderCut(dt){
   const def=CUT.def;CUT.t+=dt;let t=CUT.t,i=0;
   while(i<def.shots.length&&t>=def.shots[i].d){t-=def.shots[i].d;i++}
@@ -2451,7 +2451,7 @@ const CUTS={
     {d:1.5,scene:'room',room:{light:u=>u>.15&&!(u>.35&&u<.45)&&!(u>.55&&u<.62),win:u=>u>.15?1.7:0,clock6:true},cam:(u,t,C)=>{C.position.set(0,1.3,-.2);C.lookAt(-RX,1.5,CAMZ)},at:{.2:()=>{buzzClick();humTo(.5,.4)},.6:()=>buzzClick(),.9:()=>buzzClick()}},
     {d:1.5,scene:'room',room:{light:true,clock6:true,tally:u=>u},cam:(u,t,C)=>shotCam(C,V(-.85,2.12,-.8),V(-.85,2.12,-.85),V(-.85,2.2,-1.4),V(-.85,2.2,-1.4),u),at:{.2:()=>nburst(3200,6,.25,.06,0)}},
     {d:1.6,scene:'room',fo:.5,room:{light:true,clock6:true,map:u=>EXIT_CAM[Math.min(4,CUT.n)],tally:()=>1},cam:(u,t,C)=>shotCam(C,V(0,1.08,-.62),V(0,1.06,-.66),V(0,1.03,-.95),V(0,1.03,-.95),u),at:{.2:()=>sfx(990,.05,'sine',.06),.65:()=>sfx(990,.05,'sine',.06),1.1:()=>sfx(990,.05,'sine',.06)}}]},
-  ending:{area:'outro',prep(){CUT.areas.outro.dyn.phone.visible=false},shots:[
+  ending:{area:'outro',poolN:1,prep(){CUT.areas.outro.dyn.phone.visible=false},shots:[
     {d:2,scene:'room',fi:.3,room:{light:true,mon:true,monText:['CAM A-H 연결됨'],clock6:true},cam:(u,t,C)=>shotCam(C,V(0,1.3,-.2),V(0,1.3,-.25),V(0,1.75,-1.4),V(0,1.8,-1.4),u),at:{.8:()=>sfx(1200,.03,'square',.08)}},
     {d:2.5,scene:'room',room:{light:u=>u<.8,mon:true,win:u=>Math.max(0,1-u*1.3),clock6:true},cam:(u,t,C)=>{C.position.set(0,1.3,-.2);const a=V(0,1.8,-1.4),b=V(-RX,1.5,CAMZ);C.lookAt(a.lerp(b,ease(Math.min(1,u*2))))},at:{0:()=>relay(),.5:()=>relay(),.9:()=>relay(),1.2:()=>relay(),1.5:()=>relay(),1.8:()=>{relay();humTo(0,.02)}}},
     {d:3,scene:'room',room:{light:false,win:()=>0,green:u=>u,clock6:true},cam:(u,t,C)=>{C.position.set(0,1.3,-.2);C.lookAt(-RX,1.5,CAMZ)},at:{1:()=>sfx(2400,2.2,'sine',.015)}},
@@ -2464,14 +2464,12 @@ const CUTS={
     {d:3.4,scene:'outro',cam:(u,t,C)=>inCar(C,0,Math.PI*ease(Math.min(1,u*2.2))),fx:(u,t)=>{const D=CUT.areas.outro.dyn;setCars(0);carLt(0,D.carA,1);D.gate.scale.x=.06+.94*ease(Math.min(1,Math.max(0,(t-1.3)/.7)))},at:{1.3:()=>nburst(2600,6,.6,.1,0),2.05:()=>{thump(70,.3,.4,0);metal()},2.9:()=>relay()}}, // 돌아서면 철창문이 닫힘
     {d:4.5,scene:'outro',cap:'',cam:(u,t,C)=>{const s=16*(t/7)**1.5,a=Math.PI-PI2*ease(Math.min(1,Math.max(0,(t/7-.2)/.3))),y=-s+1.62,hy=-16+s+1.6;inCar(C,s,a,y+Math.max(-.7,Math.min(1,(hy-y)*.5)));C.position.y+=Math.sin(t*37)*.006},
       fx:(u,t)=>{const D=CUT.areas.outro.dyn;setCars(16*(t/7)**1.5);carLt(0,D.carA,1);carLt(1,D.carB,1,0xfff0d0)},at:{0:()=>{thump(45,.9,.55,0);for(let k=0;k<10;k++)thump(36,.3,.12,0,.5+k*.45)},2.5:()=>metal(),4.1:()=>whisper()}}, // 아래에서 맞은편 칸 불빛이 올라옴
-    {d:2.6,pic:'sjbars',pfy:.48,cap:'고마워.',capDelay:500,at:{0:()=>{thump(60,.3,.3,0);nburst(3000,3,.4,.08,0)},.2:()=>buzzClick()}}, // 철창 너머 서진 (사진)
     {d:3.2,scene:'outro',cap:'',cam:(u,t,C)=>{const s=8.25+3.4*t,y=-s+1.62;inCar(C,s,Math.PI-.25*u,y+.4*u)},
       fx:(u,t)=>{const D=CUT.areas.outro.dyn;setCars(8.25+3.4*t);carLt(0,D.carA,(t*11)%1<.4&&u>.5?.15:1);carLt(1,D.carB,1,0xfff0d0)},at:{0:()=>{for(let k=0;k<7;k++)thump(36,.3,.12,0,k*.45)}}},
-    {d:2.6,pic:'sjup',pfy:.36,cap:'이거 혼자선 안 움직이거든.',capDelay:300,at:{0:()=>{for(let k=0;k<5;k++)thump(36,.3,.08,0,k*.45)},1.8:()=>buzzClick()}}, // 위로 올라가며 내려다보는 서진 (사진)
     {d:4,scene:'outro',cap:'',cam:(u,t,C)=>{const s=19.13+4.03*t;inCar(C,s,Math.PI-.25+.25*u)},fx:(u,t)=>{const D=CUT.areas.outro.dyn;setCars(19.13+4.03*t);carLt(0,D.carA,(t*7)%1<.3?.5:.08);carLt(1,D.carB,0)},fo:.5,at:{0:()=>{for(let k=0;k<7;k++)thump(36,.3,.1,0,k*.5)},3.85:()=>{thump(48,.7,.6,0);metal()}}},
     {d:1.6,black:true,at:{.3:()=>drip(-.3),.9:()=>drip(.4),1.3:()=>drip(0)}},
-    {d:5,scene:'outro',fi:.8,cam:(u,t,C)=>{const B=ELEV_BOT,p=V(-1.4,-B+1.62,-12.75).lerp(V(-1.4,-B+1.62,-11.7),ease(Math.max(0,(u-.35)/.65)));C.position.copy(p);C.lookAt(-1.2,-B+1.1,-6)},fx:(u,t)=>{poolFx();CUT.areas.outro.dyn.gate.scale.x=.06+.94*(1-ease(Math.min(1,Math.max(0,(t-.6)/.8))))},at:{.6:()=>nburst(2600,6,.6,.1,0),1.2:()=>drip(.5),2.4:()=>drip(-.6),3.5:()=>drip(.2)}}, // 철창문이 열리면 하얀 타일 수영장
-    {d:2.4,scene:'outro',fo:2,cam:(u,t,C)=>{const B=ELEV_BOT;C.position.set(-1.4,-B+1.62,-11.7);C.lookAt(-1.2+u*.3,-B+1.1,-6)},fx:()=>{poolFx();CUT.areas.outro.dyn.gate.scale.x=.06},at:{.8:()=>drip(0)}}]},
+    {d:5,scene:'pool',fi:.8,pool:{lit:1,gate:(u,t)=>ease(Math.min(1,Math.max(0,(t-.6)/1.4)))},cam:(u,t,C)=>shotCam(C,V(.05,1.62,2.75),V(.05,1.62,2.6),V(0,1.55,-6),V(0,1.5,-7),u),at:{.6:()=>{creak(0);nburst(2600,6,.6,.1,0)},1.2:()=>drip(.5),2.4:()=>drip(-.6),3.5:()=>drip(.2)}}, // 철창문이 열리면 하얀 타일 수영장 (챕터 2 인트로와 같은 곳)
+    {d:2.4,scene:'pool',fo:2,pool:{lit:1,gate:1},cam:(u,t,C)=>{C.position.set(.05,1.62,2.6);C.lookAt(.3*u,1.5,-7)},at:{.8:()=>drip(0)}}]},
 };
 // ---- 챕터 2 컷씬 (수영장 장면) ----
 function poolCut(o,u,t,C){const P=R3.p2,f=(v,d)=>typeof v==='function'?v(u,t):v??d,lit=f(o.lit,0),em=f(o.em,lit?0:1),tr=f(o.torch,0);
@@ -2481,7 +2479,7 @@ function poolCut(o,u,t,C){const P=R3.p2,f=(v,d)=>typeof v==='function'?v(u,t):v?
   if(o.exitD!==undefined&&P.exitG)P.exitG.position.z=P.Z1-f(o.exitD);
   if(P.gate)P.gate.scale.x=Math.max(.06,1-f(o.gate,0));
   if(o.under){const k=f(o.under);if(k>0){R3.sc2.background.setHex(0x0b3a40);P.fog.color.setHex(0x0b3a40);P.fog.near=0;P.fog.far=lerp(22,7,k)}else P.fog.near=5}
-  [P.hum,P.dvHead,P.slHand,P.wake,P.hmS,P.hmP].forEach(m=>{if(m)m.visible=false});if(P.drn)P.drn.material.opacity=0;
+  [P.hum,P.dvHead,P.slHand,P.wake,P.hmS,P.hmP].forEach(m=>{if(m)m.visible=false});if(P.rphone)P.rphone.visible=!!o.phone;if(P.drn)P.drn.material.opacity=0;
   const dirV=new R3.T.Vector3(0,0,-1).applyQuaternion(C.quaternion);P.torch.intensity=tr*9;P.torch.position.copy(C.position);P.torch.position.y-=.25;P.torch.target.position.copy(C.position).addScaledVector(dirV,8);P.flashL.intensity=0}
 const exD=k=>EXIT2[Math.max(0,Math.min(4,k))];
 const offAt=(u,a,b)=>1-Math.min(1,Math.max(0,(u-a)/(b-a))); // 불이 하나씩 꺼지는 비율
@@ -2505,9 +2503,9 @@ CUTS.ending2={shots:[ // 5일 차 6시: 수로 입구까지 온 초록 불 → �
   {d:4.5,scene:'pool',pool:{lit:1,exitD:()=>exD(4),under:u=>u>.12?1:0},teal:u=>u<.12?0:.32+u*.25,glow:u=>u<.12?0:Math.min(1,(u-.12)*2.2),white:u=>Math.max(0,(u-.72)/.28),cam:(u,t,C)=>{const z=-7-exD(4)+1.2-u*1.4,y=lerp(WATER_Y+.16,-1.25,ease(Math.min(1,u*1.5)));C.position.set(Math.sin(t*.9)*.05,y,z);C.lookAt(0,lerp(.4,2.4,ease(u)),z-4)},at:{.4:()=>{bubbles(0,.18);nburst(300,1,1.5,.15,0,0,'lowpass')}}}, // 물속으로
   {d:2,white:u=>1-u*.2,scene:null}]};
 CUTS.reset2d={shots:[{d:1.4,black:true,at:{0:()=>{relay();humTo(0,.05)},.35:()=>relay(),.65:()=>relay()}},{d:1.6,black:true,at:{.4:()=>drag(0,.25),1.3:()=>buzzClick()}}]}; // 3D가 안 될 때 6시 소등은 소리로만
-CUTS.ending_hard={area:'outro',prep(){CUT.areas.outro.dyn.phone.visible=true},shots:CUTS.ending.shots.slice(0,-1).concat([ // 하드: 물가에서 빨간 전화기가 울림
-  {d:3.5,scene:'outro',cam:(u,t,C)=>{const B=ELEV_BOT;C.position.set(-1.4,-B+1.62,-11.7);const a=V(-1.2,-B+1.1,-6),b=V(1.7,-B+.1,-10.35);C.lookAt(a.lerp(b,ease(Math.min(1,Math.max(0,(u-.3)/.5)))))},fx:()=>{poolFx();CUT.areas.outro.dyn.gate.scale.x=.06},at:{.2:()=>ringTone(),2.2:()=>ringTone()}},
-  {d:2.5,scene:'outro',cam:(u,t,C)=>{const B=ELEV_BOT;shotCam(C,V(-1.4,-B+1.62,-11.7),V(.9,-B+1.1,-10.6),V(1.7,-B+.1,-10.35),V(1.7,-B+.1,-10.35),u,{walk:true})},fx:()=>{poolFx();CUT.areas.outro.dyn.gate.scale.x=.06},at:{0:()=>steps(4,.6,.14),.5:()=>ringTone()},cutAt:2.2}])};
+CUTS.ending_hard={area:'outro',poolN:1,prep(){},shots:CUTS.ending.shots.slice(0,-1).concat([ // 하드: 수영장 물가에서 빨간 전화기가 울림
+  {d:3.5,scene:'pool',pool:{lit:1,gate:1,phone:1},cam:(u,t,C)=>{C.position.set(.05,1.62,2.6);const a=V(0,1.5,-7),b=V(1.6,.1,-1.5);C.lookAt(a.lerp(b,ease(Math.min(1,Math.max(0,(u-.3)/.5)))))},at:{.2:()=>ringTone(),2.2:()=>ringTone()}},
+  {d:2.5,scene:'pool',pool:{lit:1,gate:1,phone:1},cam:(u,t,C)=>{const Pp=walkPath([[.05,2.6],[1.35,1.6],[1.45,-.75]]),e=ease(u),p=Pp.getPointAt(e);C.position.set(p.x,lerp(1.62,1.25,e)+Math.sin(e*Pp.getLength()/.7*Math.PI)*.02,p.z);C.lookAt(1.6,.1,-1.5)},at:{0:()=>steps(4,.6,.14),.5:()=>ringTone()},cutAt:2.2}])};
 
 // ===================== 챕터 2: 수영장 (풀룸) =====================
 // 엘리베이터로 떨어진 곳. 밤엔 불이 다 꺼짐. 손전등 플래시를 터뜨리면 그쪽 아치에 선 것이 도망감. 패널로는 근처 통로 3개만 봄
@@ -2525,11 +2523,11 @@ const POOL_RULES=[
   [1,'가운데 수로는 물입니다. 걸어서 오는 사람은 없습니다.'],
   [1,'수로 끝 초록 비상구 불빛은 매일 아침 조금씩 가까워집니다.'],
   [2,'가운데 수로 바닥을 패널로 자주 확인하십시오. 오래 안 보면 떠오릅니다.'],
-  [3,'물 위로 머리가 올라오면 손전등을 끄고 가만히 계십시오. 빛을 쫓아옵니다. 플래시 금지.'],
+  [3,'가운데 수로에서 헤엄치는 소리가 나면, 머리가 올라오기 전에 손전등을 끄십시오. 불빛이 켜져 있으면 바로 덮칩니다. 가라앉을 때까지 켜지 마십시오.'],
   [4,'미끄럼틀에서 긁히는 소리가 나면, 끝에 손이 보일 때 앞을 보고 플래시를 터뜨리십시오.'],
   [5,'흥얼거리는 소리가 가까이 오면 눈을 감으십시오. 노래가 완전히 멀어질 때까지 뜨지 마십시오.'],
   [1,'플래시는 충전되는 동안 쓸 수 없습니다.'],
-  [1,'조명이 켜지면 다음 구역으로 이동하십시오.']];
+  [1,'여분 배터리는 테이블 위에 하나 있습니다. 손전등은 한 밤을 버티지 못합니다. 불빛이 깜빡이면 갈아 끼우십시오.']];
 const DEATH2={'흥얼이':'눈을 뜨자, 바로 앞에서 웃고 있었다.','교대자':'어둠 속에서 젖은 손이 얼굴을 덮었다.','익사자':'물 밑에서 올라온 손이 발목을 잡았다.','잠수부':'불빛을 따라 물 밖으로 뛰어올랐다.','미끄럼틀':'미끄럼틀 끝에서 무언가 쏟아져 나왔다.'};
 // 챕터 2는 한 자리(안전요원석)에서 버팀. 가운데 수로 끝 초록 비상구 불빛이 매일 아침 다가옴
 const SPOT1={name:'안전요원석',eye:2.05,R:7,plat:true,slide:true,pool:[-4.6,4.6,-1.8]},SPOT2=[SPOT1,SPOT1,SPOT1,SPOT1,SPOT1];
@@ -2548,7 +2546,7 @@ function update2(dt){
   if(S.t>=HOUR*6){S.dawn=.01;setHum(true);if(S.swap)endSwap(true);for(let k=0;k<6;k++)setTimeout(()=>relay(),400+k*260);setTimeout(()=>{thump(50,.4,.4,0);humTo(.7,.3)},2100);return}
   const h=S.hum;if(h.dir===undefined){humInit2(h);S.fl=1;S.spare=1;S.drn={p:0,said:0};S.dv={st:0,timer:rnd(40,55)-S.night*3,off:0};S.sl={st:0,timer:rnd(35,50),sT:0};S.hm={st:0,timer:rnd(30,45),nT:0,ni:0,side:0,said:0}}
   // 배터리: 손전등이 켜져 있으면 닳음 (한 밤에 한 번은 갈아야 함), 패널, 플래시는 한 번에
-  if(torchOn())S.power=Math.max(0,S.power-dt*((S.hard?.4:.34)+(S.mon?.05:0)));
+  if(torchOn())S.power=Math.max(0,S.power-dt*((S.hard?.43:.37)+(S.mon?.07:0)));
   if(S.power<=0&&!S.outSaid){S.outSaid=true;say(S.spare>0?'손전등이 꺼졌다. 배터리를 갈아야 한다.':'손전등이 꺼졌다. 남은 배터리가 없다.','bad');sfx(50,1.5,'sawtooth',.2);buildUI()}
   if(S.power<20&&!S.lowSaid&&S.power>0){S.lowSaid=true;say('손전등 불빛이 깜빡인다.')}
   // 배터리 교체: 꾹 누르는 단계는 누르고 있는 동안만 진행
@@ -2564,7 +2562,7 @@ function update2(dt){
   else if(h.timer<=0){
     h.st++;
     if(h.st===1){h.timer=humStep2();footsteps(DIRX[h.dir],3,.08);buzzClick();0}
-    else if(h.st===2){h.timer=humArch2();footsteps(DIRX[h.dir],3,.16);relay();0;if(monOn()&&S.cam===h.dir)S.camSw=.6}
+    else if(h.st===2){h.timer=humArch2();footsteps(DIRX[h.dir],3,.16);relay();sting(DIRX[h.dir]);0;if(monOn()&&S.cam===h.dir)S.camSw=.6}
     else if(h.st===3){h.timer=humNear2();breathe(DIRX[h.dir],.3);drip(DIRX[h.dir])}
     else return die('교대자');
   }
@@ -2576,15 +2574,16 @@ function update2(dt){
   // 잠수부 (3일 차~): 가운데 수로 → 풀 → 물 위로 머리. 빛을 쫓아옴 → 손전등을 끄고 버티면 가라앉음, 플래시를 터뜨리면 덮침
   if(S.night>=3){const v=S.dv;v.timer-=dt*(v.st===2&&torchOn()?1.6:1);
     if(v.st===0&&v.timer<=0&&(SHOOT||(S.hm&&S.hm.st>=1)))v.timer=rnd(3,6);
-    else if(v.st===0&&v.timer<=0){v.st=1;v.timer=rnd(6,8);nburst(700,1,.6,.08,0);0}
+    else if(v.st===0&&v.timer<=0){v.st=1;v.timer=rnd(6,8);splashFar(0,.22);v.sT=0}
+    if(v.st===1||v.st===2){v.sT=(v.sT||0)-dt;if(v.sT<=0){const k=v.st===1?1-Math.max(0,v.timer)/7:1;v.sT=lerp(.95,.5,k);swimStroke(0,lerp(.08,.3,k)*(v.st===2?1.2:1))}}
     else if(v.st===1&&v.timer<=0){v.st=2;v.timer=rnd(5,6.5);bubbles(0,.12)}
-    else if(v.st===2&&v.timer<=0){v.st=3;v.off=0;v.timer=S.hard?2.2:3.2;nburst(900,1,.5,.25,0);thump(70,.3,.3,0);0}
-    else if(v.st===3){if(torchOn()){if(v.timer<=0)return die('잠수부')}else{v.timer+=dt;v.off+=dt;if(v.off>=3){v.st=0;v.timer=Math.max(14,rnd(26,40)-S.night*2);bubbles(0,.15);0}}}}
+    else if(v.st===2&&v.timer<=0){v.st=3;v.off=0;v.timer=S.hard?2.2:3.2;nburst(900,1,.5,.3,0);thump(70,.3,.35,0);if(torchOn())return die('잠수부')}
+    else if(v.st===3){if(torchOn())return die('잠수부');else{v.timer+=dt;v.off+=dt;if(v.off>=3){v.st=0;v.timer=Math.max(14,rnd(26,40)-S.night*2);bubbles(0,.15);0}}}}
   // 미끄럼틀 (4일 차~): 긁히며 내려오는 소리 → 끝에 손이 보일 때 앞을 보고 플래시
   if(S.night>=4&&!DVU){const l=S.sl;l.timer-=dt;
     if(l.st===0&&l.timer<=0&&h.st>=2)l.timer=rnd(3,6);
     else if(l.st===0&&l.timer<=0){l.st=1;l.timer=8;0}
-    else if(l.st===1){l.sT-=dt;if(l.sT<=0){l.sT=.22;const k=1-l.timer/8;nburst(lerp(500,1400,Math.random()),3,.18,.03+k*.12,lerp(.9,.4,k),0)}if(l.timer<=3&&!l.saw){l.saw=1;thump(90,.2,.25,.4)}if(l.timer<=0)return die('미끄럼틀')}}
+    else if(l.st===1){l.sT-=dt;if(l.sT<=0){l.sT=.22;const k=1-l.timer/8;slideScrape(k,lerp(.95,.35,k))}if(l.timer<=3&&!l.saw){l.saw=1;thump(90,.2,.25,.4)}if(l.timer<=0)return die('미끄럼틀')}}
   }
   // 흥얼이 (5일 차~): 흥얼거리며 좌우 아치에서 옴 → 가까워지면 눈을 감음 → 의자 주위를 한 바퀴 돌고 감. 도는 동안 눈 뜨면 죽음
   if(S.night>=5&&S.t>=10){const m=S.hm,SD=['왼쪽','','오른쪽'],sp=m.side===0?-1:1;
@@ -2603,13 +2602,16 @@ function update2(dt){
   if(S.msgT>0)S.msgT-=dt;if(S.shake>0)S.shake-=dt;
   ambient(dt);heartbeat(dt);threeAM();if(S.monMsg){S.monMsg.t+=dt;if(S.monMsg.t>1.6)S.monMsg=null}if(S.clockRev>0)S.clockRev-=dt;
   if(Math.random()<dt*.5)drip(rnd(-1,1));if(Math.random()<dt*.06)nburst(rnd(500,900),2,.5,.04,rnd(-1,1),0); // 물방울, 멀리서 출렁
+  if(S.fakeL&&S.fakeL.t>0)S.fakeL.t-=dt;
+  S.evT=(S.evT??rnd(14,24))-dt;if(S.evT<=0&&S.t>12){S.evT=rnd(16,32);const r=Math.random(),pn=rnd(-1,1); // 아무 일도 아닌 것들 (조용할 때 긴장을 유지)
+    if(r<.2)whistleFar(pn);else if(r<.4)splashFar(pn,.12);else if(r<.55)footsteps(pn,rnd(3,6)|0,.05);else if(r<.7&&h.dir<0)S.fakeL={i:[0,2][ri(2)],t:rnd(.8,1.6)};else if(r<.82)groan(pn,.06);else giggle(pn,.035)}
   updHUD();
 }
 // 플래시: 카메라 플래시처럼 팍. 지금 보는 쪽 아치에 서 있거나 바로 앞까지 온 것은 도망감
 function flash(){
   if(!S||S.ch!==2||S.over||S.dawn||S.log||S.eyes||S.paused||PAUSE.on||mode!=='game'||jump>0)return;
   if(S.fl<1||!torchOn()){sfx(240,.05,'square',.05);return}
-  S.fl=0;S.power=Math.max(0,S.power-2);S.flashT=.45;S.shake=.08;nburst(5200,1,.06,.28,0);thump(220,.04,.25,0);
+  S.fl=0;S.power=Math.max(0,S.power-3);S.flashT=.45;S.shake=.08;nburst(5200,1,.06,.28,0);thump(220,.04,.25,0);
   const h=S.hum;
   if(S.view===1&&S.dv&&S.dv.st===3)return die('잠수부'); // 빛을 보고 덮침
   if(S.view===1&&S.sl&&S.sl.st===1&&S.sl.timer<=3){const l=S.sl;l.st=0;l.saw=0;l.timer=Math.max(16,rnd(28,40)-S.night*2);for(let k=0;k<5;k++)nburst(900,3,.2,.12-k*.02,.5+k*.08,k*.18);0}
@@ -2679,7 +2681,7 @@ function disposeSc(sc){sc.traverse(o=>{if(o.geometry)o.geometry.dispose();const 
 function build3D2(n){
   if(R3.sc2)disposeSc(R3.sc2);
   const T3=R3.T,sp=SPOT2[Math.min(4,n-1)],R=sp.R,Hc=6.4,AW=2.7,AH=4.0,FW=Math.min(2*R-3.2,8),FH=5.6,sc=new T3.Scene(),M=poolMats(),P={hot:{},n,sp,R,day:[],lamps:[]};R3.sc2=sc;R3.p2=P;
-  sc.background=new T3.Color(0x020405);sc.fog=new T3.Fog(0x020405,5,22);P.fog=sc.fog;
+  sc.background=new T3.Color(0x020405);sc.fog=new T3.Fog(0x020405,3,15);P.fog=sc.fog;
   const add=(geo,m=M.room)=>{wUV(geo,2.6,2.6);const o=new T3.Mesh(geo,m);o.receiveShadow=true;sc.add(o);return o};
   const BX=(w,h,d,x,y,z,m)=>{const g=new T3.BoxGeometry(w,h,d);g.translate(x,y,z);return add(g,m)};
   const Z0=1.6,Z1=-R,dep=Z0-Z1,c=(Z0+Z1)/2;
@@ -2718,17 +2720,32 @@ function build3D2(n){
   if(sp.slide){const V3=T3.Vector3,[ex,ey,ez]=SLIDE_EXIT,pts=[[R-.9,6.1,.9],[R-1.8,5.6,-1.2],[R-3.0,4.4,-3.4],[3.4,2.9,-5.2],[2.6,1.5,-4.7],[ex,ey,ez]].map(([x,y,z])=>new V3(x,y,z));mesh(new T3.TubeGeometry(new T3.CatmullRomCurve3(pts),90,.42,14,false),MS({color:0xdfe8ea,roughness:.25,side:T3.DoubleSide}),0,0,0,sc,false);[[R-1.8,-1.2],[R-3.0,-3.4],[3.4,-5.2]].forEach(([x,z])=>CYL(.07,.07,6.4,M.chrome,x,3.2,z,sc,8))} // 천장에서 풀로 내려오는 미끄럼틀
   if(sp.locker){[-1,1].forEach(s=>{for(let z=Z0-.6;z>Z1+1.2;z-=.46){if(Math.abs(z+.2)<1.8)continue;const g=grp(s*(R-.28),0,z,s<0?PI2:-PI2,sc);BOX(.44,1.9,.5,M.locker,0,.95,0,g);for(let k=0;k<4;k++)BOX(.25,.012,.01,M.edge,0,1.6+k*.05,.255,g)}})}
   if(!sp.plat){BOX(1.6,.06,.45,MS({color:0x8a6a44,roughness:.6}),0,.45,.75,sc);[-.6,.6].forEach(x=>BOX(.06,.43,.36,M.chrome,x,.22,.75,sc))} // 앉아 있는 벤치
-  // 이용 수칙 카드: 내 앞 작은 선반
-  {const sh=eye-.62,shz=-.5,base=sp.plat?1:0;BOX(.6,.04,.3,lam,0,sh,shz,sc);BOX(.04,sh-base,.04,M.chrome,0,base+(sh-base)/2,shz,sc);
-   const g=grp(0,sh+.025,shz,.15,sc),cv2=cvs(256,320,(q,w,h)=>{q.fillStyle='#e8ece6';q.fillRect(0,0,w,h);q.fillStyle='#1a3a5a';q.font=`bold ${h*.075}px 'Nanum Gothic Coding',sans-serif`;q.fillText('이용 수칙',w*.08,h*.12);q.fillStyle='rgba(20,30,40,.55)';for(let k=0;k<7;k++)q.fillRect(w*.08,h*(.22+k*.1),w*(.6+(k%3)*.1),h*.025)});
-   PLN(.2,.26,MS({map:ctx3(cv2),roughness:.9}),0,0,0,g).rotation.x=-PI2;P.hot.log=g}
+  // 내 앞 테이블 (수영장 흰 플라스틱 테이블): 이용 수칙 카드, 여분 배터리, 통로 패널(휴대용 CCTV 모니터)
+  {const base=sp.plat?1:0,TY=base+.55,TZ=-.42,pl=MS({map:ctx3(cvs(256,128,(q,w,h)=>{q.fillStyle='#d9dcd6';q.fillRect(0,0,w,h);for(let k=1;k<9;k++){q.fillStyle='rgba(60,70,70,.35)';q.fillRect(k*w/9-1,0,2,h)}q.fillStyle='rgba(120,110,80,.18)';for(let k=0;k<30;k++)q.fillRect(Math.random()*w,Math.random()*h,rnd(2,10),rnd(1,3))})),roughness:.6,color:0xd0d4cc}),
+     leg=MS({color:0xc4c8c0,roughness:.55});
+   BOX(.92,.03,.5,pl,0,TY-.015,TZ,sc);BOX(.94,.05,.02,leg,0,TY-.04,TZ+.25,sc);BOX(.94,.05,.02,leg,0,TY-.04,TZ-.25,sc);
+   [[-.42,-.21],[.42,-.21],[-.42,.21],[.42,.21]].forEach(([x,z])=>CYL(.018,.022,TY-base,leg,x,base+(TY-base)/2,TZ+z,sc,10));P.TY=TY;
+   // 이용 수칙 카드 (코팅된 종이, 테이블 위)
+   const g=grp(.02,TY+.002,TZ-.06,.12,sc),cv2=cvs(256,320,(q,w,h)=>{q.fillStyle='#e8ece6';q.fillRect(0,0,w,h);q.fillStyle='#1a3a5a';q.font=`bold ${h*.075}px 'Nanum Gothic Coding',sans-serif`;q.fillText('이용 수칙',w*.08,h*.12);q.fillStyle='rgba(20,30,40,.55)';for(let k=0;k<7;k++)q.fillRect(w*.08,h*(.22+k*.1),w*(.6+(k%3)*.1),h*.025)});
+   PLN(.2,.26,MS({map:ctx3(cv2),roughness:.4}),0,0,0,g).rotation.x=-PI2;P.hot.log=g;
+   // 여분 배터리 (누르면 교체)
+   {const b=grp(.3,TY+.017,TZ-.02,.5,sc),cell=MS({color:0x2a5a3a,roughness:.4,metalness:.3});const c=CYL(.016,.016,.07,cell,0,0,0,b,18);c.rotation.z=PI2;const t=CYL(.0162,.0162,.014,MS({color:0x9a9488,roughness:.3,metalness:.8}),.037,0,0,b,18);t.rotation.z=PI2;
+    P.batHit=mesh(new T3.BoxGeometry(.16,.08,.12),new T3.MeshBasicMaterial({visible:false}),0,0,0,b,false);P.batW=b}
+   // 휴대용 CCTV 모니터: 평소엔 테이블 위에 서 있고, 패널을 열면 눈앞으로 들어 올림 (화면 = CCTV 영상)
+   {const m=new T3.Group();sc.add(m);const body=MS({color:0x23282a,roughness:.55,metalness:.25}),SW=.2,SH=SW*CH/CW;
+    BOX(SW+.04,SH+.05,.05,body,0,0,-.025,m);BOX(.06,.012,.008,MS({color:0x3a4244}),SW/2-.02,-(SH/2)-.016,.002,m);
+    const tx=new T3.CanvasTexture(camC);tx.colorSpace=T3.SRGBColorSpace;P.monTex=tx;P.monScr=PLN(SW,SH,new T3.MeshBasicMaterial({map:tx,fog:false,toneMapped:false,color:0x9ab0b0}),0,.005,.0015,m);
+    P.monLed=mesh(new T3.SphereGeometry(.0011,8,6),new T3.MeshBasicMaterial({color:0xff2a20}),-(SW/2)+.01,-(SH/2)-.016,.003,m,false);
+    [-1,1].forEach(k=>{const l=BOX(.012,.07,.012,body,k*.08,-(SH/2)-.045,-.04,m);l.rotation.x=.35}); // 받침 다리
+    P.monHit=mesh(new T3.BoxGeometry(SW+.08,SH+.1,.1),new T3.MeshBasicMaterial({visible:false}),0,0,0,m,false);
+    P.mon=m;P.monRestP=new T3.Vector3(-.27,TY+(SH/2)+.07,TZ-.08);m.rotation.set(-.12,.24,0);P.monRestQ=m.quaternion.clone();m.position.copy(P.monRestP);P.monT=0}}
   P.hemi=new T3.HemisphereLight(0x7fa8b0,0x0a1214,.05);sc.add(P.hemi);
   // 6시에 켜지는 천장 등
   const pg=new T3.PlaneGeometry(.7,1.4);P.panM=new T3.MeshBasicMaterial({color:0x1a2022});
   [-R/2,0,R/2].forEach(x=>[.2,c-1.5,Z1+1.6].forEach(z=>{const q=mesh(pg,P.panM,x,Hc-.01,z,sc,false);q.rotation.x=PI2}));
   [[-R/2,.2],[R/2,.2],[-R/2,Z1+1.6],[R/2,Z1+1.6],[0,c-1.5]].forEach(([x,z])=>{const l=new T3.PointLight(0xf0faff,0,16,1.2);l.position.set(x,Hc-.5,z);sc.add(l);P.day.push(l)});
   // 손전등 (평소엔 약하게) + 플래시
-  P.torch=new T3.SpotLight(0xfff2dc,0,22,.36,.55,1.2);sc.add(P.torch);sc.add(P.torch.target);
+  P.torch=new T3.SpotLight(0xfff2dc,0,18,.29,.6,1.3);sc.add(P.torch);sc.add(P.torch.target);
   P.flashL=new T3.PointLight(0xf4f8ff,0,18,1.1);sc.add(P.flashL);
   // 가운데 수로 끝 초록 비상구 불빛 (밤마다 가까워짐)
   {const d=EXIT2[Math.min(4,n-1)],ex=grp(0,0,Z1-d,0,sc);P.exitG=ex;P.Z1=Z1;BOX(.6,.3,.08,M.dark,0,2.6,0,ex);[-.24,.24].forEach(x=>CYL(.012,.012,FH-2.75,M.chrome,x,(FH+2.75)/2,0,ex,6));BOX(.7,.04,.12,M.dark,0,FH-.02,0,ex); /* 둥근 천장 꼭대기에 매달린 비상구 등 */mesh(new T3.PlaneGeometry(.5,.24),new T3.MeshBasicMaterial({map:exitTex(),fog:false}),0,2.6,.05,ex,false);const gl=new T3.PointLight(0x40ff70,2.2,8,1.4);gl.position.set(0,2.2,.6);ex.add(gl);P.exitL=gl}
@@ -2743,9 +2760,12 @@ function build3D2(n){
      q.fillStyle='#c8d6cc';q.beginPath();q.ellipse(w*.5,h*.16,w*.13,h*.08,0,0,7);q.fill();q.fillRect(w*.36,h*.24,w*.28,h*.36);[-1,1].forEach(sd=>{q.save();q.translate(w*(.5+sd*.15),h*.26);q.rotate(sd*.5);q.fillRect(-w*.04,0,w*.08,h*.3);q.restore()});q.fillRect(w*.38,h*.58,w*.1,h*.36);q.fillRect(w*.52,h*.58,w*.1,h*.36);
      q.fillStyle='#050807';[-1,1].forEach(sd=>{q.beginPath();q.ellipse(w*(.5+sd*.05),h*.15,w*.03,h*.02,0,0,7);q.fill()});q.fillRect(w*.47,h*.2,w*.06,h*.012)}));
    const dI=PIC.drowned,dh=1.75,m=mesh(new T3.PlaneGeometry(dI?dh*dI.width/dI.height:.9,dh),new T3.MeshBasicMaterial({map:t,transparent:true,opacity:0,depthWrite:false,color:0x406a6c}),-.3,-POOL_D+.08,-4.4,sc,false);m.rotation.x=-PI2;m.rotation.z=.35;m.renderOrder=-1;P.drn=m}
-  // 잠수부: 물살(V자) → 수면 위 머리
-  {const wk=ctx3(cvs(256,256,(q,w,h)=>{q.strokeStyle='rgba(220,250,255,.55)';q.lineWidth=5;for(let k=0;k<4;k++){q.beginPath();q.moveTo(w*.5,h*.15+k*18);q.lineTo(w*(.1+k*.04),h*.95);q.moveTo(w*.5,h*.15+k*18);q.lineTo(w*(.9-k*.04),h*.95);q.stroke()}}));
-   const m=mesh(new T3.PlaneGeometry(1.6,1.6),new T3.MeshBasicMaterial({map:wk,transparent:true,depthWrite:false,opacity:.8}),0,WATER_Y+.02,-6,sc,false);m.rotation.x=-PI2;m.visible=false;P.wake=m;
+  // 잠수부: 물 밑 검은 그림자 + 수면에 번지는 동그란 물결 → 수면 위 머리
+  {const ringT=ctx3(cvs(256,256,(q,w,h)=>{const gr=q.createRadialGradient(w/2,h/2,w*.36,w/2,h/2,w*.5);gr.addColorStop(0,'rgba(220,245,250,0)');gr.addColorStop(.55,'rgba(220,245,250,.9)');gr.addColorStop(1,'rgba(220,245,250,0)');q.fillStyle=gr;q.fillRect(0,0,w,h)})),
+     blobT=ctx3(cvs(128,256,(q,w,h)=>{const gr=q.createRadialGradient(w/2,h*.45,4,w/2,h*.5,h*.5);gr.addColorStop(0,'rgba(0,4,6,.95)');gr.addColorStop(.6,'rgba(0,6,8,.55)');gr.addColorStop(1,'rgba(0,8,10,0)');q.fillStyle=gr;q.fillRect(0,0,w,h)})),
+     m=grp(0,0,-6,0,sc),body=mesh(new T3.PlaneGeometry(.8,1.9),new T3.MeshBasicMaterial({map:blobT,transparent:true,depthWrite:false}),0,WATER_Y-.22,0,m,false);body.rotation.x=-PI2;body.renderOrder=-1;
+   const rings=[0,1,2,3].map(()=>{const r=mesh(new T3.PlaneGeometry(1,1),new T3.MeshBasicMaterial({map:ringT,transparent:true,depthWrite:false,blending:T3.AdditiveBlending,opacity:0}),0,WATER_Y+.03,0,m,false);r.rotation.x=-PI2;return r});
+   m.userData={body,rings};m.visible=false;P.wake=m;
    const ht=PIC.diver?imgTex(PIC.diver):ctx3(cvs(256,256,(q,w,h)=>{q.fillStyle='#07090a';q.beginPath();q.ellipse(w*.5,h*.55,w*.34,h*.45,0,0,7);q.fill();[-1,1].forEach(sd=>{const gx=w*(.5+sd*.15),gy=h*.48;q.fillStyle='#1a2a2e';q.beginPath();q.arc(gx,gy,w*.12,0,7);q.fill();q.fillStyle='rgba(190,240,250,.85)';q.beginPath();q.arc(gx-w*.03,gy-h*.03,w*.035,0,7);q.fill()});q.fillStyle='#b8c8c2';q.beginPath();q.ellipse(w*.5,h*.78,w*.14,h*.1,0,0,7);q.fill();q.fillStyle='#120606';q.beginPath();q.ellipse(w*.5,h*.8,w*.07,h*.06,0,0,7);q.fill()}));
    const dI=PIC.diver,dW=dI?1.0:1.1,dH=dI?dW*dI.height/dI.width:1.1,hd=mesh(new T3.PlaneGeometry(dW,dH),new T3.MeshBasicMaterial({map:ht,transparent:true,alphaTest:.05,side:T3.DoubleSide,color:0x7f9492}),0,.22,-2.1,sc,false);hd.visible=false;P.dvHead=hd;P.dvH=dH}
   // 미끄럼틀 끝에 걸친 손
@@ -2761,13 +2781,17 @@ function build3D2(n){
   // 흥얼이: 옆 아치 통로에 서서 다가옴(손전등에 보임) / 눈을 뜨고 있으면 바로 옆을 지나감
   {const I1=PIC.hstand,I2=PIC.hside,mk=(im,em)=>{const m=mesh(new T3.PlaneGeometry(1,1),MS({map:im?imgTex(im):null,transparent:true,alphaTest:.06,side:T3.DoubleSide,roughness:.5,color:0xc8d4d0,emissive:em,emissiveMap:im?imgTex(im):null}),0,0,0,sc,false);m.visible=false;m.userData.ar=im?im.width/im.height:.4;return m};
    P.hmS=mk(I1,0x101818);P.hmP=mk(I2,0x2a3634)}
+  // 하드 엔딩: 물가 바닥에 놓인 빨간 전화기 (컷씬에서만)
+  {const g=grp(1.6,0,-1.5,-.5,sc),red=MS({color:0x9a1712,roughness:.35});BOX(.24,.09,.2,red,0,.045,0,g);BOX(.26,.035,.07,red,0,.12,-.0,g);[-1,1].forEach(k=>BOX(.06,.05,.08,red,k*.11,.1,0,g));
+   const cd=mesh(new T3.TorusGeometry(.05,.008,6,14),MS({color:0x1a1a1a}),0,.091,.02,g,false);cd.rotation.x=-PI2;g.visible=false;P.rphone=g}
   // 교대자 (빛을 받아야 보이는 판)
   P.hum=mesh(new T3.PlaneGeometry(1,1),MS({transparent:true,alphaTest:.05,side:T3.DoubleSide,roughness:1,color:0xd0d6d4,emissive:0x1e2626}),0,1,0,sc,false);P.hum.visible=false;
   return P;
 }
 const Z1C=P=>-P.R; // 가운데 수로 입구 z
 // ===================== 챕터 2: 1인칭 3D 손 (설정 '손으로' 조작) =====================
-// 오른손: 손전등을 쥠 (손전등 누르기 = 끄기/켜기, 꼬리 뚜껑 = 배터리 교체). 왼손: 무릎 위 (꾹 = 눈 가리기). 팔걸이 모니터 = 통로 패널. 나머지 화면 누르기 = 플래시
+// 오른손: 손전등을 쥠 (누르기 = 끄기/켜기, 배터리 교체도 이 손전등으로 보여 줌). 왼손: 무릎 위 (꾹 = 손바닥으로 눈을 가림, 손가락 틈으로 조금 보임)
+// 테이블 위 모니터 = 통로 패널, 테이블 위 여분 배터리 = 교체. 플래시는 버튼으로만
 const handsOn=()=>SET.ctrl!=='buttons';
 const HND={sc:null};
 function buildHands(){const T3=R3.T,sc=new T3.Scene(),cam=new T3.PerspectiveCamera(50,1,.01,5);HND.sc=sc;HND.cam=cam;
@@ -2783,7 +2807,10 @@ function buildHands(){const T3=R3.T,sc=new T3.Scene(),cam=new T3.PerspectiveCame
   {const h=M(new T3.CylinderGeometry(.026,.019,.05,22),metal,[0,0,-.105],fl);h.rotation.x=PI2}                  // 머리
   HND.lens=M(new T3.CircleGeometry(.023,22),new T3.MeshBasicMaterial({color:0xfff2d0}),[0,0,-.1305],fl);HND.lens.rotation.y=Math.PI;
   for(let k=0;k<6;k++){const r=M(new T3.TorusGeometry(.018,.0018,6,20),rub,[0,0,.07+k*.006],fl)}                 // 손잡이 홈
-  HND.tail=M(new T3.CylinderGeometry(.019,.019,.022,20),rub,[0,0,.115],fl);HND.tail.rotation.x=PI2;                // 꼬리 뚜껑 (배터리)
+  HND.capG=G();HND.capG.position.z=.115;fl.add(HND.capG);HND.tail=M(new T3.CylinderGeometry(.019,.019,.022,20),rub,null,HND.capG);HND.tail.rotation.x=PI2; // 꼬리 뚜껑 (돌려서 엶)
+  M(new T3.BoxGeometry(.003,.02,.024),metal,[.019,0,0],HND.capG);M(new T3.BoxGeometry(.003,.02,.024),metal,[-.019,0,0],HND.capG); // 돌아가는 게 보이게 홈
+  {const mk1=(col)=>{const g=G();fl.add(g);const c=M(new T3.CylinderGeometry(.0145,.0145,.075,16),new T3.MeshStandardMaterial({color:col,roughness:.45,metalness:.3}),null,g);c.rotation.x=PI2;M(new T3.CylinderGeometry(.006,.006,.006,10),metal,[0,0,.04],g).rotation.x=PI2;g.visible=false;return g};
+   HND.oldB=mk1(0x5a4a3a);HND.newB=mk1(0x2a6a3a)} // 교체할 때 보이는 배터리 (헌 것·새 것)
   HND.sw=M(new T3.BoxGeometry(.011,.006,.016),rub,[0,.019,-.045],fl);                                                // 스위치
   // ---- 사람 손 만들기: 손바닥 판 + 마디 3개짜리 손가락(굵기가 끝으로 갈수록 가늘어짐) + 엄지 ----
   // 손 로컬: x = 손가락 뿌리 줄, +y = 손가락 방향, +z = 손등. 손가락은 x축으로 -각도만큼 돌리면 손바닥 쪽으로 굽음
@@ -2817,61 +2844,55 @@ function buildHands(){const T3=R3.T,sc=new T3.Scene(),cam=new T3.PerspectiveCame
    HND.th=H.th[0].parent;HND.RH=H}
   sleeve(fl,[.055,-.07,.05],[.1,-.3,.2],.033);
   HND.pTorch=M(new T3.BoxGeometry(.09,.08,.22),hid,[.01,0,-.02],fl);
-  // 여분 배터리: 오른손 옆 팔걸이 위에 놓여 있음 (누르면 교체)
-  {const b=G();sc.add(b);const bc=M(new T3.CylinderGeometry(.012,.012,.05,18),new T3.MeshStandardMaterial({color:0x2a5a3a,roughness:.4,metalness:.3}),null,b);bc.rotation.z=PI2;
-   M(new T3.CylinderGeometry(.0122,.0122,.012,18),new T3.MeshStandardMaterial({color:0x9a9488,roughness:.3,metalness:.8}),[.022,0,0],b).rotation.z=PI2;M(new T3.CylinderGeometry(.004,.004,.006,10),metal,[.03,0,0],b).rotation.z=PI2;
-   HND.pBatt=M(new T3.BoxGeometry(.11,.07,.08),hid,null,b);HND.bat=b}
   HND.R=R;HND.fl=fl;
   // ---- 왼손: 무릎(팔걸이) 위에 손등이 보이게 → 꾹 누르면 손바닥으로 눈앞을 덮음 ----
   const Lh=G();sc.add(Lh);const LH=hand(-1);LH.g.scale.x=-1; /* 왼손: 손등을 볼 때 엄지가 오른쪽 */Lh.add(LH.g);const lp=LH.g;HND.LH=LH;
   sleeve(lp,[0,-LH.L/2-.03,0],[0,-.34,.02],.034);
-  HND.qRest=new T3.Quaternion().setFromEuler(new T3.Euler(-1.3,.3,.2,'XYZ'));HND.qCov=new T3.Quaternion().setFromEuler(new T3.Euler(0,Math.PI,.05,'XYZ'));
+  HND.qRest=new T3.Quaternion().setFromEuler(new T3.Euler(-1.3,.3,.2,'XYZ'));HND.qCov=new T3.Quaternion().setFromRotationMatrix(new T3.Matrix4().makeBasis(new T3.Vector3(0,1,0),new T3.Vector3(1,0,0),new T3.Vector3(0,0,-1))); // 가릴 때: 손가락은 오른쪽(가로), 손바닥이 얼굴 쪽
   HND.pEye=M(new T3.BoxGeometry(.13,.16,.06),hid,[0,.02,0],lp);HND.L=Lh;HND.lp=lp;
-  // ---- 팔걸이 모니터 ----
-  const mo=G();sc.add(mo);M(new T3.BoxGeometry(.15,.1,.016),rub,null,mo);
-  {const c=mk(128,84),q=c.getContext('2d');q.fillStyle='#071012';q.fillRect(0,0,128,84);for(let y=0;y<84;y+=3){q.fillStyle=`rgba(90,200,210,${.05+Math.random()*.06})`;q.fillRect(0,y,128,1)}q.fillStyle='rgba(160,230,235,.5)';q.font='11px monospace';q.fillText('CAM',8,16);
-   const tx=new T3.CanvasTexture(c);HND.scr=M(new T3.PlaneGeometry(.13,.084),new T3.MeshBasicMaterial({map:tx,color:0x6a8a8c}),[0,0,.0085],mo)}
-  HND.led=M(sph(.004),new T3.MeshBasicMaterial({color:0xff2a20}),[.062,.043,.009],mo);
-  HND.pMon=M(new T3.BoxGeometry(.19,.14,.05),hid,null,mo);HND.mo=mo;
-  // 의자 팔걸이 (왼쪽엔 모니터가 받침대로 고정, 오른쪽엔 여분 배터리가 놓임) — 허공에 뜨지 않게
-  {const vin=new T3.MeshStandardMaterial({color:0x22292b,roughness:.6}),arm=()=>{const g=G();sc.add(g);M(new T3.BoxGeometry(.085,.04,.6),vin,null,g);M(new T3.BoxGeometry(.095,.012,.6),metal,[0,-.026,0],g);return g};
-   HND.armL=arm();HND.armR=arm();HND.pole=M(new T3.CylinderGeometry(.009,.009,1,10),metal,null,sc)}
   // ---- 빛: 아치 비상등(청록 역광), 손전등 머리 빛, 플래시 ----
   HND.hemi=new T3.HemisphereLight(0x6fa8b0,0x080c0d,.35);sc.add(HND.hemi);
   HND.rim=new T3.DirectionalLight(0x6fd8e0,.7);HND.rim.position.set(-1,1.2,-1.5);sc.add(HND.rim);
   HND.key=new T3.PointLight(0xffe8c8,0,1.2,1.6);sc.add(HND.key);HND.fx=new T3.PointLight(0xf4f8ff,0,2,1.2);sc.add(HND.fx);
-  HND.cov=0;HND.aim=0;HND.aimX=0;HND.aimY=0;HND.thP=0}
+  HND.cov=0;HND.aim=0;HND.aimX=0;HND.aimY=0;HND.thP=0;HND.swK=0;HND.swS=-1;HND.swT=0}
 // 매 프레임: 화면 비율에 맞춰 손 위치, 숨쉬기 흔들림, 눈 가리기, 빛
 function drawHands(fk,lit,warn){if(!HND.sc)buildHands();const T3=R3.T,cam=HND.cam,A=W/H;cam.aspect=A;cam.updateProjectionMatrix();
   const hw=Math.tan(25*Math.PI/180)*A*.45,t=T_,lag=(S.view-S.camX)*.06,br=Math.sin(t*1.3)*.003;
   HND.cov+=((S.eyes?1:0)-HND.cov)*(S.eyes?.3:.18);HND.aim=Math.max(0,HND.aim-1/60*2.2);HND.thP=Math.max(0,HND.thP-1/60*5);
-  // 오른손 + 손전등 (클릭한 쪽으로 잠깐 겨눔)
-  const xr=Math.min(hw*.62,.34),ak=ease(Math.min(1,HND.aim));HND.R.position.set(xr+lag,-.098+br,-.4);HND.armR.position.set(xr*.82+lag,-.235,-.68);HND.bat.position.set(xr*.82+lag,-.203,-.55);HND.bat.rotation.set(0,.35,0);HND.bat.visible=(S.spare??1)>0&&!S.swap&&!S.dawn;
-  HND.fl.rotation.set(.06+ak*HND.aimY*.35+Math.sin(t*.9)*.01,.16-ak*HND.aimX*.45,-.05);
+  // 오른손 + 손전등. 배터리 교체 중엔 손전등을 눈앞으로 가져와 옆으로 눕히고 꼬리 뚜껑을 돌려 엶
+  const sw=S.swap;if(sw){if(HND.swS!==sw.step){HND.swS=sw.step;HND.swT=0}HND.swT+=1/60}else HND.swS=-1;
+  HND.swK+=((sw?1:0)-HND.swK)*.14;const k=ease(Math.min(1,HND.swK)),xr=Math.min(hw*.62,.34),ak=ease(Math.min(1,HND.aim));
+  HND.R.visible=(handsOn()||HND.swK>.02)&&S.monA<.4;
+  HND.R.position.set(lerp(xr+lag,-.075,k),lerp(-.098+br,.012,k),lerp(-.4,-.3,k));
+  HND.fl.rotation.set(lerp(.06+ak*HND.aimY*.35+Math.sin(t*.9)*.01,.12,k),lerp(.16-ak*HND.aimX*.45,1.4,k),lerp(-.05,0,k));
+  {const st=HND.swS,T=HND.swT,p=sw?sw.p:0,cap=HND.capG,ob=HND.oldB,nb=HND.newB;let cz=.115,cy=0,spin=0;ob.visible=nb.visible=false;
+   if(st===0){cz=.115+.014*p;spin=p*9}
+   else if(st===1){cz=.13+.035*Math.min(1,T/.25);cy=-.012*Math.min(1,T/.25);spin=9;ob.visible=true;ob.position.set(0,0,.07)}
+   else if(st===2){cz=.165;cy=-.012;spin=9;const o=Math.min(1,T/.35);ob.visible=T<1.2;ob.position.set(0,-Math.max(0,T-.35)*Math.max(0,T-.35)*1.6,.07+o*.13);nb.visible=true;nb.position.set(0,lerp(-.06,0,Math.min(1,T/.4)),.24)}
+   else if(st===3){const i=Math.min(1,T/.3);nb.visible=true;nb.position.set(0,0,lerp(.24,.07,i));cz=lerp(.165,.115,p);cy=lerp(-.012,0,p);spin=9*(1-p)}
+   cap.position.set(0,cy,cz);cap.rotation.z=spin}
   HND.lens.material.color.setHex(torchOn()&&!lit?0xfff2d0:0x2a2a26);
-  // 왼손: 무릎 위 → 눈앞
-  const c=ease(Math.min(1,HND.cov)),xl=-Math.min(hw*.36,.21);
-  HND.L.position.set(lerp(xl-lag,.012,c),lerp(-.16+br*.8,-.04,c),lerp(-.46,-.155,c));HND.L.quaternion.copy(HND.qRest).slerp(HND.qCov,c);
-  HND.LH.F.forEach((f,i)=>{f.root.rotation.z=lerp(0,(i-1.5)*.1,c);f.j[0].rotation.x=-lerp(.45,.04,c);f.j[1].rotation.x=-lerp(.6,.04,c);f.j[2].rotation.x=-lerp(.4,.03,c)}); // 가릴 땐 손가락을 펴고 살짝 벌림 (틈으로 빛이 샘)
-  HND.LH.th[0].rotation.x=-lerp(.2,.05,c);HND.LH.th[0].parent.rotation.set(lerp(-.55,-.2,c),0,lerp(-.5,-.15,c));
-  HND.mo.position.set(-Math.min(hw*.95,.56),-.17,-.62);HND.mo.rotation.set(-.55,.5,.08);HND.mo.visible=true;
-  {const mp=HND.mo.position;HND.armL.position.set(mp.x,-.27,-.68);const top=-.27+.022,y0=mp.y-.03;HND.pole.position.set(mp.x,(top+y0)/2,mp.z+.01);HND.pole.scale.set(1,y0-top,1)} // 모니터 받침대
-  HND.led.material.color.setHex(S.mon||T_%1.4<.7?0xff2a20:0x300604);
+  // 왼손: 무릎 위 → 눈앞을 가로로 덮음. 화면을 거의 다 가리고 손가락 사이로만 조금 보임
+  const c=ease(Math.min(1,HND.cov)),xl=-Math.min(hw*.55,.31),dz=.085,sc2=lerp(1,1.55,c);
+  HND.L.visible=(handsOn()||HND.cov>.01)&&(S.monA<.4||HND.cov>.01);
+  HND.L.position.set(lerp(xl-lag,-.11,c),lerp(-.16+br*.8,.002,c),lerp(-.46,-dz,c));HND.L.quaternion.copy(HND.qRest).slerp(HND.qCov,c);HND.L.scale.setScalar(sc2);
+  HND.LH.F.forEach((f,i)=>{f.root.rotation.z=lerp((i-1.5)*.02,(i-1.5)*.12,c);f.root.scale.set(lerp(1,.72,c),1,lerp(1,.8,c));f.j[0].rotation.x=-lerp(.45,.02,c);f.j[1].rotation.x=-lerp(.6,.02,c);f.j[2].rotation.x=-lerp(.4,.01,c)}); // 손가락을 펴서 틈을 살짝 벌림
+  HND.LH.th[0].rotation.x=-lerp(.2,.3,c);HND.LH.th[0].parent.rotation.set(lerp(-.55,-.9,c),0,lerp(-.5,-.05,c));
   // 빛
   HND.hemi.intensity=lit?1.1:.3;HND.rim.color.setHex(warn?0xff3020:0x6fd8e0);HND.rim.intensity=lit?.6:warn?(Math.sin(T_*14)>0?1.1:.1):.7;
-  const head=new T3.Vector3(0,0,-.17);HND.fl.localToWorld(head);HND.key.position.copy(head);HND.key.intensity=torchOn()&&!lit?.9:0;
+  const head=new T3.Vector3(0,0,-.17);HND.fl.localToWorld(head);HND.key.position.copy(head);HND.key.intensity=torchOn()&&!lit?.9:0;if(HND.swK>.05){HND.key.position.set(.02,.06,-.18);HND.key.intensity=.35*HND.swK} // 교체할 땐 손이 잘 보이게 (밖에서 새어 드는 빛)
   HND.fx.position.copy(head);HND.fx.intensity=fk>0?6*fk*fk:0;
   const rd=R3.rd;rd.autoClear=false;rd.clearDepth();rd.render(HND.sc,cam);rd.autoClear=true}
-// 누른 곳의 손 물건: 'torch'|'batt'|'eye'|'mon'|null
-function handHit(p){if(!HND.sc||!handsOn())return null;const T3=R3.T,rc=new T3.Raycaster();rc.setFromCamera(new T3.Vector2(p.x/W*2-1,-(p.y/H*2-1)),HND.cam);
-  const L=[...(HND.bat.visible?[[HND.pBatt,'batt']]:[]),[HND.pTorch,'torch'],[HND.pEye,'eye'],[HND.pMon,'mon']].filter(([o,k])=>k!=='mon'||HND.mo.visible);let best=null,bd=1e9;
-  L.forEach(([o,k])=>{const h=rc.intersectObject(o,false)[0];if(h&&h.distance<bd){bd=h.distance;best=k}});return best}
-function handFlash(p){HND.aim=1;HND.aimX=p.x/W*2-1-.3;HND.aimY=-(p.y/H*2-1)-.2;flash()}
-// 처음 몇 초: 손 물건마다 손글씨 이름표
-function handLabels(){if(!HND.sc||S.t>18||S.dawn)return;const a=Math.min(1,(18-S.t)/3)*.85,P=(o,dx,dy,txt)=>{const v=new R3.T.Vector3();o.getWorldPosition(v);v.project(HND.cam);const x=(v.x+1)/2*W+dx,y=(1-v.y)/2*H+dy;cx.fillText(txt,x,y)};
+// 누른 곳의 물건: 'torch'|'eye' (손) 또는 'mon'|'batt' (테이블 위)
+function handHit(p){if(!HND.sc||!handsOn())return null;const T3=R3.T,v=new T3.Vector2(p.x/W*2-1,-(p.y/H*2-1)),rc=new T3.Raycaster();let best=null,bd=1e9;
+  const P=R3.p2;if(P&&P.mon&&S.monA<.05){rc.setFromCamera(v,R3.cam); // 테이블 위 물건 먼저
+    [[P.monHit,'mon',true],[P.batHit,'batt',P.batW.visible]].forEach(([o,k,on])=>{if(!on)return;const h=rc.intersectObject(o,false)[0];if(h&&h.distance<bd){bd=h.distance;best=k}});if(best)return best}
+  rc.setFromCamera(v,HND.cam);[[HND.pTorch,'torch',HND.R.visible],[HND.pEye,'eye',HND.L.visible]].forEach(([o,k,on])=>{if(!on)return;const h=rc.intersectObject(o,false)[0];if(h&&h.distance<bd){bd=h.distance;best=k}});return best}
+// 처음 몇 초: 누를 수 있는 것마다 손글씨 이름표
+function handLabels(){if(!HND.sc||S.t>18||S.dawn||S.mon)return;const a=Math.min(1,(18-S.t)/3)*.85,P2=R3.p2,P=(o,dx,dy,txt,c3)=>{const v=new R3.T.Vector3();o.getWorldPosition(v);v.project(c3);if(v.z>1)return;const x=(v.x+1)/2*W+dx,y=(1-v.y)/2*H+dy;cx.fillText(txt,x,y)};
   cx.save();cx.globalAlpha=a;cx.font=`${Math.round(Math.max(18,H*.042))}px 'Nanum Pen Script',cursive`;cx.textAlign='center';cx.fillStyle='rgba(230,222,196,.95)';cx.shadowColor='#000';cx.shadowBlur=6;
-  P(HND.pTorch,-10,-H*.12,'손전등 누르기: 끄기/켜기');if(HND.bat.visible)P(HND.pBatt,0,H*.07,'여분 배터리');P(HND.mo,-W*.03,-H*.11,'모니터: 통로 패널');
-  if(S.night>=5)P(HND.pEye,W*.05,-H*.06,'왼손 꾹: 눈 감기');cx.font=`${Math.round(Math.max(20,H*.05))}px 'Nanum Pen Script',cursive`;cx.restore()}
+  P(HND.pTorch,-10,-H*.12,'손전등 누르기: 끄기/켜기',HND.cam);if(S.view===1&&P2&&P2.mon){if(P2.batW.visible)P(P2.batW,0,-H*.05,'여분 배터리',R3.cam);P(P2.mon,0,-H*.1,'모니터: 통로 패널',R3.cam)}
+  if(S.night>=5)P(HND.pEye,W*.05,-H*.06,'왼손 꾹: 눈 감기',HND.cam);cx.restore()}
 function draw3D2(){
   if(!R3.sc2||R3.p2.n!==S.night)build3D2(S.night);
   const T3=R3.T,P=R3.p2,cam=R3.cam,eye=P.sp.eye;
@@ -2884,10 +2905,10 @@ function draw3D2(){
   // 6시: 등이 하나씩 탁탁 켜짐
   const dw=S.dawn||0,on=k=>dw>.4+k*.3&&!(dw<1.9&&Math.sin(dw*40+k)>.6),h=S.hum;
   P.day.forEach((l,k)=>l.intensity=on(k)?22:0);P.panM.color.setHex(on(0)?0xf4fbff:0x1a2022);
-  const lit=dw>1.6,bg=lit?0xb4c8ca:0x020405;R3.sc2.background.setHex(bg);P.fog.color.setHex(bg);P.fog.far=lit?60:22;P.hemi.intensity=lit?.8:.05;
+  const lit=dw>1.6,bg=lit?0xb4c8ca:0x020405;R3.sc2.background.setHex(bg);P.fog.color.setHex(bg);P.fog.far=lit?60:15;P.fog.near=lit?5:3;P.hemi.intensity=lit?.8:.025;
   if(P.exitG)P.exitG.visible=dw>2; // 5일 차 6시: 앞 통로 끝에 비상구
   // 아치 위 비상등: 교대자가 그 통로 중간까지 오면 깜빡, 아치에 서면 꺼짐
-  P.lamps.forEach((L,i)=>{const me=h.dir===i&&!dw,warn=me&&h.st===1,k=lit?0:me&&h.st>=2?0:warn?(Math.sin(T_*14+i)>0?1.2:.08):(Math.random()<.01?.4:1);L.l.intensity=3.2*k;L.l.color.setHex(warn?0xff2a18:0x6fd8e0);L.box.material.color.setHex(warn?(k>.5?0xff3a20:0x300604):me&&h.st>=2?0x220402:0x6fd8e0)});
+  P.lamps.forEach((L,i)=>{const me=h.dir===i&&!dw,fake=S.fakeL&&S.fakeL.i===i&&S.fakeL.t>0&&!dw,warn=me&&h.st===1||fake,k=lit?0:me&&h.st>=2?0:warn?(Math.sin(T_*14+i)>0?1.2:.08):(Math.random()<.01?.4:1);L.l.intensity=1.9*k; /* fake: 아무도 없는데 잠깐 빨갛게 깜빡임 */L.l.color.setHex(warn?0xff2a18:0x6fd8e0);L.box.material.color.setHex(warn?(k>.5?0xff3a20:0x300604):me&&h.st>=2?0x220402:0x6fd8e0)});
   // 손전등: 보는 쪽으로 약하게, 배터리가 적으면 깜빡임. 플래시 땐 팡
   const fk=Math.max(0,S.flashT||0)/.45,dirV=new T3.Vector3(0,0,-1).applyEuler(cam.rotation);
   let tI=torchOn()&&!lit?(S.power<20&&Math.random()<.12?1.5:9):0;if(fk>0)tI+=420*fk*fk;
@@ -2898,7 +2919,8 @@ function draw3D2(){
   if(S.drn){const k=Math.min(1,Math.max(0,(S.drn.p-15)/85)),e=k*k*(3-2*k),m=P.drn; // 바닥에 누워 있다가 수면 바로 밑까지 천천히 떠오름
     m.material.opacity=lit||S.night<2?0:Math.min(.95,.25+e*.75);m.position.y=lerp(-POOL_D+.08,WATER_Y-.16,e);m.rotation.z=.35+Math.sin(T_*.37)*.07;
     m.scale.set(1+Math.sin(T_*2.1)*.025,1+Math.sin(T_*1.7+1)*.02,1);m.material.color.setRGB(lerp(.2,.62,e),lerp(.34,.8,e),lerp(.35,.78,e))} // 물에 일렁이는 굴절·깊을수록 어두운 청록
-  if(S.dv){const v=S.dv;P.wake.visible=!lit&&(v.st===1||v.st===2);if(P.wake.visible){const z=v.st===1?lerp(Z1C(P)-10,Z1C(P),1-Math.max(0,v.timer)/7):lerp(Z1C(P),-5.6,1-Math.max(0,v.timer)/6);P.wake.position.set(Math.sin(T_*.7)*.3,WATER_Y+.025,z+.8)}
+  if(S.dv){const v=S.dv;P.wake.visible=!lit&&(v.st===1||v.st===2);if(P.wake.visible){const z=v.st===1?lerp(Z1C(P)-10,Z1C(P),1-Math.max(0,v.timer)/7):lerp(Z1C(P),-5.6,1-Math.max(0,v.timer)/6);const x=Math.sin(T_*.7)*.3;P.wake.position.set(x,0,z+.8);P.wake.userData.body.material.opacity=v.st===2?.9:.6;
+      P.wake.userData.rings.forEach((r,i)=>{const ph=(T_*.6+i/4)%1;r.position.set(Math.sin(T_*.7-ph*.9)*.3-x,WATER_Y+.03,-ph*1.1);r.scale.setScalar(.3+ph*1.6);r.material.opacity=(1-ph)*(1-ph)*.85})}
     P.dvHead.visible=!lit&&v.st===3;if(P.dvHead.visible){const yH=WATER_Y+P.dvH/2-.1+Math.sin(T_*1.3)*.03;P.dvHead.position.set(Math.sin(T_*.5)*.05,yH,-5.2);P.dvHead.lookAt(cam.position.x,yH,cam.position.z)}}
   if(S.sl){const l=S.sl;P.slHand.visible=!lit&&l.st===1&&l.timer<=3;if(P.slHand.visible){P.slHand.position.copy(P.slLip);P.slHand.position.y+=Math.sin(T_*20)*.004;P.slHand.lookAt(cam.position);P.slHand.rotateZ(-.3)}}
   // 교대자: 아치에 서 있다가 바로 앞까지
@@ -2906,19 +2928,27 @@ function draw3D2(){
    if(v){if(P.hum.userData.im!==im){P.hum.material.map=P.hum.material.emissiveMap=imgTex(im);P.hum.material.needsUpdate=true;P.hum.userData.im=im}
      const a=P.arch[h.dir],to=new T3.Vector3(a.x,0,a.z),me=new T3.Vector3(0,0,.45),dir=to.clone().sub(me).normalize(),dist=h.st===2?to.distanceTo(me)+.5:lerp(3.2,1.6,1-Math.max(0,h.timer)/humNear2()),hh=2.1;
      const p=me.clone().addScaledVector(dir,dist);P.hum.scale.set(hh*im.width/im.height,hh,1);P.hum.position.set(p.x+Math.sin(T_*1.7)*.02,hh/2,p.z);P.hum.lookAt(cam.position.x,hh/2,cam.position.z)}}
-  if(P.hmS){const m=S.hm,on=m&&!dw&&S.night>=5;P.hmS.visible=on&&m.st===1;P.hmP.visible=on&&m.st===2&&!S.eyes;
+  if(P.hmS){const m=S.hm,on=m&&!dw&&S.night>=5;P.hmS.visible=on&&m.st===1;P.hmP.visible=on&&m.st===2; /* 눈을 가려도 손가락 틈으로 도는 게 보임 */
     if(P.hmS.visible){const a=P.arch[m.side],sx=Math.sign(a.x),k=1-Math.max(0,m.timer)/9,d=lerp(9,.6,k*k),hh=1.78; // 통로 깊은 곳에서 아치 입구까지
       P.hmS.scale.set(hh*P.hmS.userData.ar,hh,1);P.hmS.position.set(a.x+sx*d,hh/2+.01,a.z+Math.sin(T_*.8)*.04);P.hmS.lookAt(cam.position.x,hh/2,cam.position.z)}
     if(P.hmP.visible){const sp=m.side===0?-1:1,k=1-Math.max(0,m.timer)/7.5,th=sp*Math.cos(k*Math.PI)*1.25, // 의자 둘레를 도는 중 (눈을 떴다면 바로 옆을 스쳐 감)
       fw=new T3.Vector3();cam.getWorldDirection(fw);fw.y=0;fw.normalize();const rt=new T3.Vector3(-fw.z,0,fw.x),hh=1.05,r=1.2,
       p=cam.position.clone().addScaledVector(fw,Math.cos(th)*r).addScaledVector(rt,Math.sin(th)*r);
       P.hmP.scale.set(hh*P.hmP.userData.ar*(sp<0?1:-1),hh,1);P.hmP.position.set(p.x,cam.position.y-.28*hh+Math.sin(T_*3)*.02,p.z);P.hmP.lookAt(cam.position.x,P.hmP.position.y,cam.position.z)}}
+  // 통로 패널: 테이블 위 모니터를 눈앞으로 들어 올림. 화면엔 CCTV 영상 (내려놓았을 땐 가끔만 갱신)
+  if(P.mon){const e=ease(Math.min(1,S.monA));P.monLed.material.color.setHex(S.mon||T_%1.4<.7?0xff2a20:0x300604);
+    if(e>.001){cam.updateMatrixWorld();const fw=new T3.Vector3(0,0,-1).applyQuaternion(cam.quaternion),up=new T3.Vector3(0,1,0).applyQuaternion(cam.quaternion),th=Math.tan(cam.fov*Math.PI/360)*cam.aspect,d=.24/(2*th*.7);
+      P.mon.position.lerpVectors(P.monRestP,cam.position.clone().addScaledVector(fw,d).addScaledVector(up,-.004),e);P.mon.quaternion.slerpQuaternions(P.monRestQ,cam.quaternion,e)}
+    else{P.mon.position.copy(P.monRestP);P.mon.quaternion.copy(P.monRestQ)}
+    P.monT-=1/60;if(e>.001||P.monT<=0){if(e<=.001)P.monT=.5;renderCam(S.cam,false);P.monTex.needsUpdate=true}
+    P.batW.visible=(S.spare??1)>0&&!S.swap}
   R3.rd.render(R3.sc2,cam);
-  if(handsOn())drawHands(fk,lit,(h.dir===0||h.dir===2)&&h.st===1&&!dw);
+  drawHands(fk,lit,(h.dir===0||h.dir===2)&&h.st===1&&!dw);
   cx.drawImage(R3.rd.domElement,0,0,W,H);
   if(handsOn())handLabels();
   if(fk>.55){cx.fillStyle=`rgba(245,250,255,${(fk-.55)*1.6})`;cx.fillRect(0,0,W,H)} // 팍
-  S.eyeA=handsOn()?Math.max(0,Math.min(1,(HND.cov-.55)/.45)):Math.max(0,Math.min(1,(S.eyeA||0)+(S.eyes?.12:-.18))); // 손으로: 손이 눈앞을 덮은 다음 깜깜해짐if(S.eyeA>0){cx.fillStyle=`rgba(0,0,0,${.97*S.eyeA})`;cx.fillRect(0,0,W,H);if(S.eyes){cx.fillStyle='rgba(120,30,30,.06)';cx.fillRect(0,0,W,H)}} // 눈 감음
+  { /* 눈 감음: 손바닥이 화면을 덮고 손가락 틈으로만 조금 보임. 가장자리는 어둡게 */ const c=ease(Math.min(1,HND.cov||0));S.eyeA=c;
+    if(c>.02){cx.fillStyle=`rgba(0,0,0,${.35*c})`;cx.fillRect(0,0,W,H);const gr=cx.createRadialGradient(W/2,H/2,Math.min(W,H)*.25,W/2,H/2,Math.max(W,H)*.62);gr.addColorStop(0,'rgba(0,0,0,0)');gr.addColorStop(1,`rgba(0,0,0,${.95*c})`);cx.fillStyle=gr;cx.fillRect(0,0,W,H)}}
   // 화면 가장자리 빨간 빛: 교대자가 오는 쪽 (왼쪽/오른쪽). 아치에 서면 더 진하게 깜빡
   if(h.dir===0||h.dir===2){const rel=h.dir-S.camX,side=rel<-.3?-1:rel>.3?1:0,a=h.st>=2?.32+.2*Math.sin(T_*10):h.st===1?.14+.08*Math.sin(T_*6):0;
     if(a>0&&!dw){if(side){const x0=side<0?0:W,gw=W*.16,gr=cx.createLinearGradient(x0,0,x0-side*gw,0);gr.addColorStop(0,`rgba(255,30,20,${a})`);gr.addColorStop(1,'rgba(255,30,20,0)');cx.fillStyle=gr;cx.fillRect(side<0?0:W-gw,0,gw,H)}
@@ -2977,8 +3007,7 @@ function render3D(){
     if(lightVis()&&turning<.3){cx.globalCompositeOperation='lighter';DUST.forEach(d=>{cx.fillStyle=`rgba(255,240,190,${.06+.06*Math.sin(T_*2+d.p)})`;cx.fillRect(d.x*W,d.y*H,1.6,1.6)});cx.globalCompositeOperation='source-over'} // 먼지
     cx.restore();drawHints(0);
   }
-  if(S.monA>.001&&S.ch===2)drawPanel2();
-  else if(S.monA>.001){
+  if(S.monA>.001&&S.ch!==2){
     renderCam(S.cam,false);const e=ease(S.monA);const ms=S.ch===2?R3.p2&&R3.p2.scr:R3.dyn.scr;let m=ms&&S.monA<.999?scrRect(ms):null;if(!m)m={x:W*.4,y:H*.35,w:W*.2,h:H*.2};
     cx.drawImage(camC,lerp(m.x,0,e),lerp(m.y,0,e),lerp(m.w,W,e),lerp(m.h,H,e));
   }
@@ -3071,7 +3100,9 @@ function post(){
 function canalOver(g,t){const d=S.drn;if(d&&S.night>=2){const k=Math.min(1,d.p/100),x=CW*.5,y=CH*(.92-k*.12),w=CW*(.16+k*.22),h=w*1.9;g.save();g.globalAlpha=.25+k*.6;
     if(PIC.drowned){g.drawImage(PIC.drowned,x-w/2,y-h*.6,w,h)}else{g.translate(x,y);g.rotate(.3);g.fillStyle=`rgba(190,215,205,${.5+k*.4})`;g.beginPath();g.ellipse(0,-h*.42,w*.16,w*.18,0,0,7);g.fill();g.fillRect(-w*.14,-h*.3,w*.28,h*.4);g.fillRect(-w*.14,.1*h,w*.1,h*.36);g.fillRect(w*.04,.1*h,w*.1,h*.36);g.fillStyle='#000';[-1,1].forEach(sd=>{g.beginPath();g.arc(sd*w*.05,-h*.44,w*.022,0,7);g.fill()})}
     g.restore();const wg=g.createLinearGradient(0,CH*.6,0,CH);wg.addColorStop(0,'rgba(40,90,100,0)');wg.addColorStop(1,'rgba(40,90,100,.35)');g.fillStyle=wg;g.fillRect(0,CH*.6,CW,CH*.4)} // 물 너머로 흐릿하게
-  if(S.dv&&S.dv.st===1){const k=1-Math.max(0,S.dv.timer)/7,y=lerp(CH*.48,CH*.95,k),sp=lerp(10,CW*.4,k);g.strokeStyle='rgba(220,250,255,.55)';g.lineWidth=2;for(let j=0;j<3;j++){g.beginPath();g.moveTo(CW/2,y-j*8);g.lineTo(CW/2-sp,y+sp*.3);g.moveTo(CW/2,y-j*8);g.lineTo(CW/2+sp,y+sp*.3);g.stroke()}}}
+  if(S.dv&&S.dv.st===1){const k=1-Math.max(0,S.dv.timer)/7,y=lerp(CH*.5,CH*.92,k),sc=lerp(.25,1,k),x=CW/2+Math.sin(T_*.7)*CW*.04; // 수로를 따라 다가오는 검은 그림자와 동그란 물결
+    g.save();g.fillStyle=`rgba(0,6,8,${.35+k*.35})`;g.beginPath();g.ellipse(x,y,CW*.05*sc,CH*.08*sc,0,0,7);g.fill();
+    for(let j=0;j<4;j++){const ph=(T_*.6+j/4)%1;g.strokeStyle=`rgba(210,240,245,${(1-ph)*(1-ph)*.5})`;g.lineWidth=1.5;g.beginPath();g.ellipse(x,y-ph*CH*.08*sc,CW*(.03+ph*.12)*sc,CH*(.01+ph*.035)*sc,0,0,7);g.stroke()}g.restore()}}
 function renderCam(i,menu){
   const g=cg,t=T_;let C=null;EXIT3.on=false;
   g.globalCompositeOperation='source-over';g.globalAlpha=1;
@@ -3267,6 +3298,15 @@ function hmNote(f,dur,pan,v){if(!AC||!HMB)return;const t=AC.currentTime,pn=AC.cr
   {const b=AC.createBufferSource();b.buffer=NB;const bf=AC.createBiquadFilter();bf.type='bandpass';bf.frequency.value=600;bf.Q.value=1;const bg=AC.createGain();bg.gain.value=.08;b.connect(bf);bf.connect(bg);bg.connect(lp);b.start(t,Math.random());b.stop(t+dur+.1)} // 숨 섞인 소리
   lp.connect(pk);pk.connect(ns);ns.connect(g);if(pn){pn.pan.value=Math.max(-1,Math.min(1,pan));g.connect(pn);pn.connect(HMB)}else g.connect(HMB);lfo.start(t);lfo.stop(t+dur+.12)}
 const HM_SONG=[[7,1],[10,1],[12,2],[10,1],[7,1],[5,2],[3,1],[5,1],[7,1],[3,1],[0,3],[null,1]]; // 짧은 자장가 (A 단조)
+// 수영장 소리: 멀리서 호루라기 (울림), 첨벙, 헤엄치는 물살, 미끄럼틀 긁힘, 섬뜩한 울림
+function whistleFar(pan){if(!AC)return;const t=AC.currentTime,o2=out(pan),g=AC.createGain(),lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=2600;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.035,t+.04);g.gain.setValueAtTime(.035,t+.5);g.gain.linearRampToValueAtTime(0,t+.62);
+  [2950,3120].forEach(f=>{const o=AC.createOscillator(),lfo=AC.createOscillator(),lg=AC.createGain();o.frequency.value=f;lfo.frequency.value=28;lg.gain.value=90;lfo.connect(lg);lg.connect(o.frequency);o.connect(lp);o.start(t);lfo.start(t);o.stop(t+.7);lfo.stop(t+.7)});lp.connect(g);g.connect(o2)}
+function splashFar(pan,v=.12){if(!AC)return;nburst(900,.7,.7,v,pan,0,'lowpass');nburst(2400,1.2,.35,v*.5,pan,.05);thump(55,.25,v*1.3,pan)}
+function swimStroke(pan,v){if(!AC)return;nburst(650,.8,.42,v,pan,0,'lowpass');nburst(1600,1.5,.18,v*.35,pan,.08);if(Math.random()<.4)bubbles(pan,v*.3)}
+function slideScrape(k,pan){if(!AC)return;nburst(lerp(450,1500,Math.random()),2.5,.2,.08+k*.22,pan);if(Math.random()<.3)thump(rnd(60,95),.14,.15+k*.35,pan);
+  if(Math.random()<.18){const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(rnd(700,1100),t);o.frequency.linearRampToValueAtTime(rnd(1200,1700),t+.18);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.025+k*.05,t+.03);g.gain.linearRampToValueAtTime(0,t+.2);o.connect(g);g.connect(out(pan));o.start(t);o.stop(t+.22)}}
+function sting(pan){if(!AC)return;const t=AC.currentTime,g=AC.createGain(),o2=out(pan);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.09,t+.06);g.gain.exponentialRampToValueAtTime(.001,t+2.6);g.connect(o2);
+  [55,58.3,110.6,233].forEach((f,k)=>{const o=AC.createOscillator();o.type=k<2?'sawtooth':'triangle';o.frequency.setValueAtTime(f,t);o.frequency.linearRampToValueAtTime(f*.97,t+2.5);const lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=900;o.connect(lp);lp.connect(g);o.start(t);o.stop(t+2.7)})}
 function drip(pan){if(!AC)return;const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain(),f0=rnd(700,1100);o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(f0*2.3,t+.05);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(.07,t+.004);g.gain.exponentialRampToValueAtTime(.001,t+.1);o.connect(g);g.connect(out(pan));o.start(t);o.stop(t+.12)} // 물방울 똑
 // 키득거리는 웃음
 function giggle(pan,v=.07){if(!AC)return;const n=rnd(5,8);for(let k=0;k<n;k++){const t=AC.currentTime+k*(.13-k*.008),o=AC.createOscillator(),d=dist(4),f=AC.createBiquadFilter(),g=AC.createGain();o.type='sawtooth';o.frequency.setValueAtTime(rnd(300,380),t);o.frequency.linearRampToValueAtTime(rnd(240,280),t+.08);f.type='bandpass';f.frequency.value=1500;f.Q.value=4;g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v,t+.015);g.gain.exponentialRampToValueAtTime(.001,t+.09);o.connect(d);d.connect(f);f.connect(g);g.connect(out(pan));o.start(t);o.stop(t+.1)}}
@@ -3411,7 +3451,7 @@ const ACH=[
   ['first_shift','첫 근무','1일 차를 버틴다'],
   ['ch1_normal','챕터 1: 비상구','노말 모드 5일 차 클리어'],
   ['ch1_hard','챕터 1: 물가의 전화','하드 모드 5일 차 클리어'],
-  ['lie','잠그지 마','5일 차, 서진이 아닌 목소리를 믿지 않는다'],
+  ['lie','잠그지 마','5일 차, 녹음이 끝난 뒤의 목소리를 믿지 않는다'],
   ['bolt','빗장','교대자를 문 앞에서 10번 돌려보낸다'],
   ['vent','숨 참기','은둔자를 환풍구에서 5번 돌려보낸다'],
   ['crawl','올라가지 마','지켜봐서 은둔자가 덕트에 못 들어가게 한다'],
@@ -3421,7 +3461,7 @@ const ACH=[
   ['peek','엿보는 것','CCTV에서 엿보는 교대자를 처음 본다'],
   ['light','불 켜 둬','그림자가 절반을 못 넘게 3일 차 클리어'],
   ['dark','어둠 속에서','하드 모드에서 정전이 있는 밤을 버틴다'],
-  ['phone','서진','서진의 전화를 다섯 밤 모두 끝까지 듣는다'],
+  ['phone','녹음','전화 녹음을 다섯 밤 모두 끝까지 듣는다'],
   ['tally','다섯 획','한 번도 죽지 않고 1~5일 차 연속 클리어'],
   ['missing','실종','처음으로 사라진다']];
 const AS={got:{},n:{},calls:{},streak:0};try{Object.assign(AS,JSON.parse(localStorage.getItem('awful_ach')||'{}'))}catch(e){}
