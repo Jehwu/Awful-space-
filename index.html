@@ -353,7 +353,7 @@ body[data-mode=game] #pauseBtn{display:flex}
 <script nomodule>window.THREE_ERR='nomodule'</script>
 <script>
 // ===================== 기본 =====================
-const VER='0.26.3'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
+const VER='0.27.0'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
 const $=id=>document.getElementById(id);
 const cv=$('cv'),cx=cv.getContext('2d');
 let W,H,DPR=1;const MOB=matchMedia('(pointer:coarse)').matches||/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent); // 폰이면 가볍게
@@ -1697,12 +1697,22 @@ function monPeek(g,k,clip,o={}){const u=g.userData;if(!monOnBB(g,k,clip))return 
   if(I.pk==null)I.pk=g.position.z;g.position.x=u.cx+hd*(Math.sin(ang)*H*.8+.06);g.position.z=I.pk-(o.dz??.3);I.g.rotation.z=hd*ang+Math.sin(T_*.9)*.015;return true}
 // 수영장: 위에서 계산한 판 그림(위치·보임)을 그대로 쓰고, 3D 모델이 있으면 판 대신 모델을 보여 줌
 function m2(P,key,k){let I=P['m3'+key];if(!I){if(!monReady(k))return null;I=P['m3'+key]=monNew(k);if(!I)return null;R3.sc2.add(I.g);I.g.rotation.order='YXZ'}I.g.visible=true;return I}
+// 그림자: 보고 있는 쪽 어둠 끝에서 눈만 빛나는 검은 형체 → 웅크린 채 다가옴 → 바로 앞 (챕터 1 그림)
+function shadow2(P,cam,lit){const T3=R3.T,sp=S.shadow.p;if(!P.shd){const m=new T3.Mesh(new T3.PlaneGeometry(1,1),new T3.MeshBasicMaterial({transparent:true,alphaTest:.04,depthWrite:false,fog:false,color:0xb8c0c0}));m.visible=false;m.renderOrder=4;R3.sc2.add(m);P.shd=m;P.shdS=Math.random()<.5?-1:1;
+    const ec=cvs(128,32,(q,w,h)=>{[w*.3,w*.7].forEach(x=>{const g=q.createRadialGradient(x,h/2,0,x,h/2,h*.5);g.addColorStop(0,'rgba(255,240,225,1)');g.addColorStop(.25,'rgba(255,200,170,.7)');g.addColorStop(1,'rgba(255,120,90,0)');q.fillStyle=g;q.fillRect(0,0,w,h)})});
+    const e=new T3.Mesh(new T3.PlaneGeometry(1,.25),new T3.MeshBasicMaterial({map:ctx3(ec),transparent:true,depthWrite:false,blending:T3.AdditiveBlending,fog:false}));e.position.z=.02;e.renderOrder=5;m.add(e);P.shdE=e} // 어둠 속에서도 눈만은 보이게
+  const m=P.shd;if(!(S.night>=3&&sp>20&&PIC.sh1&&!lit&&!torchOn())){m.visible=false;if(sp<5)P.shdS=Math.random()<.5?-1:1;return}
+  const im=sp<55?PIC.sh1:sp<80?PIC.sh2:PIC.sh3,ey=sp<55?[.48,.115,.09]:sp<80?[.37,.33,.08]:[.74,.195,.09];if(m.userData.im!==im){m.material.map=imgTex(im);m.material.needsUpdate=true;m.userData.im=im}
+  const k=Math.min(1,(sp-20)/80),fw=new T3.Vector3();cam.getWorldDirection(fw);fw.y=0;fw.normalize();const rt=new T3.Vector3(-fw.z,0,fw.x),d=lerp(7,1.1,k*k),side=P.shdS*lerp(.55,.12,k)*d,
+    hgt=sp<55?2.0:sp<80?1.45:1.9,p=cam.position.clone().addScaledVector(fw,d).addScaledVector(rt,side),base=d<2.2?P.TY-.55:0; // 멀리선 물가·수면 위, 가까우면 안전요원석 바닥
+  P.shdE.position.set(ey[0]-.5,.5-ey[1],.02);{const ar=im.width/im.height,ew=Math.max(ey[2],lerp(.22,.06,k)/(hgt*ar));P.shdE.scale.set(ew,ew*ar,1)} // 멀리 있을수록 눈빛을 크게 (어둠 끝의 두 점)
+  m.visible=true;m.scale.set(hgt*im.width/im.height,hgt,1);m.position.set(p.x+Math.sin(T_*1.3)*.01,base+hgt/2,p.z);m.lookAt(cam.position.x,m.position.y,cam.position.z);m.material.opacity=Math.min(1,(sp-20)/30)}
 function m2off(P,key){const I=P['m3'+key];if(I&&I.g.visible){I.g.visible=false;if(I.mx)I.mx.stopAllAction();I.cur=null}} // 다음에 나올 땐 동작을 처음부터
 function faceTo(I,x,z,cam){I.g.rotation.y=Math.atan2(cam.position.x-x,cam.position.z-z)}
 // 뼈를 세상 기준 위쪽 축으로 돌림 (머리를 플레이어 쪽으로)
 function boneYaw(I,name,a){let b=null;I.o.traverse(o=>{if(!b&&o.isBone&&o.name.endsWith(name))b=o});if(!b||!a)return;const T=R3.T;b.updateWorldMatrix(true,false);
   const pw=new T.Quaternion();b.parent.getWorldQuaternion(pw);const bw=pw.clone().multiply(b.quaternion);bw.premultiply(new T.Quaternion().setFromAxisAngle(new T.Vector3(0,1,0),a));b.quaternion.copy(pw.invert().multiply(bw))}
-function mon2(P,cam,lit){const T3=R3.T,h=S.hum;if(P.DVX==null){P.DVX=-2.2;P.DVZ=-3.3} // 테이블에 안 가리고 앉은 눈높이에서 보이는 자리
+function mon2(P,cam,lit){const T3=R3.T,h=S.hum;shadow2(P,cam,lit);if(P.DVX==null){P.DVX=-2.2;P.DVZ=-3.3} // 테이블에 안 가리고 앉은 눈높이에서 보이는 자리
   // 교대자: 아치에 서 있음
   if(P.hum.visible&&m2(P,'hum','stalker')){const I=P.m3hum;P.hum.visible=false;I.g.position.set(P.hum.position.x,0,P.hum.position.z);faceTo(I,I.g.position.x,I.g.position.z,cam);I.g.rotation.x=I.g.rotation.z=0;monPlay(I,'idle')}
   else if(P.humPk.visible&&m2(P,'hum','stalker')){const I=P.m3hum;P.humPk.visible=false; // 의자 옆 난간 너머에서 몸을 꺾어 얼굴을 들이밂
@@ -2640,9 +2650,10 @@ const POOL_RULES=[
   [1,'손전등이 깜빡임','테이블 위 배터리로 교체'],
   [2,'패널 가운데 화면','자주 볼 것. 안 보면 떠오른다'],
   [3,'헤엄치는 소리','손전등 끄기. 가라앉을 때까지'],
-  [4,'미끄럼틀 긁는 소리','손이 보이면 앞을 보고 플래시'],
+  [3,'불 꺼진 어둠 속 숨소리','손전등 다시 켜기'],
+  [4,'미끄럼틀 쿵쿵 소리','손이 보이면 앞을 보고 플래시'],
   [5,'흥얼거림','눈 감기. 노래가 멀어질 때까지']];
-const DEATH2={'흥얼이':'눈을 뜨자, 바로 앞에서 웃고 있었다.','교대자':'어둠 속에서 젖은 손이 얼굴을 덮었다.','익사자':'물 밑에서 올라온 손이 발목을 잡았다.','잠수부':'불빛을 따라 물 밖으로 뛰어올랐다.','미끄럼틀':'미끄럼틀 끝에서 무언가 쏟아져 나왔다.'};
+const DEATH2={'그림자':'불을 끈 사이, 어둠이 바로 앞까지 와 있었다.','흥얼이':'눈을 뜨자, 바로 앞에서 웃고 있었다.','교대자':'어둠 속에서 젖은 손이 얼굴을 덮었다.','익사자':'물 밑에서 올라온 손이 발목을 잡았다.','잠수부':'불빛을 따라 물 밖으로 뛰어올랐다.','미끄럼틀':'미끄럼틀 끝에서 무언가 쏟아져 나왔다.'};
 // 챕터 2는 한 자리(안전요원석)에서 버팀. 가운데 수로 끝 초록 비상구 불빛이 매일 아침 다가옴
 const SPOT1={name:'안전요원석',eye:2.05,R:7,plat:true,slide:true,pool:[-4.6,4.6,-1.8]},SPOT2=[SPOT1,SPOT1,SPOT1,SPOT1,SPOT1];
 const EXIT2=[18,14.5,11,7.5,4]; // 수로 입구에서 비상구 불빛까지 거리 (밤마다)
@@ -2709,6 +2720,12 @@ function update2(dt){
       if(m.nT<=0&&m.st>0){const [n,b]=HM_SONG[m.ni%HM_SONG.length];m.ni++;const bt=m.st===2?.5:.42,dur=b*bt;m.nT=dur;
         let pan,v;if(m.st===1){const k=1-m.timer/9;pan=sp*lerp(1,.7,k);v=lerp(.07,.32,k)}else if(m.st===2){const k=1-m.timer/7.5;pan=sp*Math.cos(k*Math.PI);v=.4}else{const k=1-m.timer/3;pan=-sp*lerp(.7,1,k);v=lerp(.3,0,k)}
         if(n!==null&&v>.01)hmNote(220*Math.pow(2,n/12)*(m.st===2?.97:1),dur,pan,v)}}}
+  // 그림자 (3일 차~): 손전등이 꺼져 있으면(직접 끄거나, 배터리 교체 중이거나, 다 닳았거나) 어둠 속에서 다가옴. 켜서 비추면 물러남
+  // 잠수부가 와 있는 동안(끄라고 하는 동안)·흥얼이가 도는 동안엔 멈춤
+  if(S.night>=3&&S.t>=10){const s=S.shadow,dark=!torchOn()&&!S.dawn;
+    if(!dark)s.p=Math.max(0,s.p-dt*10);else if(!HIDE)s.p+=dt*(S.hard?8+S.night:5.5+S.night*.8);
+    if(s.p>45&&!s.br){s.br=1;breathe(rnd(-.6,.6),.32)}if(s.p>78&&!s.br2){s.br2=1;breathe(rnd(-.3,.3),.45)}if(s.p<25){s.br=0;s.br2=0} // 어둠 속 숨소리 (가까워지면 한 번 더)
+    if(s.p>=100)return die('그림자')}
   // 정신력: 어둠 속에선 천천히, 손전등이 꺼지면 빠르게
   if(S.log)S.san+=dt*4;else if(h.dir>=0&&h.st>=2)S.san-=dt*.8;else S.san+=dt*.6; // 수영장: 정신력은 교대자가 아치에 서 있을 때만 깎임
   S.san=100; // 수영장엔 정신력 없음 (게이지도 숨김)
