@@ -353,7 +353,7 @@ body[data-mode=game] #pauseBtn{display:flex}
 <script nomodule>window.THREE_ERR='nomodule'</script>
 <script>
 // ===================== 기본 =====================
-const VER='0.27.0'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
+const VER='0.27.1'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
 const $=id=>document.getElementById(id);
 const cv=$('cv'),cx=cv.getContext('2d');
 let W,H,DPR=1;const MOB=matchMedia('(pointer:coarse)').matches||/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent); // 폰이면 가볍게
@@ -1676,7 +1676,7 @@ void main(){vec2 px=1./res,cell=floor(vUv*res),uv=(cell+.5)*px;vec3 c=texture2D(
   rd.setViewport(0,0,W,H);const ac=rd.autoClear;rd.autoClear=true;rd.render(FX.sc,FX.cam);rd.autoClear=ac}
 // ---- 3D 괴물 (model/m_*.glb, 뼈·애니메이션 포함): 처음 필요할 때 불러와 원본으로 두고, 쓰는 곳마다 복제 ----
 // h: 서 있을 때 키(m), em: 어두워도 형체가 보이게 살짝 스스로 빛남, still: 애니메이션 없이 통째로 움직임
-const MON={def:{stalker:{h:2.1,em:.05},hermit:{h:2.15,em:.05},runner:{h:.95,em:.1,still:1},diver:{h:1.9,em:.22},slider:{h:1.95,em:.45},hummer:{h:1.38,em:.06},drowned:{h:1.68,em:.08,still:1}},tpl:{},list:[],ld:null};
+const MON={def:{stalker:{h:2.1,em:.05},hermit:{h:2.15,em:.05},runner:{h:.95,em:.1,still:1},diver:{h:1.9,em:.22},slider:{h:1.95,em:.45},hummer:{h:1.38,em:.06},drowned:{h:1.68,em:.08,still:1},shadow:{h:2.05,em:0}},tpl:{},list:[],ld:null};
 function monLoad(keys){if(!R3.T)return;
   if(!MON.ld)MON.ld=Promise.all([import('./lib/GLTFLoader.js'),import('./lib/SkeletonUtils.js')]).then(([a,b])=>{MON.GL=new a.GLTFLoader();MON.SU=b}).catch(e=>{console.warn('3D 괴물 불러오기 실패',e);MON.fail=1});
   keys.forEach(k=>{if(k in MON.tpl)return;MON.tpl[k]=null;MON.ld.then(()=>MON.fail?null:MON.GL.loadAsync('model/m_'+k+'.glb?v='+VER)).then(g=>{if(!g)return;const T=R3.T,d=MON.def[k];
@@ -1701,11 +1701,19 @@ function m2(P,key,k){let I=P['m3'+key];if(!I){if(!monReady(k))return null;I=P['m
 function shadow2(P,cam,lit){const T3=R3.T,sp=S.shadow.p;if(!P.shd){const m=new T3.Mesh(new T3.PlaneGeometry(1,1),new T3.MeshBasicMaterial({transparent:true,alphaTest:.04,depthWrite:false,fog:false,color:0xb8c0c0}));m.visible=false;m.renderOrder=4;R3.sc2.add(m);P.shd=m;P.shdS=Math.random()<.5?-1:1;
     const ec=cvs(128,32,(q,w,h)=>{[w*.3,w*.7].forEach(x=>{const g=q.createRadialGradient(x,h/2,0,x,h/2,h*.5);g.addColorStop(0,'rgba(255,240,225,1)');g.addColorStop(.25,'rgba(255,200,170,.7)');g.addColorStop(1,'rgba(255,120,90,0)');q.fillStyle=g;q.fillRect(0,0,w,h)})});
     const e=new T3.Mesh(new T3.PlaneGeometry(1,.25),new T3.MeshBasicMaterial({map:ctx3(ec),transparent:true,depthWrite:false,blending:T3.AdditiveBlending,fog:false}));e.position.z=.02;e.renderOrder=5;m.add(e);P.shdE=e} // 어둠 속에서도 눈만은 보이게
-  const m=P.shd;if(!(S.night>=3&&sp>20&&PIC.sh1&&!lit&&!torchOn())){m.visible=false;if(sp<5)P.shdS=Math.random()<.5?-1:1;return}
+  const m=P.shd;if(!(S.night>=3&&sp>20&&PIC.sh1&&!lit&&!torchOn())){m.visible=false;m2off(P,'shd');if(P.shdE3)P.shdE3.visible=false;if(sp<5)P.shdS=Math.random()<.5?-1:1;return}
   const im=sp<55?PIC.sh1:sp<80?PIC.sh2:PIC.sh3,ey=sp<55?[.48,.115,.09]:sp<80?[.37,.33,.08]:[.74,.195,.09];if(m.userData.im!==im){m.material.map=imgTex(im);m.material.needsUpdate=true;m.userData.im=im}
   const k=Math.min(1,(sp-20)/80),fw=new T3.Vector3();cam.getWorldDirection(fw);fw.y=0;fw.normalize();const rt=new T3.Vector3(-fw.z,0,fw.x),d=lerp(7,1.1,k*k),side=P.shdS*lerp(.55,.12,k)*d,
-    hgt=sp<55?2.0:sp<80?1.45:1.9,p=cam.position.clone().addScaledVector(fw,d).addScaledVector(rt,side),base=d<2.2?P.TY-.55:0; // 멀리선 물가·수면 위, 가까우면 안전요원석 바닥
+    hgt=sp<55?2.0:sp<80?1.45:1.9,p=cam.position.clone().addScaledVector(fw,d).addScaledVector(rt,side),base=(Math.abs(p.x)<1.05&&p.z>-.7)?P.TY-.55:0; // 멀리선 물가·수면 위, 가까우면 안전요원석 바닥
   P.shdE.position.set(ey[0]-.5,.5-ey[1],.02);{const ar=im.width/im.height,ew=Math.max(ey[2],lerp(.22,.06,k)/(hgt*ar));P.shdE.scale.set(ew,ew*ar,1)} // 멀리 있을수록 눈빛을 크게 (어둠 끝의 두 점)
+  if(m2(P,'shd','shadow')){const I=P.m3shd;m.visible=false; // 3D: 거의 새카만 몸, 어둠 끝에선 형체만. 다가올수록 몸을 앞으로 숙이고 고개를 꺾음
+    if(!P.shdE3){const e=new T3.Sprite(new T3.SpriteMaterial({map:P.shdE.material.map,transparent:true,depthWrite:false,depthTest:false,blending:T3.AdditiveBlending,fog:false}));e.renderOrder=5;R3.sc2.add(e);P.shdE3=e;
+      I.o.traverse(o=>{if(o.isMesh){o.material.color.setHex(0x3a3e40);o.material.emissiveIntensity=0;o.material.transparent=true}if(!P.shdH&&o.isBone&&o.name.endsWith('HeadTop_End'))P.shdH=o})}
+    const lean=lerp(.04,.32,k*k);I.g.position.set(p.x,base,p.z);faceTo(I,p.x,p.z,cam);I.g.rotation.x=lean+Math.sin(T_*.8)*.015;I.g.rotation.z=Math.sin(T_*.53)*.025+(sp>80?.18:0);
+    monPlay(I,'walk',{speed:0,fade:0});I.o.traverse(o=>{if(o.isMesh)o.material.opacity=Math.min(1,(sp-20)/30)});I.g.updateMatrixWorld(true);
+    const hp=new T3.Vector3();if(P.shdH)P.shdH.getWorldPosition(hp);else hp.set(p.x,base+2,p.z);const tc=cam.position.clone().sub(hp).normalize();hp.addScaledVector(tc,.06);hp.y-=.13;
+    const E=P.shdE3,ew=lerp(.55,.17,k);E.visible=true;E.position.copy(hp);E.scale.set(ew,ew/4,1);E.material.opacity=Math.min(1,(sp-20)/20)*(Math.random()<.015?.2:1);return}
+  if(P.shdE3)P.shdE3.visible=false;
   m.visible=true;m.scale.set(hgt*im.width/im.height,hgt,1);m.position.set(p.x+Math.sin(T_*1.3)*.01,base+hgt/2,p.z);m.lookAt(cam.position.x,m.position.y,cam.position.z);m.material.opacity=Math.min(1,(sp-20)/30)}
 function m2off(P,key){const I=P['m3'+key];if(I&&I.g.visible){I.g.visible=false;if(I.mx)I.mx.stopAllAction();I.cur=null}} // 다음에 나올 땐 동작을 처음부터
 function faceTo(I,x,z,cam){I.g.rotation.y=Math.atan2(cam.position.x-x,cam.position.z-z)}
@@ -3738,7 +3746,7 @@ function toMenu(){
   $('play').classList.remove('show');
   setMode('menu');if(staticG)staticG.gain.setTargetAtTime(.009,AC.currentTime,.6);
 }
-function startGame(n,dev,hard=false,ch=1){initAudio();setChapter(ch);monLoad(ch===2?['stalker','diver','slider','hummer','drowned']:['stalker','hermit','runner']);DEV.on=dev;HARD=dev?DEV.hard:hard;DEV.speed=1;if(staticG)staticG.gain.setTargetAtTime(0,AC.currentTime,.1);newNight(n);buildDbg()}
+function startGame(n,dev,hard=false,ch=1){initAudio();setChapter(ch);monLoad(ch===2?['stalker','diver','slider','hummer','drowned','shadow']:['stalker','hermit','runner']);DEV.on=dev;HARD=dev?DEV.hard:hard;DEV.speed=1;if(staticG)staticG.gain.setTargetAtTime(0,AC.currentTime,.1);newNight(n);buildDbg()}
 // 3D 엔진(700KB)이 아직 오는 중이면 잠깐 기다렸다 시작. 안 그러면 느린 폰 회선에서 2D 방으로 시작됨
 let going=false;
 function go(fn){
