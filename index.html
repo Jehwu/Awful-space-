@@ -353,7 +353,7 @@ body[data-mode=game] #pauseBtn{display:flex}
 <script nomodule>window.THREE_ERR='nomodule'</script>
 <script>
 // ===================== 기본 =====================
-const VER='0.26.2'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
+const VER='0.26.3'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
 const $=id=>document.getElementById(id);
 const cv=$('cv'),cx=cv.getContext('2d');
 let W,H,DPR=1;const MOB=matchMedia('(pointer:coarse)').matches||/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent); // 폰이면 가볍게
@@ -1736,11 +1736,8 @@ function mon2(P,cam,lit){const T3=R3.T,h=S.hum;if(P.DVX==null){P.DVX=-2.2;P.DVZ=
     const k=ease(Math.min(1,Math.max(0,(3-l.timer)/2.4))); // 처음엔 늘어뜨린 손만(출구 밖 ~25cm), 끝엔 거꾸로 된 얼굴까지
     I.g.quaternion.copy(P.slQ);I.g.position.copy(P.slE).addScaledVector(P.slD,lerp(.45,1.75,k));I.g.position.y+=Math.sin(T_*20)*.003;monPlay(I,'hang')}
   else m2off(P,'sl');
-  // 익사자: 바닥에 누워 있다가 수면 바로 밑까지 떠오름 (그림과 같은 투명도·물빛)
-  if(P.drn&&P.drn.material.opacity>.01&&m2(P,'drn','drowned')){const I=P.m3drn,m=P.drn;if(!I.bm){I.bm=1;I.o.traverse(o=>{if(o.isMesh){o.material=new T3.MeshBasicMaterial({map:o.material.map,transparent:true,depthWrite:false});o.renderOrder=3 /* 물 다음에 그려서 물빛 너머로 보이게 */}})}
-    I.o.traverse(o=>{if(o.isMesh){o.material.opacity=m.material.opacity;o.material.color.copy(m.material.color)}});m.visible=false;
-    I.g.position.set(-2.6,m.position.y+.05,-4.7);I.g.rotation.set(-PI2,0,m.rotation.z,'XYZ');I.g.rotation.order='XYZ';I.g.scale.set(1+Math.sin(T_*2.1)*.02,1,1)}
-  else{m2off(P,'drn');if(P.drn)P.drn.visible=true}
+  // 익사자는 가운데 수로(CCTV로만 보는 곳)에 있음: 안전요원석에선 안 보임
+  m2off(P,'drn');if(P.drn)P.drn.visible=false;
 }
 function monShown(I){let o=I.g;while(o){if(!o.visible)return false;o=o.parent}return true}
 function monUpdate(dt){MON.f=(MON.f||0)+1;for(const I of MON.list)if(I.mx&&MON.f-(I.seen||-9)<=2&&monShown(I))I.mx.update(dt)} // 지금 그리고 있는 것만 (지난 밤 CCTV에 쓰던 복제는 쉼)
@@ -2802,7 +2799,7 @@ function build3D2(n){
   const BX=(w,h,d,x,y,z,m)=>{const g=new T3.BoxGeometry(w,h,d);g.translate(x,y,z);return add(g,m)};
   const Z0=1.6,Z1=-R,dep=Z0-Z1,c=(Z0+Z1)/2;
   // 바닥·천장·뒤 벽
-  P.wM=M.water.clone();P.wM.opacity=.66;P.wM.depthWrite=false;P.wM.side=T3.DoubleSide;P.wM.userData.keep=false; // 풀 물: 조금 더 비치게 (바닥에 누운 익사자가 보이도록)
+  P.wM=M.water.clone();P.wM.opacity=.66;P.wM.side=T3.DoubleSide;P.wM.userData.keep=false; // 풀 물: 조금 더 비치게 (바닥에 누운 익사자가 보이도록)
   {const [x0,x1,z0]=sp.pool,fl=(w,d,x,z)=>{const f=new T3.PlaneGeometry(w,d);f.rotateX(-PI2);f.translate(x,0,z);add(f,M.floor)};
    fl(2*R,Z0-z0,0,(Z0+z0)/2);fl(x0+R,z0-Z1,(x0-R)/2,(z0+Z1)/2);fl(R-x1,z0-Z1,(x1+R)/2,(z0+Z1)/2);
    const D=POOL_D,wl=(geo)=>{wUV(geo,2.6,2.6);const o=new T3.Mesh(geo,M.wall);sc.add(o);return o};
