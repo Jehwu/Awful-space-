@@ -353,7 +353,7 @@ body[data-mode=game] #pauseBtn{display:flex}
 <script nomodule>window.THREE_ERR='nomodule'</script>
 <script>
 // ===================== 기본 =====================
-const VER='0.26.0'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
+const VER='0.26.1'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
 const $=id=>document.getElementById(id);
 const cv=$('cv'),cx=cv.getContext('2d');
 let W,H,DPR=1;const MOB=matchMedia('(pointer:coarse)').matches||/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent); // 폰이면 가볍게
@@ -2700,7 +2700,7 @@ function update2(dt){
   if(S.night>=4&&!DVU){const l=S.sl;l.timer-=dt;
     if(l.st===0&&l.timer<=0&&h.st>=2)l.timer=rnd(3,6);
     else if(l.st===0&&l.timer<=0){l.st=1;l.timer=8;0}
-    else if(l.st===1){l.sT-=dt;if(l.sT<=0){l.sT=.22;const k=1-l.timer/8;slideScrape(k,lerp(.95,.35,k))}if(l.timer<=3&&!l.saw){l.saw=1;thump(90,.2,.25,.4)}if(l.timer<=0)return die('미끄럼틀')}}
+    else if(l.st===1){l.sT-=dt;if(l.sT<=0){const k=1-l.timer/8;l.sT=rnd(.26,.55)*(1-k*.35);slideScrape(k,lerp(.95,.35,k))}if(l.timer<=3&&!l.saw){l.saw=1;slideBump(.6,.4);slideBump(.35,.4,.16)}if(l.timer<=0)return die('미끄럼틀')}}
   }
   // 흥얼이 (5일 차~): 흥얼거리며 좌우 아치에서 옴 → 가까워지면 눈을 감음 → 의자 주위를 한 바퀴 돌고 감. 도는 동안 눈 뜨면 죽음
   if(S.night>=5&&S.t>=10){const m=S.hm,SD=['왼쪽','','오른쪽'],sp=m.side===0?-1:1;
@@ -3467,8 +3467,12 @@ function whistleFar(pan){if(!AC)return;const t=AC.currentTime,o2=out(pan),g=AC.c
   [2950,3120].forEach(f=>{const o=AC.createOscillator(),lfo=AC.createOscillator(),lg=AC.createGain();o.frequency.value=f;lfo.frequency.value=28;lg.gain.value=90;lfo.connect(lg);lg.connect(o.frequency);o.connect(lp);o.start(t);lfo.start(t);o.stop(t+.7);lfo.stop(t+.7)});lp.connect(g);g.connect(o2)}
 function splashFar(pan,v=.12){if(!AC)return;nburst(900,.7,.7,v,pan,0,'lowpass');nburst(2400,1.2,.35,v*.5,pan,.05);thump(55,.25,v*1.3,pan)}
 function swimStroke(pan,v){if(!AC)return;nburst(650,.8,.42,v,pan,0,'lowpass');nburst(1600,1.5,.18,v*.35,pan,.08);if(Math.random()<.4)bubbles(pan,v*.3)}
-function slideScrape(k,pan){if(!AC)return;nburst(lerp(450,1500,Math.random()),2.5,.2,.08+k*.22,pan);if(Math.random()<.3)thump(rnd(60,95),.14,.15+k*.35,pan);
-  if(Math.random()<.18){const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(rnd(700,1100),t);o.frequency.linearRampToValueAtTime(rnd(1200,1700),t+.18);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.025+k*.05,t+.03);g.gain.linearRampToValueAtTime(0,t+.2);o.connect(g);g.connect(out(pan));o.start(t);o.stop(t+.22)}}
+// 미끄럼틀 안을 몸이 굴러 내려오는 소리: 플라스틱 관에 몸이 부딪히는 둔한 '쿵', 관이 울리는 '덩', 살이 쓸리는 소리 (음 높이가 미끄러지지 않게)
+function slideBump(v,pan,when=0){if(!AC)return;const t=AC.currentTime+when,o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.setValueAtTime(rnd(52,70),t);o.frequency.linearRampToValueAtTime(rnd(42,48),t+.18);
+  g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v,t+.008);g.gain.exponentialRampToValueAtTime(.001,t+.28);o.connect(g);g.connect(out(pan));o.start(t);o.stop(t+.32);
+  nburst(rnd(220,320),.8,.11,v*.9,pan,when,'lowpass');nburst(rnd(150,240),7,.38,v*.35,pan,when)}
+function slideScrape(k,pan){if(!AC)return;const v=.12+k*.4;slideBump(v*rnd(.7,1),pan);if(Math.random()<.35)slideBump(v*rnd(.4,.7),pan,rnd(.08,.13)); // 가끔 '쿵-쿵' 두 번
+  nburst(rnd(380,520),.7,.35,.02+k*.06,pan,0,'lowpass')}
 function sting(pan){if(!AC)return;const t=AC.currentTime,g=AC.createGain(),o2=out(pan);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.09,t+.06);g.gain.exponentialRampToValueAtTime(.001,t+2.6);g.connect(o2);
   [55,58.3,110.6,233].forEach((f,k)=>{const o=AC.createOscillator();o.type=k<2?'sawtooth':'triangle';o.frequency.setValueAtTime(f,t);o.frequency.linearRampToValueAtTime(f*.97,t+2.5);const lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=900;o.connect(lp);lp.connect(g);o.start(t);o.stop(t+2.7)})}
 function drip(pan){if(!AC)return;const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain(),f0=rnd(700,1100);o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(f0*2.3,t+.05);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(.07,t+.004);g.gain.exponentialRampToValueAtTime(.001,t+.1);o.connect(g);g.connect(out(pan));o.start(t);o.stop(t+.12)} // 물방울 똑
