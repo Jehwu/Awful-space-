@@ -166,7 +166,6 @@ body:not([data-mode=game]) #flashBtn,body:not([data-mode=game]) #pnl,body:not([d
 #devp{background:rgba(0,0,0,.88);font-size:15px}
 #devp h2{font-family:VT323,monospace;font-size:34px;margin:0;letter-spacing:4px}
 #devp .row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
-#devp label{display:flex;gap:8px;align-items:center;min-height:36px;cursor:pointer}
 #dbg{position:fixed;left:8px;top:64px;z-index:3;font-size:11px;line-height:1.45;background:rgba(0,0,0,.6);padding:6px 8px;border:1px solid rgba(120,110,60,.5);display:none;max-width:260px}
 #dbg.min{background:none;border:none;padding:0}
 #dbg.min pre,#dbg.min .row{display:none}
@@ -395,6 +394,26 @@ body:has(#battOv.show) #msg{bottom:118px}
 .short .pl-r{font-size:12px;gap:6px}.short .pl-r b{font-size:12px}
 #log.pool #logClose{border:1px solid rgba(255,255,255,.55);background:transparent;color:#fff;min-height:30px;padding:2px 10px;top:13px;right:14px}
 .short #clock{font-size:33px}.short #clock small{font-size:16px}.short .pb{font-size:16px;padding:8px 8px 8px 28px}.short .ph{font-size:19px}
+/* 치트 모드 패널 */
+#devp{background:rgba(0,0,0,.7)}
+#devp .pnl{display:flex;flex-direction:column;max-height:calc(100% - 16px)}
+.dvg{display:grid;grid-template-columns:1fr 1fr 1.15fr;gap:6px 22px;overflow:auto;min-height:0}
+.dvh{font-size:12px;color:var(--dim);margin:12px 0 6px}.dvg>div>.dvh:first-child{margin-top:2px}
+.dvb{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.dvb.cut{grid-template-columns:1fr 1fr}
+.dvb button{min-height:38px;min-width:0;padding:4px 6px;font-family:var(--ui);font-size:14px;color:var(--tx);background:transparent;border:1px solid var(--ln);border-radius:0;box-shadow:none;text-shadow:none}
+.dvb.cut button{text-align:left;padding:4px 10px;font-size:13px}
+.dvb button:hover,.dvb button:active{background:var(--ac);color:#120c04;border-color:var(--ac)}
+.dvt{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:38px;padding:0 2px;border-bottom:1px solid var(--ln);font-size:15px;color:var(--tx);cursor:pointer}
+.dvt input{appearance:none;-webkit-appearance:none;margin:0;flex:none;width:42px;height:22px;border:1px solid var(--ln);background:#000;position:relative;cursor:pointer}
+.dvt input::after{content:'';position:absolute;top:3px;left:3px;width:14px;height:14px;background:var(--dim)}
+.dvt input:checked{border-color:var(--ac)}.dvt input:checked::after{left:23px;background:var(--ac)}
+#devp .srow2{margin-top:12px}
+#dbg{top:100px}.short #dbg{top:72px}
+.short .dvh{margin:6px 0 4px}.short .dvb button,.short .dvt{min-height:30px}.short .dvt{font-size:13px}.short #devp .pnl{padding:10px 16px}
+#devp .pnl.wide.two{width:min(980px,96%)}
+.short #devp .psub{margin-bottom:2px}.short .dvh{margin:4px 0 3px}.short #devp .ph{padding-bottom:6px}.short #devp .srow2{margin-top:8px}.short #devp .pb{padding:6px}
+.short .dvt{min-height:29px}.short .dvb button{min-height:28px;font-size:13px}.short .dvb.cut button{font-size:12px;padding:2px 8px}.short .dvb{gap:5px}
 </style>
 </head>
 <body data-mode="menu">
@@ -421,7 +440,7 @@ body:has(#battOv.show) #msg{bottom:118px}
 <div class="row"><span id="battStep">1/4</span><button id="battAct">뚜껑 돌려서 열기</button></div><div class="bar"><i id="battBar"></i></div></div>
 <div id="map"></div>
 <button id="pauseBtn" aria-label="일시정지"><i></i><i></i></button>
-<div id="dbg"><button id="dbgTog">DEV ▾</button><pre id="dbgText"></pre><div class="row" id="dbgBtns"></div></div>
+<div id="dbg"><button id="dbgTog">치트 ▾</button><pre id="dbgText"></pre><div class="row" id="dbgBtns"></div></div>
 
 <div id="menu">
   <h1 id="title">AWFUL SPACE</h1>
@@ -429,25 +448,31 @@ body:has(#battOv.show) #msg{bottom:118px}
   <button class="mbtn" id="mPlay">게임 시작</button>
   <button class="mbtn" id="mAch">기록</button>
   <button class="mbtn" id="mSet">설정</button>
-  <button class="mbtn" id="mDev">개발자 모드</button>
+  <button class="mbtn" id="mDev">치트 모드</button>
   <div class="foot" id="foot">이어폰 권장</div>
 </div>
 
-<div class="ov" id="devp">
-  <h2>DEVELOPER MODE</h2>
-  <div>시작할 일차</div>
-  <div class="row" id="devNights"></div>
-  <div>컷씬</div>
-  <div class="row" id="devCuts"></div>
-  <div>
-    <label><input type="checkbox" id="dHard"> 하드 모드 (특이사항 + 원래 난이도)</label>
-    <label><input type="checkbox" id="dNoScare" checked> 점프스케어 끄기 (사망 시 글자만 표시)</label>
-    <label><input type="checkbox" id="dInfo" checked> 디버그 정보 표시</label>
-    <label><input type="checkbox" id="dGod"> 무적 (사망 판정 무시)</label>
-    <label><input type="checkbox" id="dBright"> 밝게 보기</label>
+<div class="ov" id="devp"><div class="pnl wide two">
+  <div class="ph">치트 모드</div><div class="psub">원하는 날부터 바로 시작 · 기록(업적)은 안 쌓임</div>
+  <div class="dvg">
+    <div>
+      <div class="dvh">챕터 1 · 경비실</div><div class="dvb" id="devN1"></div>
+      <div class="dvh">챕터 2 · 수영장</div><div class="dvb" id="devN2"></div>
+    </div>
+    <div>
+      <div class="dvh">옵션</div>
+      <label class="dvt"><span>하드 모드</span><input type="checkbox" id="dHard"></label>
+      <label class="dvt"><span>무적</span><input type="checkbox" id="dGod"></label>
+      <label class="dvt"><span>밝게 보기</span><input type="checkbox" id="dBright"></label>
+      <label class="dvt"><span>점프스케어 끄기</span><input type="checkbox" id="dNoScare" checked></label>
+      <label class="dvt"><span>상태 정보 표시</span><input type="checkbox" id="dInfo" checked></label>
+    </div>
+    <div>
+      <div class="dvh">컷씬 다시 보기</div><div class="dvb cut" id="devCuts"></div>
+    </div>
   </div>
-  <button id="devBack">메인 메뉴</button>
-</div>
+  <div class="srow2"><button class="pb" id="devBack">닫기</button></div>
+</div></div>
 
 <div class="ov" id="play"><div class="pw"><div class="chs"><button class="chc" data-ch="1"><img src="img/ch1.jpg" alt=""><span class="ct">챕터 1</span><span class="cn">경비실</span><span class="cp"></span></button><button class="chc" data-ch="2"><img src="img/ch2.jpg" alt=""><span class="ct">챕터 2</span><span class="cn">수영장</span><span class="cp"></span><span class="lk">🔒 잠금</span></button></div>
 <div class="side"><div class="md"><button data-h="0">노말</button><button data-h="1">하드</button></div><button class="sb" id="pCont">이어하기</button><button class="sb" id="pNew">처음부터</button><button class="sb back" id="pBack">뒤로</button></div></div></div>
@@ -467,7 +492,7 @@ body:has(#battOv.show) #msg{bottom:118px}
 <script nomodule>window.THREE_ERR='nomodule'</script>
 <script>
 // ===================== 기본 =====================
-const VER='0.28.0'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
+const VER='0.28.1'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
 const $=id=>document.getElementById(id);
 const cv=$('cv'),cx=cv.getContext('2d');
 let W,H,DPR=1;const MOB=matchMedia('(pointer:coarse)').matches||/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent); // 폰이면 가볍게
@@ -3895,13 +3920,13 @@ $('pCont').onclick=()=>{const n=savedOf(PLAY.ch,PLAY.hard);$('play').classList.r
 $('pNew').onclick=()=>{$('play').classList.remove('show');const {ch,hard}=PLAY;go(()=>{if(ch===1&&!hard&&R3.ok)playCut('intro',()=>startGame(1,false),1);else startGame(1,false,hard,ch)})};
 $('mDev').onclick=()=>$('devp').classList.add('show');
 $('devBack').onclick=()=>$('devp').classList.remove('show');
-[['인트로','intro',1],['밤 시작','night_start',3],['5일 차 시작','night5_open',5],['6시','reset',2],['엔딩','ending',5],['하드 엔딩','ending_hard',5],['수영장 인트로','intro2',1],['수영장 밤','night2_start',3],['수영장 6시','reset2',2],['수영장 엔딩','ending2',5]].forEach(([t,id,n])=>{const b=document.createElement('button');b.textContent=t;b.onclick=()=>devCut(id,n);$('devCuts').appendChild(b)});
+[['1 · 인트로','intro',1],['1 · 밤 시작','night_start',3],['1 · 5일 시작','night5_open',5],['1 · 6시','reset',2],['1 · 엔딩','ending',5],['1 · 하드 엔딩','ending_hard',5],['2 · 인트로','intro2',1],['2 · 밤 시작','night2_start',3],['2 · 6시','reset2',2],['2 · 엔딩','ending2',5]].forEach(([t,id,n])=>{const b=document.createElement('button');b.textContent=t;b.onclick=()=>devCut(id,n);$('devCuts').appendChild(b)});
 function devCut(id,n){if(!R3.ok)return;$('devp').classList.remove('show');if(id==='intro'){playCut(id,toMenu,1);return}startGame(n,true,false,/2$/.test(id)?2:1);S.over=true;$('intro').classList.remove('show');playCut(id,toMenu,n)}
 $('endMenu').onclick=toMenu;
-for(let n=1;n<=NIGHTS;n++){const b=document.createElement('button');b.textContent=n+'일 차';b.onclick=()=>go(()=>startGame(n,true));$('devNights').appendChild(b)}
-for(let n=1;n<=NIGHTS;n++){const b=document.createElement('button');b.textContent='수영장 '+n;b.onclick=()=>go(()=>startGame(n,true,false,2));$('devNights').appendChild(b)}
+for(let n=1;n<=NIGHTS;n++){const b=document.createElement('button');b.textContent=n+'일';b.onclick=()=>{$('devp').classList.remove('show');go(()=>startGame(n,true))};$('devN1').appendChild(b)}
+for(let n=1;n<=NIGHTS;n++){const b=document.createElement('button');b.textContent=n+'일';b.onclick=()=>{$('devp').classList.remove('show');go(()=>startGame(n,true,false,2))};$('devN2').appendChild(b)}
 [['dHard','hard'],['dNoScare','noScare'],['dInfo','info'],['dGod','god'],['dBright','bright']].forEach(([id,k])=>{$(id).onchange=e=>{DEV[k]=e.target.checked;buildDbg()}});
-$('dbgTog').onclick=e=>{e.stopPropagation();const d=$('dbg');d.classList.toggle('min');$('dbgTog').textContent=d.classList.contains('min')?'DEV ▸':'DEV ▾'};
+$('dbgTog').onclick=e=>{e.stopPropagation();const d=$('dbg');d.classList.toggle('min');$('dbgTog').textContent=d.classList.contains('min')?'치트 ▸':'치트 ▾'};
 function buildDbg(){
   const box=$('dbgBtns');box.innerHTML='';
   const mb=(t,f,on)=>{const b=document.createElement('button');b.textContent=t;if(on)b.className='on';b.onclick=e=>{e.stopPropagation();f();buildDbg()};box.appendChild(b)};
@@ -3911,12 +3936,19 @@ function buildDbg(){
   mb('6시로',()=>{if(S&&!S.over)S.t=HOUR*6-3});
   mb('메뉴',toMenu);
   $('dbg').style.display=(mode==='game'&&DEV.on&&DEV.info)?'block':'none';
-  $('dbgTog').textContent=$('dbg').classList.contains('min')?'DEV ▸':'DEV ▾';
+  $('dbgTog').textContent=$('dbg').classList.contains('min')?'치트 ▸':'치트 ▾';
 }
 function updDbg(){
+  if(S.ch===2){const f=o=>o?o.st+' / '+(o.timer||0).toFixed(0)+'s':'-';$('dbgText').textContent=
+`[치트] 수영장 ${S.night}일 차 · ${DEV.speed}x
+배터리 ${S.power.toFixed(1)} · 정신 ${S.san.toFixed(1)}
+잠수부: ${f(S.dv)}
+미끄럼틀: ${f(S.sl)}
+흥얼이: ${f(S.hm)}
+특이: ${S.mods.map(m=>MODS[m][0]).join(', ')||'-'}`;return}
   const h=S.hum,g=S.gaze,s=S.shadow,c=S.clone,n=S.night;
   $('dbgText').textContent=
-`[DEV] ${n}일 차 · ${DEV.speed}x
+`[치트] ${n}일 차 · ${DEV.speed}x
 교대자: ${h.node===DOOR?'문 앞!':'CAM '+CAMS[h.node]+' (위치 '+h.spot+')'} · 이동 ${h.timer.toFixed(1)}s
   대기 ${h.wait.toFixed(1)} / 잠금 ${h.lock.toFixed(1)}
 응시자: ${n>=2?'CAM '+CAMS[g.cam]+' · '+(g.p|0)+'%':'-'}
