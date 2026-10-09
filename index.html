@@ -372,7 +372,7 @@ button.on{background:var(--ac);color:#120c04;border-color:var(--ac)}
 .hb span{font:13px/1 var(--ui);transform:translateX(-50%);color:rgba(236,229,205,.85);text-shadow:0 1px 0 #000,0 0 3px #000}
 #pnl button{font:15px/1 var(--ui);border-radius:0;background:rgba(0,0,0,.75);border:1px solid var(--ln);box-shadow:none}
 #pnl button.on{background:var(--ac);color:#120c04;border-color:var(--ac);box-shadow:none}
-#battOv{background:rgba(0,0,0,.85);border:1px solid var(--ln)}#battX{flex:none;min-height:0;align-self:stretch;padding:0 14px;font-family:var(--ui);font-size:14px;color:var(--dim);background:transparent;border:1px solid var(--ln);border-radius:0}#battX:hover,#battX:active{color:var(--tx);border-color:var(--rd)}#battAct{font-family:var(--ui);border-radius:0;background:rgba(0,0,0,.6)}#battStep{font-family:var(--ui)}#battBar{background:var(--ac)}
+#battOv{background:rgba(0,0,0,.85);border:1px solid var(--ln)}#battOv .bar{height:12px;padding:2px;box-sizing:border-box}#battBar{transition:none}#battX{flex:none;min-height:0;align-self:stretch;padding:0 14px;font-family:var(--ui);font-size:14px;color:var(--dim);background:transparent;border:1px solid var(--ln);border-radius:0}#battX:hover,#battX:active{color:var(--tx);border-color:var(--rd)}#battAct{font-family:var(--ui);border-radius:0;background:rgba(0,0,0,.6)}#battStep{font-family:var(--ui)}#battBar{background:var(--ac)}
 #map .cb,#map .mlab{font-family:var(--ui)}#map .cb{font-size:13px}#map .cb.on{background:var(--ac);color:#120c04}#map{background:rgba(0,0,0,.6);border:1px solid var(--ln)}
 #pauseBtn{border:1px solid var(--ln);background:rgba(0,0,0,.5)}#pauseBtn i{background:var(--tx);box-shadow:none}
 /* 기록 */
@@ -437,7 +437,7 @@ body:has(#battOv.show) #msg{bottom:118px}
 <button id="bpBack">← 돌아가기</button>
 <button id="battBtn" class="hb"><svg viewBox="0 0 24 24"><rect x="5" y="7" width="13" height="10" rx="1.5"/><path d="M18 10.5h2v3h-2"/><path d="M8 10v4M11 10v4"/></svg><span>배터리</span><b id="battN">1</b></button>
 <div id="battOv"><svg id="battPic" data-s="0" viewBox="0 0 300 70"><rect class="tube" x="60" y="18" width="170" height="34" rx="6"/><path class="head" d="M10 8h50v54H10z"/><rect class="lens" x="4" y="14" width="10" height="42" rx="3"/><rect class="old" x="90" y="24" width="110" height="22" rx="4"/><rect class="new" x="90" y="24" width="110" height="22" rx="4"/><rect class="cap" x="228" y="14" width="34" height="42" rx="5"/></svg>
-<div class="row"><span id="battStep">1/4</span><button id="battAct">뚜껑 돌려서 열기</button><button id="battX">취소</button></div><div class="bar"><i id="battBar"></i></div></div>
+<div class="row"><button id="battX">취소</button><span id="battStep">1/4</span><button id="battAct">뚜껑 돌려서 열기</button></div><div class="bar"><i id="battBar"></i></div></div>
 <div id="map"></div>
 <button id="pauseBtn" aria-label="일시정지"><i></i><i></i></button>
 <div id="dbg"><button id="dbgTog">치트 ▾</button><pre id="dbgText"></pre><div class="row" id="dbgBtns"></div></div>
@@ -492,7 +492,7 @@ body:has(#battOv.show) #msg{bottom:118px}
 <script nomodule>window.THREE_ERR='nomodule'</script>
 <script>
 // ===================== 기본 =====================
-const VER='0.28.2'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
+const VER='0.28.3'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
 const $=id=>document.getElementById(id);
 const cv=$('cv'),cx=cv.getContext('2d');
 let W,H,DPR=1;const MOB=matchMedia('(pointer:coarse)').matches||/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent); // 폰이면 가볍게
@@ -2906,7 +2906,7 @@ function flash(){
   buildUI();
 }
 // 배터리 교체: 뚜껑 열기(꾹) → 빈 배터리 빼기 → 새 배터리 끼우기 → 뚜껑 닫기(꾹). 그동안 손전등은 꺼짐
-function startSwap(){if(!S||S.ch!==2||S.over||S.dawn||S.swap||!(S.spare>0))return;S.swap={step:0,p:0,hold:false};sfx(900,.04,'square',.05);say('손전등이 꺼졌다. 서둘러.');buildUI();updSwap()}
+function startSwap(){if(!S||S.ch!==2||S.over||S.dawn||S.swap||!(S.spare>0))return;S.swap={step:0,p:0,hold:false,t0:performance.now()};sfx(900,.04,'square',.05);say('손전등이 꺼졌다. 서둘러.');buildUI();updSwap()}
 function swapNext(){const sw=S.swap;if(!sw)return;sw.step++;sw.p=0;sw.hold=false;thump(160,.06,.25,0);nburst(2200,5,.08,.12,0);if(sw.step===2)drip(0);if(sw.step>=SWAP.length)endSwap(false);else updSwap()}
 function swapTap(){const sw=S&&S.swap;if(!sw)return;if(!SWAP[sw.step][1])swapNext()}
 function endSwap(cancel){if(!cancel){S.power=100;S.spare--;S.outSaid=false;S.lowSaid=false;sfx(1800,.06,'sine',.06);say('손전등이 다시 켜졌다.')}S.swap=null;buildUI()}
@@ -3758,7 +3758,7 @@ addEventListener('blur',()=>{if(S&&S.eyes)setEyes(false)});
 $('torchBtn').onclick=e=>{e.stopPropagation();toggleTorch()};
 $('pnlBtn').onclick=e=>{e.stopPropagation();if(S&&S.ch===2&&!S.over)toggleMon()};
 $('battBtn').onclick=e=>{e.stopPropagation();startSwap()};
-$('battX').onclick=e=>{e.stopPropagation();if(S&&S.swap){endSwap(true);updSwap();sfx(700,.04,'square',.04);say('그냥 다시 끼웠다.')}};
+$('battX').onclick=e=>{e.stopPropagation();if(S&&S.swap&&performance.now()-S.swap.t0>600){endSwap(true);updSwap();sfx(700,.04,'square',.04);say('그냥 다시 끼웠다.')}};
 {const b=$('battAct'),hold=v=>{if(S&&S.swap)S.swap.hold=v};b.addEventListener('pointerdown',e=>{e.stopPropagation();hold(true)});['pointerup','pointerleave','pointercancel'].forEach(k=>b.addEventListener(k,()=>hold(false)));b.onclick=e=>{e.stopPropagation();swapTap()};$('battOv').addEventListener('pointerdown',e=>e.stopPropagation())}
 $('pnl').onclick=e=>{e.stopPropagation();const b=e.target.closest('button');if(!b||!S)return;if(b.classList.contains('x'))toggleMon();else setCam(+b.dataset.c)};
 
