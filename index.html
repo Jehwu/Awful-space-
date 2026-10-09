@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
 <title>Awful Space</title>
+<link rel="preload" href="fonts/Galmuri11.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=VT323&family=Nanum+Gothic+Coding&family=Nanum+Myeongjo:wght@800&family=Nanum+Pen+Script&family=Nosifer&family=Song+Myung&family=East+Sea+Dokdo&display=swap" rel="stylesheet">
 <style>
@@ -281,6 +282,119 @@ body[data-mode=game] #pauseBtn{display:flex}
  #camOff{font-size:17px;padding:10px 34px}#map{width:380px;height:285px}#map .cb{font-size:19px;min-width:38px;min-height:30px}
  #bpBack{font-size:18px;padding:12px 24px}.hb{width:64px;height:64px}.hb span{font-size:20px}#flashBtn{width:104px;height:104px}#torchBtn{right:142px}#battBtn{bottom:136px;right:150px}#eyeBtn{left:110px;width:82px;height:82px}#pnl button{font-size:16px;padding:9px 18px}}
 .short #clock{font-size:32px}.short .meter{width:120px;margin-bottom:6px}.short #ekg{width:120px;height:24px}
+
+/* ================= 디자인 리메이크: 픽셀 글꼴(갈무리) · 납작한 패널 · 호박색 강조 ================= */
+@font-face{font-family:'Galmuri11';src:url(fonts/Galmuri11.woff2) format('woff2');font-display:swap}
+@font-face{font-family:'Galmuri11';font-weight:700;src:url(fonts/Galmuri11-Bold.woff2) format('woff2');font-display:swap}
+@font-face{font-family:'Hahmlet';src:url(fonts/Hahmlet.woff) format('woff');font-display:swap}
+:root{--ui:'Galmuri11','Nanum Gothic Coding',monospace;--serif:'Hahmlet','Nanum Myeongjo',serif;--tx:#ece5cd;--dim:#8e866d;--ac:#e9a53d;--acd:#7a5418;--rd:#d93a25;--pn:rgba(8,7,5,.94);--ln:rgba(236,229,205,.16)}
+*{letter-spacing:0!important}
+html,body{font-family:var(--ui);color:var(--tx)}
+button{font-family:var(--ui);font-size:16px;color:var(--tx);background:rgba(8,7,5,.82);border:1px solid var(--ln);border-radius:0}
+button:hover{border-color:rgba(233,165,61,.6)}
+button.on{background:var(--ac);color:#120c04;border-color:var(--ac)}
+::selection{background:var(--ac);color:#000}
+/* HUD */
+#clock{font-family:var(--ui);font-weight:700;font-size:44px;line-height:1;text-shadow:2px 0 rgba(255,40,30,.35),-2px 0 rgba(40,220,255,.2),0 2px 0 #000}
+#clock small{font-size:22px;margin-left:4px;opacity:.7;font-weight:400}
+#night{font-family:var(--ui);font-size:11px;opacity:.6;margin-top:6px}
+.meter .lab{font-family:var(--ui);font-size:11px;opacity:.75}
+.meter b{font-family:var(--ui);font-weight:700;font-size:22px}
+.bar{height:10px;background:rgba(0,0,0,.65);border:1px solid rgba(236,229,205,.3);padding:2px}
+.bar i{background:var(--tx);box-shadow:none}
+.bar.seg::after{inset:2px;background:repeating-linear-gradient(90deg,transparent 0 calc(10% - 2px),rgba(0,0,0,.9) calc(10% - 2px) 10%)}
+.bar.low i{background:var(--rd)!important;box-shadow:none!important}
+#ekg{background:rgba(0,0,0,.55);border:1px solid rgba(236,229,205,.22)}
+/* 자막 */
+#msg{font-family:var(--ui);font-size:calc(19px*var(--sub));line-height:1.5;padding:6px 14px;color:#f3eedc;background:rgba(0,0,0,.72);border:none;box-shadow:none;text-shadow:none}
+#msg.voice{color:#ffd88a;font-style:normal}
+#msg.bad{color:#ff7058;text-shadow:none}
+#cap{font-family:var(--ui);font-size:calc(clamp(15px,2.2vw,22px)*var(--sub));line-height:1.5;padding:6px 14px;background:rgba(0,0,0,.6);text-shadow:none}
+/* 메인 메뉴 */
+#menu{padding:7vh 8vw;gap:2px}
+#menu h1{font-family:var(--ui);font-weight:700;font-size:clamp(40px,7.4vw,96px);line-height:1;color:#efe7cc;letter-spacing:.04em!important;text-shadow:3px 0 rgba(255,40,30,.45),-3px 0 rgba(40,220,255,.25),0 4px 0 #000;animation:flick 6s infinite}
+#menu .sub{font-family:var(--ui);font-size:clamp(11px,1.4vw,16px);color:#b8ae90;opacity:1;text-shadow:0 1px 0 #000,0 0 6px #000;margin:14px 0 5vh 2px}
+#menu .sub b{color:var(--rd);text-shadow:none}
+.mbtn{font-family:var(--ui);font-size:clamp(18px,2.4vw,24px);color:var(--tx);opacity:.82;text-shadow:0 2px 0 #000,0 0 6px #000;padding:5px 12px 5px 30px;min-height:40px;transition:none}
+.mbtn:hover,.mbtn:focus-visible{color:#120c04;background:var(--ac);text-shadow:none;opacity:1}
+.mbtn::before{content:'▶';left:8px;top:50%;width:auto;height:auto;margin-top:0;transform:translateY(-50%);background:none;box-shadow:none;font-size:.7em;color:#120c04;opacity:0;transition:none}
+.mbtn:hover::before,.mbtn:focus-visible::before{opacity:1;transform:translateY(-50%);background:none;box-shadow:none}
+.mbtn::after{display:none}
+#menu .foot{font-family:var(--ui);font-size:11px;color:var(--dim);opacity:.8}
+/* 공통 창 */
+.pnl{background:var(--pn);border:1px solid var(--ln);box-shadow:0 30px 80px #000;padding:22px 24px 18px}
+.pnl::before{display:none}
+.ph{font-family:var(--ui);font-weight:700;font-size:22px;color:var(--tx);text-shadow:none;animation:none;padding-bottom:10px;border-bottom:2px solid var(--ac);margin-bottom:6px}
+.psub{font-family:var(--ui);font-size:11px;color:var(--dim);margin-bottom:14px}
+.pb{font-family:var(--ui);font-size:19px;color:var(--tx);border-bottom:1px solid var(--ln);padding:11px 8px 11px 30px;transition:none}
+.pb::before{content:'▶';left:10px;top:50%;width:auto;height:auto;margin-top:0;transform:translateY(-50%);background:none;font-size:11px;color:#120c04;opacity:0}
+.pb:hover,.pb:focus-visible{color:#120c04;background:var(--ac);padding-left:30px;text-shadow:none}
+.pb:hover::before{opacity:1;background:none;box-shadow:none}
+.pb.red{color:#ff8a72}.pb.red:hover{background:var(--rd);color:#fff}
+.srow{font-size:16px;border-bottom:1px solid var(--ln)}
+.srow .sl{color:var(--tx)}.srow .sl small{font-family:var(--ui);font-size:11px;color:var(--dim);opacity:1}
+.srow .sv{font-family:var(--ui);font-size:16px;color:var(--ac)}
+.srow input[type=range]{height:6px;border-radius:0;background:linear-gradient(90deg,var(--ac) var(--p,50%),rgba(236,229,205,.15) var(--p,50%))}
+.srow input[type=range]::-webkit-slider-thumb{width:12px;height:20px;border-radius:0;background:var(--tx);border:2px solid #000;box-shadow:none}
+.srow input[type=range]::-moz-range-thumb{width:10px;height:18px;border-radius:0;background:var(--tx);border:2px solid #000}
+.seg{border:1px solid var(--ln)}
+.seg button{font-family:var(--ui);font-size:14px;color:var(--dim);border-left:1px solid var(--ln)}
+.seg button.on{background:var(--ac);color:#120c04;text-shadow:none}
+.skh{font-family:var(--ui);font-size:13px;color:var(--ac)}
+.kbtn{font-family:var(--ui);font-size:16px;border-radius:0;background:#000;border:1px solid var(--ln);border-bottom-width:3px}
+.srow2 .pb{border:1px solid var(--ln);padding:10px}
+#pause,#settings{background:rgba(0,0,0,.78)}
+/* 챕터 고르기 */
+#play{background:rgba(0,0,0,.9)}
+#play .chc{border:1px solid var(--ln);font-family:var(--ui)}
+#play .chc .ct{font-size:11px;color:var(--dim);opacity:1}
+#play .chc .cn{font-family:var(--ui);font-weight:700;font-size:clamp(22px,4.4vmin,33px);top:28px;text-shadow:0 2px 0 #000}
+#play .chc .cp{font-size:13px;opacity:.9;text-shadow:0 1px 0 #000}
+#play .chc.on{border-color:var(--ac);box-shadow:0 0 0 1px var(--ac)}
+#play .chc .lk{font-size:16px;color:var(--dim)}
+#play .md button{font-family:var(--ui);font-size:16px;background:rgba(8,7,5,.9);border:1px solid var(--ln)}
+#play .md button.on{background:var(--ac);color:#120c04;border-color:var(--ac);box-shadow:none}
+#play .sb{font-family:var(--ui);font-size:clamp(16px,2.6vmin,22px);background:rgba(8,7,5,.9);border:1px solid var(--ln)}
+#play .sb:hover{border-color:var(--ac);background:var(--ac);color:#120c04}
+/* 끝 화면 */
+#end{background:radial-gradient(ellipse at center,rgba(40,0,0,.5),rgba(0,0,0,.96))}
+#end h1{font-family:var(--ui);font-weight:700;font-size:clamp(56px,10vw,110px);color:var(--rd);text-shadow:4px 0 rgba(255,40,30,.35),-4px 0 rgba(40,220,255,.2),0 4px 0 #000}
+#end pre{font-family:var(--ui);font-size:19px;line-height:1.7;opacity:.9}
+#end pre .tip{display:block;margin-top:18px;font-size:14px;color:var(--ac)}
+#end button{font-family:var(--ui);font-size:16px;border:1px solid var(--ln);padding:10px 22px}
+#end button:hover{background:var(--ac);color:#120c04;border-color:var(--ac)}
+#intro .big{font-family:var(--ui);font-weight:700;font-size:66px}
+#intro .small{font-family:var(--ui);font-size:22px;opacity:.7}
+/* 게임 중 버튼 */
+#camOff,#bpBack,#skip{font-family:var(--ui);background:rgba(0,0,0,.72);border:1px solid var(--ln);color:var(--tx)}
+#camOff:hover,#bpBack:hover,#skip:hover{background:var(--ac);color:#120c04}
+#camOff .ar{font-family:var(--ui);font-size:13px}
+#camRep{font-family:var(--ui);background:#3a0904;border:1px solid var(--rd)}
+.hb span{font:13px/1 var(--ui);transform:translateX(-50%);color:rgba(236,229,205,.85);text-shadow:0 1px 0 #000,0 0 3px #000}
+#pnl button{font:15px/1 var(--ui);border-radius:0;background:rgba(0,0,0,.75);border:1px solid var(--ln);box-shadow:none}
+#pnl button.on{background:var(--ac);color:#120c04;border-color:var(--ac);box-shadow:none}
+#battOv{background:rgba(0,0,0,.85);border:1px solid var(--ln)}#battAct{font-family:var(--ui);border-radius:0;background:rgba(0,0,0,.6)}#battStep{font-family:var(--ui)}#battBar{background:var(--ac)}
+#map .cb,#map .mlab{font-family:var(--ui)}#map .cb{font-size:13px}#map .cb.on{background:var(--ac);color:#120c04}#map{background:rgba(0,0,0,.6);border:1px solid var(--ln)}
+#pauseBtn{border:1px solid var(--ln);background:rgba(0,0,0,.5)}#pauseBtn i{background:var(--tx);box-shadow:none}
+/* 기록 */
+#achBox{background:rgba(0,0,0,.85)}
+#achToast{font-family:var(--ui);background:var(--pn);border:1px solid var(--ln)}#achToast .k{font-size:11px;color:var(--ac)}#achToast .n{font-size:16px}
+.acard .ad{font-family:var(--ui);font-size:11px}
+/* 일지·안내판: 종이에 인쇄된 글은 명조 */
+.lg-h{font-family:var(--serif);font-weight:700}
+.lg-sub,.lg-keys{font-family:var(--ui)}
+.pl-h{font-family:var(--serif);font-weight:700}
+#log.pool .sheet{font-family:var(--ui)}
+.pl-r{font-size:13px}.pl-f{font-family:var(--ui)}
+#logClose{font-family:var(--ui)}
+.cab-h .bpt{font-family:var(--ui);font-weight:700;font-size:19px}
+#brkp .bhint,#bclose,#blever{font-family:var(--ui)}
+#devp h2{font-family:var(--ui);font-weight:700}
+@media (min-width:1000px) and (min-height:600px){#clock{font-size:55px}#clock small{font-size:22px}#night{font-size:13px}.meter .lab{font-size:13px}.meter b{font-size:22px}#msg{font-size:calc(22px*var(--sub))}.hb span{font-size:14px}#pnl button{font-size:16px}}
+body:has(#battOv.show) #msg{bottom:118px}
+.short .pl-r{font-size:12px;gap:6px}.short .pl-r b{font-size:12px}
+#log.pool #logClose{border:1px solid rgba(255,255,255,.55);background:transparent;color:#fff;min-height:30px;padding:2px 10px;top:13px;right:14px}
+.short #clock{font-size:33px}.short #clock small{font-size:16px}.short .pb{font-size:16px;padding:8px 8px 8px 28px}.short .ph{font-size:19px}
 </style>
 </head>
 <body data-mode="menu">
@@ -312,7 +426,7 @@ body[data-mode=game] #pauseBtn{display:flex}
 <div id="menu">
   <h1 id="title">AWFUL SPACE</h1>
   <div class="sub">야간 경비 구함 · 숙식 제공 · <b>교대 없음</b></div>
-  <button class="mbtn" id="mPlay">게임 플레이</button>
+  <button class="mbtn" id="mPlay">게임 시작</button>
   <button class="mbtn" id="mAch">기록</button>
   <button class="mbtn" id="mSet">설정</button>
   <button class="mbtn" id="mDev">개발자 모드</button>
@@ -353,7 +467,7 @@ body[data-mode=game] #pauseBtn{display:flex}
 <script nomodule>window.THREE_ERR='nomodule'</script>
 <script>
 // ===================== 기본 =====================
-const VER='0.27.1'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
+const VER='0.28.0'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
 const $=id=>document.getElementById(id);
 const cv=$('cv'),cx=cv.getContext('2d');
 let W,H,DPR=1;const MOB=matchMedia('(pointer:coarse)').matches||/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent); // 폰이면 가볍게
@@ -1102,35 +1216,36 @@ function buildJumps(){
 // 5일 차 일지 빨간 줄은 그 근무자가 쓴 게 아님 (흉내 내는 괴물이 씀)
 let EXIT_CAM=[7,6,3,1,0];
 const ANOM_TXT=['여기 아까 왔음','왼쪽 말고','불 켜 줘','문 열어','나 여기 있어','6시','열어 줘','→']; // 밤마다 비상구가 보이는 구역
-const BASE_RULES='여기 들어왔으면 이것부터 읽어.\n6시까지만 버티면 돼.\n비상구가 하루에 한 칸씩 와. 닷새째 6시면 문 앞이야.\n그 전엔 절대 밖에 나가지 마.\n전기 아껴. 차단기 떨어지면 바로 올려.\n누가 뭐라고 하든 형광등 소리 끊기면 문 잠가.';
-const ANOM_RULE='화면이 가끔 이상하게 바뀌어도 신경 쓰지 마. 여기가 원래 그래.';
+const BASE_RULES='이거 먼저 읽어.\n6시까지만 버티면 됨.\n비상구 불이 하루에 한 칸씩 이쪽으로 옴. 5일째 6시엔 문 앞.\n그 전엔 절대 밖에 나가지 말 것.\n전기 아껴 쓰고, 차단기 내려가면 바로 올리기.\n형광등 소리 끊기면 무조건 문부터 잠그기.';
+const ANOM_RULE='화면이 가끔 이상하게 바뀌는 건 신경 안 써도 됨.';
 // 하드 모드: 먼저 있던 근무자가 그런 밤을 겪고 일지 맨 위에 남긴 메모
-const MODS={cold:['추위','난로 틀어 놨어. 전기 빨리 닳아.'],wire:['낡은 배선','배선에서 탄내 나. 차단기 자주 떨어져.'],fog:['습기','렌즈에 김 서려. 화면 자주 끊겨.'],
-  quiet:['작은 소리','형광등 소리가 작아. 잘 들어.'],calls:['전화','전화 많이 와.'],fast:['발소리','복도에서 뛰는 소리 들려.'],black:['정전','새벽에 한 번 다 꺼져.']};
+const MODS={cold:['추위','난로 켜 둠. 전기 빨리 닳음.'],wire:['낡은 배선','배선 타는 냄새 남. 차단기 자주 내려감.'],fog:['습기','렌즈에 김 서림. 화면 자주 끊김.'],
+  quiet:['작은 소리','형광등 소리가 작음. 귀 기울일 것.'],calls:['전화','오늘 전화 많이 옴.'],fast:['발소리','복도에서 뛰는 소리 남.'],black:['정전','새벽에 한 번 전부 나감.']};
 const hasMod=id=>S.mods.includes(id);
 // 경비실 전화: 먼저 있던 근무자가 남긴 녹음. 밤마다 한 번 벨이 울리고, 받으면 그 밤의 녹음이 재생됨. 빈 줄은 말없이 지나가는 시간
 const CALLS=[
-  ['(딸깍. 녹음된 목소리가 나온다)','"이거 듣고 있으면, 너도 여기 들어온 거야."','"형광등 소리 끊기면 문부터 잠가. 생각하지 말고."','"6시까지만 버텨. 그때 불이 한 번 다 나가."','"제일 어두운 화면에 초록 불 보이지? 비상구야."','"그리고 기억해. 문 잠그지 말라는 말은 절대 믿지 마."','"그런 말이 들리면, 그건 사람이 아니야."'],
-  ['(딸깍. 같은 목소리, 다음 녹음이다)','"이틀째지. 6시에 불 다 나가는 거 봤지?"','"무전기에서 지직거리는 소리 나면 환풍구 닫아. 그건 문으로 안 와."','"초록 불 한 칸 왔지? 하루에 한 칸씩 와."','"벽 얼룩은 오래 보지 마."','"화면이 가끔 이상하게 바뀌어도 신경 쓰지 마. 여기가 원래 그래."'],
-  ['(딸깍. 잡음이 심한 녹음이다)','"불 끄지 마."','"배전반 옆 창고 문, 오늘부터 열려. 틈 보이면 닫아. 뛰는 소리 나면 그냥 닫아."','"불 나간 칸에 뭐가 서 있어. 어두우면 그게 와."','"차단기 내려가면 바로 올려."','"...잠깐. 여기 형광등 소리가 멈췄어."','','"......갔다."','"이거 듣는 사람은, 꼭 끝까지 버텨."'],
-  ['(딸깍. 녹음)','"오늘은 화면에 네가 앉아 있을 거야."','"보이면 바로 신고해. 그거 너 아니야."','"나도 봤어. 화면 속에서 내가 날 보고 있는 거."','"초록 불 따라가. 그게 유일한 길이야."'],
-  ['(딸깍. 마지막 녹음이다)','"마지막 날이야. 초록 불 문 앞 복도까지 왔지?"','"일지 마지막 줄, 빨간 글씨. 그거 내가 안 썼어. 믿지 마."','"소리 끊기면 잠가. 6시 되면 문은 알아서 열려."','"열리면 그냥 타. 아무 생각 하지 말고."','"......난 못 탔어."','(녹음이 끝났다. 그런데 수화기 너머가 조용하지 않다)','"......잠그지 마. 나야. 열어 줘."']];
+  ['(녹음 재생)','"아, 이거 되나... 됐다."','"이거 듣고 있으면 너도 들어온 거네. 나도 그랬어."','"딴 건 몰라도 이거 하나는 기억해. 형광등 지잉 하는 소리 있지? 그게 뚝 끊기면 문부터 잠가."','"6시까지만 버티면 돼. 6시 되면 불이 한 번 싹 나가."','"모니터에 초록 불 보이는 칸 있을 거야. 비상구. 그게 매일 한 칸씩 이쪽으로 와."','"아, 그리고. 누가 문 잠그지 말라고 하면, 그건 듣지 마."'],
+  ['(녹음 재생)','"이틀째지? 6시에 불 나가는 거 봤지. 나 처음에 진짜 놀랐어."','"오늘부터 무전기가 지직거릴 거야. 그러면 오른쪽 아래 환풍구 닫아. 그건 문으로 안 와. 거기로 와."','"너무 오래 닫아 두진 말고. 숨 막혀."','"화면에 얼룩 같은 거 생기면 쳐다보지 말고 바로 넘겨."','"화면이 좀 이상하게 바뀌는 건 그냥 둬. 원래 그래, 여기."'],
+  ['(녹음 재생. 잡음이 심하다)','"불 끄지 마. 진짜로."','"불 꺼진 칸에 뭐가 서 있어. 어두우면 그게 다가와."','"그리고 배전반 옆 창고 문. 오늘부터 그게 열려. 틈 보이면 닫아. 안에서 뛰는 소리 나면 생각하지 말고 닫아."','"차단기 내려가면 바로 올리고."','"...잠깐만."','','"......"','"...갔다. 미안. 어디까지 했지."','"아무튼 끝까지 버텨."'],
+  ['(녹음 재생)','"오늘은 모니터 보다가 깜짝 놀랄 거야."','"화면 속에 네가 앉아 있어. 그 의자에."','"그거 너 아니야. 보이면 그 화면에서 바로 신고 눌러."','"나도 봤어. 화면 속에서 내가 날 쳐다보고 있더라."','"초록 불만 따라가. 다른 방법 없어."'],
+  ['(녹음 재생)','"마지막 날이다. 초록 불, 문 앞 복도까지 왔지?"','"일지 맨 밑에 빨간 글씨 있지. 그거 내가 쓴 거 아니야. 믿지 마."','"소리 끊기면 잠그고. 6시 되면 문은 알아서 열려."','"열리면 엘리베이터 그냥 타. 뒤돌아보지 말고."','"......난 못 탔어."','(녹음이 끝났다. 수화기 너머에서 숨소리가 들린다)','"......잠그지 마. 나야. 열어 줘."']];
 const RULES=[ // [몇 일 차부터, 내용] — 번호는 순서대로 붙음
-  [1,'형광등 소리 끊기면 바로 문 잠가. 소리 돌아오면 열고.'],
-  [2,'화면 속 얼룩이 커지면 바로 다른 화면으로 넘겨.'],
-  [2,'무전기가 지직거리면 오른쪽 아래 환풍구 닫아. 조용해지면 바로 열고. 오래 닫아 두면 숨 막혀.'],
-  [3,'불 끄지 마.'],
-  [3,'창고 문 틈이 벌어져 있으면 닫아. 안에서 뛰는 소리 나면 생각하지 말고 바로 닫아.'],
-  [4,'화면 속에 내가 앉아 있으면 그 화면에서 신고해. 그거 내가 아니야.'],
+  [1,'형광등 소리 끊기면 문 잠그기. 소리 돌아오면 다시 열기.'],
+  [2,'화면에 얼룩이 커지면 바로 다른 화면으로.'],
+  [2,'무전기 지직거리면 오른쪽 아래 환풍구 닫기. 조용해지면 다시 열기. (오래 닫으면 숨 막힘)'],
+  [3,'불 끄지 말 것.'],
+  [3,'창고 문 틈 벌어지면 닫기. 뛰는 소리 나면 바로.'],
+  [4,'화면에 내가 앉아 있으면 그 화면에서 신고. 그거 나 아님.'],
   [5,'오늘은 문 잠그지 마. 데리러 갈게.']
 ];
+// 죽었을 때: [무슨 일이 있었나, 다음엔 어떻게]
 const DEATH={
-  '교대자':'문이 열려 있었다.',
-  '응시자':'너무 오래 봤다.',
-  '그림자':'불이 꺼져 있었다.',
-  '정신':'정신 차려 보니 복도 한가운데였다.',
-  '은둔자':'환풍구가 열려 있었다.',
-  '질주자':'창고 문이 열려 있었다.'
+  '교대자':['문 앞에 서 있던 게 들어왔다.','형광등 소리가 끊기면 바로 문을 잠그세요.'],
+  '응시자':['눈을 너무 오래 마주쳤다.','화면 속 눈이 커지면 다른 화면으로 넘기세요.'],
+  '그림자':['불이 꺼진 사이에 다가왔다.','경비실 불을 끄지 마세요.'],
+  '정신':['정신을 차려 보니 복도 한가운데였다.','불을 켜 두고, 괴물을 오래 마주하지 마세요.'],
+  '은둔자':['환풍구로 기어 들어왔다.','무전기가 지직거리면 환풍구를 닫으세요.'],
+  '질주자':['창고 문으로 달려 들어왔다.','창고 문 틈이 벌어지면 바로 닫으세요.']
 };
 // ===== 은둔자 (2일 차~): 교대자처럼 생겼지만 문으로 오지 않음. 천장 환풍구가 있는 구역에서 덕트로 들어가 경비실 환풍구로 기어 옴 =====
 // 덕트 안에선 CCTV에 안 잡히고, 책상 무전기 잡음이 커지는 걸로만 거리를 알 수 있음. 환풍구 근처에 있을 때 화면으로 보고 있으면 들어가지 못함
@@ -1160,7 +1275,7 @@ function newNight(n){
   const go2=()=>{if(!S||S.night!==n)return;setMode('game');buildUI();updHUD();
     {const tx=n+'일 차',el=$('introSmall');el.textContent='';let k=0;const iv=setInterval(()=>{k++;el.textContent=tx.slice(0,k);if(k>=tx.length)clearInterval(iv)},40)} // 한 글자씩
     const it=$('intro');it.classList.remove('show');void it.offsetWidth;it.classList.add('show');
-    setTimeout(()=>{it.classList.remove('show');if(S&&S.night===n&&!S.over){S.view=S.camX=1;openLog();if(S.ch===2)say(SPOT2[n-1].name+'. 불이 꺼졌다.')}},DEV.on?700:2400)};
+    setTimeout(()=>{it.classList.remove('show');if(S&&S.night===n&&!S.over&&mode==='game'){S.view=S.camX=1;openLog();if(S.ch===2)say(SPOT2[n-1].name+'. 불이 꺼졌다.')}},DEV.on?700:2400)};
   if(n>=2&&!DEV.on&&R3.ok&&CHAP===1)playCut(n===5?'night5_open':'night_start',go2,n);
   else if(!DEV.on&&R3.ok&&CHAP===2){if(n===1&&!INTRO2)INTRO2=1,playCut('intro2',go2,1);else playCut('night2_start',go2,n)}else go2();
 }
@@ -1471,9 +1586,9 @@ function openLog(){
     el('pl-h','안전요원 수칙');keyGuide(box);
     POOL_RULES.forEach(([d,a,b])=>{if(d>S.night)return;const r=document.createElement('div');r.className='pl-r'+(d===S.night&&d>1?' new':'');r.innerHTML='<b></b><i>→</i><span></span>';r.querySelector('b').textContent=a;r.querySelector('span').textContent=b;box.appendChild(r)});
     el('pl-f','6시에 불이 켜집니다 · 초록 비상구 불빛은 매일 가까워집니다');S.log=true;$('log').classList.add('show');buildUI();return}
-  el('lg-h','근무 일지');el('lg-sub','근무자: (이름이 긁혀 지워져 있다)');S.mods.forEach(m=>el('lg-m',MODS[m][1]));el('lg-base',BASE_RULES+(S.night>=2?'\n'+ANOM_RULE:''));
-  RULES.forEach(([d,t],i)=>{if(d>S.night)return;if(d===5){el('lg-sig','— 먼저 있던 사람');el('lg-r lie',`${i+1}. ${t}`);return}el('lg-r'+(d===S.night?' new':''),`${i+1}. ${t}`)})
-  if(S.night<5)el('lg-sig','— 먼저 있던 사람'); // 5일 차 줄은 서명 아래에 덧붙여 씀
+  el('lg-h','근무 일지');el('lg-sub','근무자: ████ (지워짐)');S.mods.forEach(m=>el('lg-m',MODS[m][1]));el('lg-base',BASE_RULES+(S.night>=2?'\n'+ANOM_RULE:''));
+  RULES.forEach(([d,t],i)=>{if(d>S.night)return;if(d===5){el('lg-sig','전 근무자가');el('lg-r lie',`${i+1}. ${t}`);return}el('lg-r'+(d===S.night?' new':''),`${i+1}. ${t}`)})
+  if(S.night<5)el('lg-sig','전 근무자가'); // 5일 차 줄은 서명 아래에 덧붙여 씀
   keyGuide(box);
   S.log=true;$('log').classList.add('show');buildUI();
 }
@@ -1520,7 +1635,7 @@ function die(c){
   if(!DEV.on){AS.streak=0;achSave()}ach('missing');
   if(radioG)radioG.gain.setTargetAtTime(0,AC.currentTime,.05);if(humG)humG.gain.setTargetAtTime(0,AC.currentTime,.02);
   buildUI();
-  const end=()=>{setMode('end');showEnd('실종',(S.ch===2&&DEATH2[c])||DEATH[c],'다시 하기',()=>newNight(S.night))};
+  const end=()=>{setMode('end');const d=(S.ch===2&&DEATH2[c])||DEATH[c]||['',''];showEnd('실종',d[0],'다시 하기',()=>newNight(S.night),d[1])};
   if(DEV.on&&DEV.noScare){end();return}
   scream();
   try{SET.vib&&navigator.vibrate&&navigator.vibrate([350,60,120,60,600])}catch(e){}
@@ -1535,12 +1650,12 @@ function win(){
   if(!DEV.on){if(n===1)ach('first_shift');if(last)ach(hard?'ch1_hard':'ch1_normal');if(n===3&&(S.shMax||0)<50)ach('light');if(hard&&hasMod('black'))ach('dark');
     AS.streak=n===1?1:AS.streak===n-1?n:0;achSave();if(n===5&&AS.streak===5)ach('tally')}
   if(!last&&!DEV.on){try{if(hard){savedHard=Math.max(savedHard,n+1);localStorage.setItem('obs_night_hard',savedHard)}else{savedNight=Math.max(savedNight,n+1);localStorage.setItem('obs_night',savedNight)}}catch(e){}}
-  const fin=()=>{setMode('end');if(!last)showEnd('6:00 AM',`${n}일 차 끝.\n비상구가 한 칸 가까워졌다.`,`${n+1}일 차`,()=>newNight(n+1));
-    else showEnd('비상구',hard?'5일 차 끝.\n엘리베이터는 아래로 내려갔다.\n물가에서 전화가 울리고 있었다.':'5일 차 끝.\n엘리베이터는 아래로 내려갔다.','처음부터',()=>newNight(1))};
+  const fin=()=>{setMode('end');if(!last)showEnd('6:00 AM',`${n}일 차 생존.\n비상구 불이 한 칸 가까워졌다.`,`${n+1}일 차`,()=>newNight(n+1));
+    else showEnd('비상구',hard?'5일 차 생존.\n엘리베이터가 아래로 내려갔다.\n물가에서 전화가 울리고 있었다.':'5일 차 생존.\n엘리베이터가 아래로 내려갔다.','처음부터',()=>newNight(1))};
   if(R3.ok&&!DEV.on)playCut(last?(hard?'ending_hard':'ending'):'reset',fin,n);else if(!DEV.on)playCut('reset2d',fin,n);else{sfx(880,.6,'sine',.2);fin()}
 }
-function showEnd(title,text,label,fn){
-  $('endTitle').textContent=title;$('endText').textContent=text;
+function showEnd(title,text,label,fn,tip){
+  $('endTitle').textContent=title;$('endText').textContent=text;if(tip){const t=document.createElement('span');t.className='tip';t.textContent='TIP  '+tip;$('endText').appendChild(t)}
   $('endBtn').textContent=label;$('endBtn').onclick=fn;
   $('end').classList.add('show');
 }
@@ -1595,11 +1710,10 @@ function hotAt(p){
   if(p.x<0||!canAct()||Math.abs(S.view-S.camX)>.15||navZone(p))return null;const v=toView(p);
   for(const h of hots(S.view)){const r=h.r;if(!r)continue;const px=Math.max(0,(46-r.w)/2),py=Math.max(0,(46-r.h)/2);if(v.x>=r.x-px&&v.x<=r.x+r.w+px&&v.y>=r.y-py&&v.y<=r.y+r.h+py)return h}return null}
 // 가리키는 물건 테두리 + 이름. 터치 화면이거나 밤 시작 직후엔 모든 물건에 희미한 테두리
-function tapeLabel(t,cxp,y,a,red){ // 마스킹테이프에 펜으로 쓴 이름표
-  const fs=Math.max(17,Math.min(22,H*.032));cx.font=`${fs}px ${PEN}`;const tw=cx.measureText(t).width,w=tw+22,h=fs*1.25,x=Math.max(6,Math.min(W-w-6,cxp-w/2));
-  cx.save();cx.globalAlpha=a;cx.translate(x+w/2,y+h/2);cx.rotate(-.025+Math.sin(cxp)*.02);cx.shadowColor='rgba(0,0,0,.6)';cx.shadowBlur=6;cx.shadowOffsetY=2;
-  cx.fillStyle=red?'rgba(214,170,150,.94)':'rgba(222,212,172,.93)';cx.beginPath();cx.moveTo(-w/2,-h/2);for(let k=0;k<=6;k++)cx.lineTo(-w/2+w*k/6,-h/2+(k%2?1.5:0));cx.lineTo(w/2+2,h/2);for(let k=6;k>=0;k--)cx.lineTo(-w/2+w*k/6,h/2-(k%2?1.5:0));cx.closePath();cx.fill();
-  cx.shadowColor='transparent';cx.fillStyle=red?'#7a0e08':'#1e1a30';cx.textAlign='center';cx.textBaseline='middle';cx.fillText(t,0,1);cx.restore()}
+function tapeLabel(t,cxp,y,a,red){ // 가리키는 물건 이름: 검은 칸에 픽셀 글씨 (왼쪽 강조 막대)
+  const fs=Math.max(13,Math.min(16,H*.026));cx.font=`${fs}px 'Galmuri11',monospace`;const tw=cx.measureText(t).width,w=Math.round(tw+fs*1.6),h=Math.round(fs*1.9),x=Math.round(Math.max(6,Math.min(W-w-6,cxp-w/2))),yy=Math.round(y);
+  cx.save();cx.globalAlpha=a;cx.fillStyle='rgba(0,0,0,.78)';cx.fillRect(x,yy,w,h);cx.fillStyle=red?'#d93a25':'#e9a53d';cx.fillRect(x,yy,3,h);
+  cx.fillStyle=red?'#ff9a86':'#ece5cd';cx.textAlign='left';cx.textBaseline='middle';cx.fillText(t,x+fs*.9,yy+h/2+1);cx.restore()}
 // 가리키는 물건: 떨리는 손그림 테두리 + 테이프 이름표 + 은은한 빛. 터치 화면이거나 밤 시작 직후엔 모든 물건에 희미하게
 function drawHints(ox){
   if(!canAct()||Math.abs(S.view-S.camX)>.15)return;if(S.ch===2&&(S.monA>.05||S.swap||(HND.cov||0)>.05))return; // 패널을 들었거나 교체·눈 가리는 중엔 이름표 없음
@@ -1622,7 +1736,7 @@ function drawNav(){
     const gr=cx.createLinearGradient(d<0?0:W,0,d<0?zw:W-zw,0);gr.addColorStop(0,`rgba(0,0,0,${.6*a})`);gr.addColorStop(1,'rgba(0,0,0,0)');cx.fillStyle=gr;cx.fillRect(x0,0,zw,H);
     const cxp=d<0?zw*.4:W-zw*.4,cy=H*.5,s2=Math.min(14,zw*.22);cx.save();cx.strokeStyle=`rgba(236,224,170,${.75*a})`;cx.lineWidth=2;cx.shadowColor='rgba(255,220,150,.5)';cx.shadowBlur=hov?10:0;
     for(let k=0;k<2;k++){const o=k*s2*.9*d,a2=s2*.5;cx.beginPath();cx.moveTo(cxp+o-d*a2,cy-s2);cx.lineTo(cxp+o+d*a2,cy);cx.lineTo(cxp+o-d*a2,cy+s2);cx.stroke()}
-    cx.shadowBlur=0;cx.fillStyle=`rgba(236,224,170,${.75*a*(Math.random()<.04?.3:1)})`;cx.font=`${Math.max(16,Math.min(20,H*.03))}px ${PEN}`;cx.textAlign='center';cx.textBaseline='top';cx.fillText((S.ch===2?VNAME2:VNAME)[to],cxp,cy+s2+10);cx.restore()});
+    cx.shadowBlur=0;cx.fillStyle=`rgba(236,224,170,${.75*a*(Math.random()<.04?.3:1)})`;cx.font=`${Math.max(13,Math.min(16,H*.026))}px 'Galmuri11',monospace`;cx.textAlign='center';cx.textBaseline='top';cx.fillText((S.ch===2?VNAME2:VNAME)[to],cxp,cy+s2+10);cx.restore()});
 }
 // ===================== 3D 경비실 (Three.js) =====================
 // 의자에 앉은 시점에서 고개를 돌림: 0=출입문(왼쪽 -X) 1=책상(정면 -Z) 2=배전반(오른쪽 +X)
@@ -1763,6 +1877,16 @@ function monUpdate(dt){MON.f=(MON.f||0)+1;for(const I of MON.list)if(I.mx&&MON.f
 function monOnBB(g,k,clip,o={}){const u=g.userData;if(!u.mon){if(!monReady(k))return false;const I=monNew(k);if(!I)return false;u.mon=I;g.add(I.g);if(o.s)I.g.scale.setScalar(o.s);
     if(o.op<1)I.o.traverse(m=>{if(m.isMesh){m.material=m.material.clone();m.material.transparent=true;m.material.opacity=o.op;m.material.depthWrite=false}})}
   const I=u.mon;u.m.visible=false;I.g.visible=true;if(clip)monPlay(I,clip,o);return true}
+// 경비실 그림자 (3D, 챕터 1): 불 꺼진 방 구석에 새카만 형체와 빛나는 두 눈 → 다가올수록 몸을 숙이고 고개를 꺾음
+function shadow1(D,cam,x,z,sp){const T=R3.T;let I=D.shd3;if(sp<0||!monReady('shadow')){if(I)I.g.visible=false;if(D.shdE)D.shdE.visible=false;return false}
+  if(!I){I=D.shd3=monNew('shadow');if(!I)return false;R3.sc.add(I.g);I.o.traverse(o=>{if(o.isMesh){o.material=o.material.clone();o.material.color.setHex(0x3a3e40);o.material.emissiveIntensity=0;o.material.transparent=true}if(!D.shdH&&o.isBone&&o.name.endsWith('HeadTop_End'))D.shdH=o});
+    const ec=cvs(128,32,(q,w,h)=>{[w*.3,w*.7].forEach(x2=>{const g=q.createRadialGradient(x2,h/2,0,x2,h/2,h*.5);g.addColorStop(0,'rgba(255,240,225,1)');g.addColorStop(.25,'rgba(255,200,170,.7)');g.addColorStop(1,'rgba(255,120,90,0)');q.fillStyle=g;q.fillRect(0,0,w,h)})});
+    D.shdE=new T.Sprite(new T.SpriteMaterial({map:ctx3(ec),transparent:true,depthWrite:false,depthTest:false,blending:T.AdditiveBlending,fog:false}));D.shdE.renderOrder=5;R3.sc.add(D.shdE)}
+  const k=Math.min(1,Math.max(0,(sp-25)/75));I.g.visible=true;I.g.scale.setScalar(.84);I.g.position.set(x,sp>=80?-.32:0,z); // 방 천장이 낮아 조금 작게, 바로 앞에선 몸을 숙여 얼굴이 눈높이로
+  faceTo(I,x,z,cam);I.g.rotation.x=lerp(.04,.3,k*k)+Math.sin(T_*.8)*.015;I.g.rotation.z=Math.sin(T_*.53)*.025+(sp>=80?.18:0);
+  monPlay(I,'walk',{speed:0,fade:0});const op=Math.min(1,(sp-25)/40);I.o.traverse(o=>{if(o.isMesh)o.material.opacity=op});I.g.updateMatrixWorld(true);
+  const hp=new T.Vector3();if(D.shdH)D.shdH.getWorldPosition(hp);else hp.set(x,1.9,z);const tc=cam.position.clone().sub(hp).normalize();hp.addScaledVector(tc,.06);hp.y-=.13;
+  const E=D.shdE,ew=lerp(.32,.16,k);E.visible=true;E.position.copy(hp);E.scale.set(ew,ew/4,1);E.material.opacity=op*(Math.random()<.015?.2:1);return true}
 // ---- 재료/도형 도우미 ----
 function tx3(img,rx=1,ry=1,srgb=true){const T3=R3.T,t=new T3.Texture(img),src=R3.src||(R3.src=new Map());if(srgb)t.colorSpace=T3.SRGBColorSpace;t.wrapS=t.wrapT=T3.RepeatWrapping;t.repeat.set(rx,ry);t.anisotropy=8;
   if(src.has(img)){t.source=src.get(img);t.version++}else{src.set(img,t.source);t.needsUpdate=true}return t} // 같은 그림은 GPU에 한 번만 올림 (경비실·복도가 같이 씀)
@@ -2056,7 +2180,7 @@ function draw3D(){
   // 그림자 괴물
   {const sh=D.shadow,sp=S.shadow.p;if(S.night>=3&&sp>25&&PIC.sh1){const im=sp<55?PIC.sh1:sp<80?PIC.sh2:PIC.sh3;if(sh.material.map?.image!==im){sh.material.map=new T3.Texture(im);sh.material.map.colorSpace=T3.SRGBColorSpace;sh.material.map.needsUpdate=true;sh.material.needsUpdate=true}
     const spots=[[-1.55,-1.0],[-1.55,-1.0],[1.55,.95]],s0=spots[S.view],near=sp>=80?.5:0,hgt=sp<55?1.85:sp<80?1.35:1.9,x=lerp(s0[0],cam.position.x,near),z=lerp(s0[1],cam.position.z,near);
-    sh.visible=true;sh.scale.set(hgt*im.width/im.height,hgt,1);sh.position.set(x+Math.sin(T_*1.3)*.01,hgt/2-(sp>=80?.4:0),z);sh.lookAt(cam.position.x,sh.position.y,cam.position.z);sh.material.opacity=Math.min(1,(sp-25)/40)}else sh.visible=false}
+    sh.visible=true;sh.scale.set(hgt*im.width/im.height,hgt,1);sh.position.set(x+Math.sin(T_*1.3)*.01,hgt/2-(sp>=80?.4:0),z);sh.lookAt(cam.position.x,sh.position.y,cam.position.z);sh.material.opacity=Math.min(1,(sp-25)/40);if(shadow1(D,cam,x,z,sp))sh.visible=false}else{sh.visible=false;shadow1(D,cam,0,0,-1)}}
   const fx1=fxBegin();R3.rd.render(R3.sc,cam);if(fx1)fxEnd(cam);
   cx.drawImage(R3.rd.domElement,0,0,W,H);
   // 느린 기기면 화질을 단계적으로 낮춤 (해상도 → 그림자)
@@ -2433,8 +2557,8 @@ function renderCut(dt){
   const bar=H*.09;cx.fillStyle='#000';cx.fillRect(0,0,W,bar);cx.fillRect(0,H-bar,W,bar);
   let a=0;if(sh.fi)a=Math.max(a,1-t/sh.fi);if(sh.fo)a=Math.max(a,1-(sh.d-t)/sh.fo);if(sh.black)a=1;
   if(a>0){cx.fillStyle=`rgba(0,0,0,${Math.min(1,a)})`;cx.fillRect(0,0,W,H)}
-  if(sh.title){const k=Math.min(1,t/.9,(sh.d-t)/.7);cx.save();cx.globalAlpha=Math.max(0,k);cx.textAlign='center';cx.fillStyle='#d8e4e2';cx.font=`${Math.round(Math.min(W*.06,H*.1))}px 'Nanum Myeongjo',serif`;cx.fillText(sh.title,W/2+rnd(-.6,.6),H/2);
-    if(sh.sub){cx.fillStyle='rgba(150,200,205,.8)';cx.font=`${Math.round(Math.min(W*.022,H*.04))}px 'Nanum Gothic Coding',monospace`;cx.fillText(sh.sub,W/2,H/2+Math.min(W*.05,H*.08))}cx.restore()} // 챕터 제목
+  if(sh.title){const k=Math.min(1,t/.9,(sh.d-t)/.7);cx.save();cx.globalAlpha=Math.max(0,k);cx.textAlign='center';cx.fillStyle='#d8e4e2';cx.font=`bold ${Math.round(Math.min(W*.055,H*.09))}px 'Galmuri11',monospace`;cx.fillText(sh.title,W/2+rnd(-.6,.6),H/2);
+    if(sh.sub){cx.fillStyle='rgba(150,200,205,.8)';cx.font=`${Math.round(Math.min(W*.02,H*.035))}px 'Galmuri11',monospace`;cx.fillText(sh.sub,W/2,H/2+Math.min(W*.05,H*.08))}cx.restore()} // 챕터 제목
 }
 // 경비실 장면을 컷씬에서 쓸 때: 조명·모니터·창문을 게임 상태 대신 샷 설정으로
 function roomCut(o,u,t){
@@ -2661,7 +2785,7 @@ const POOL_RULES=[
   [3,'불 꺼진 어둠 속 숨소리','손전등 다시 켜기'],
   [4,'미끄럼틀 쿵쿵 소리','손이 보이면 앞을 보고 플래시'],
   [5,'흥얼거림','눈 감기. 노래가 멀어질 때까지']];
-const DEATH2={'그림자':'불을 끈 사이, 어둠이 바로 앞까지 와 있었다.','흥얼이':'눈을 뜨자, 바로 앞에서 웃고 있었다.','교대자':'어둠 속에서 젖은 손이 얼굴을 덮었다.','익사자':'물 밑에서 올라온 손이 발목을 잡았다.','잠수부':'불빛을 따라 물 밖으로 뛰어올랐다.','미끄럼틀':'미끄럼틀 끝에서 무언가 쏟아져 나왔다.'};
+const DEATH2={'그림자':['어둠 속에서 다가왔다.','숨소리가 들리면 손전등을 켜세요.'],'흥얼이':['눈을 뜨자 바로 앞에 있었다.','흥얼거림이 들리면 눈을 감고, 노래가 멀어질 때까지 기다리세요.'],'교대자':['통로에서 바로 앞까지 다가왔다.','비상등이 꺼지면 그쪽을 보고 플래시를 터뜨리세요.'],'익사자':['물 밑에서 떠올랐다.','패널의 가운데 수로 화면을 자주 확인하세요.'],'잠수부':['불빛을 보고 물 밖으로 올라왔다.','헤엄치는 소리가 나면 손전등을 끄세요.'],'미끄럼틀':['미끄럼틀 끝에서 쏟아져 나왔다.','쿵쿵 소리가 나면 앞을 보고, 손이 보일 때 플래시를 터뜨리세요.']};
 // 챕터 2는 한 자리(안전요원석)에서 버팀. 가운데 수로 끝 초록 비상구 불빛이 매일 아침 다가옴
 const SPOT1={name:'안전요원석',eye:2.05,R:7,plat:true,slide:true,pool:[-4.6,4.6,-1.8]},SPOT2=[SPOT1,SPOT1,SPOT1,SPOT1,SPOT1];
 const EXIT2=[18,14.5,11,7.5,4]; // 수로 입구에서 비상구 불빛까지 거리 (밤마다)
@@ -2766,8 +2890,8 @@ function updSwap(){const sw=S.swap,b=$('battOv');if(!sw){b.classList.remove('sho
 function win2(n,last){
   if(!last&&!DEV.on){try{if(S.hard){savedCh2h=Math.max(savedCh2h,n+1);localStorage.setItem('obs2_night_hard',savedCh2h)}else{savedCh2=Math.max(savedCh2,n+1);localStorage.setItem('obs2_night',savedCh2)}}catch(e){}}
   const fin=()=>{setMode('end');
-  if(!last)showEnd('6:00 AM',`${n}일 차 끝.\n수로 끝 초록 불빛이 가까워졌다.`,`${n+1}일 차`,()=>newNight(n+1));
-  else showEnd('비상구','5일 차 끝.\n초록 불빛은 물속에 있었다.\n(챕터 3 제작 중)','메뉴로',toMenu)};
+  if(!last)showEnd('6:00 AM',`${n}일 차 생존.\n수로 끝 초록 불이 가까워졌다.`,`${n+1}일 차`,()=>newNight(n+1));
+  else showEnd('비상구','5일 차 생존.\n초록 불은 물속에 있었다.\n\n챕터 3에서 계속','메인 메뉴',toMenu)};
   if(!DEV.on&&R3.ok)playCut(last?'ending2':'reset2',fin,n);else fin();
 }
 
@@ -3055,9 +3179,9 @@ function handHit(p){if(!HND.sc||!handsOn())return null;const T3=R3.T,v=new T3.Ve
   rc.setFromCamera(v,HND.cam);[[HND.pTorch,'torch',HND.R.visible],[HND.pEye,'eye',HND.L.visible]].forEach(([o,k,on])=>{if(!on)return;const h=rc.intersectObject(o,false)[0];if(h&&h.distance<bd){bd=h.distance;best=k}});return best}
 // 처음 몇 초: 누를 수 있는 것마다 손글씨 이름표
 function handLabels(){if(!HND.sc||S.t>18||S.dawn||S.mon)return;const a=Math.min(1,(18-S.t)/3)*.85,P2=R3.p2,P=(o,dx,dy,txt,c3)=>{const v=new R3.T.Vector3();o.getWorldPosition(v);v.project(c3);if(v.z>1)return;const x=(v.x+1)/2*W+dx,y=(1-v.y)/2*H+dy;cx.fillText(txt,x,y)};
-  cx.save();cx.globalAlpha=a;cx.font=`${Math.round(Math.max(18,H*.042))}px 'Nanum Pen Script',cursive`;cx.textAlign='center';cx.fillStyle='rgba(230,222,196,.95)';cx.shadowColor='#000';cx.shadowBlur=6;
-  P(HND.pTorch,-10,-H*.12,'손전등 누르기: 끄기/켜기',HND.cam);if(S.view===1&&P2&&P2.mon){if(P2.batW.visible)P(P2.batW,0,-H*.05,'여분 배터리',R3.cam);P(P2.mon,0,-H*.1,'모니터: 통로 패널',R3.cam)}
-  if(S.night>=5)P(HND.pEye,W*.05,-H*.06,'왼손 꾹: 눈 감기',HND.cam);cx.restore()}
+  cx.save();cx.globalAlpha=a;cx.font=`${Math.round(Math.max(13,H*.03))}px 'Galmuri11',monospace`;cx.textAlign='center';cx.fillStyle='rgba(230,222,196,.95)';cx.shadowColor='#000';cx.shadowBlur=6;
+  P(HND.pTorch,-10,-H*.12,'손전등: 끄기/켜기',HND.cam);if(S.view===1&&P2&&P2.mon){if(P2.batW.visible)P(P2.batW,0,-H*.05,'여분 배터리',R3.cam);P(P2.mon,0,-H*.1,'모니터: 통로 패널',R3.cam)}
+  if(S.night>=5)P(HND.pEye,W*.05,-H*.06,'왼손 꾹 누르기: 눈 감기',HND.cam);cx.restore()}
 function draw3D2(){
   if(!R3.sc2||R3.p2.n!==S.night)build3D2(S.night);
   const T3=R3.T,P=R3.p2,cam=R3.cam,eye=P.sp.eye;
@@ -3678,18 +3802,18 @@ $('mAch').onclick=openAch;$('achBack').onclick=()=>$('achBox').classList.remove(
 const SET_DEF={bright:1,vol:.9,sfx:1,amb:1,shake:true,grain:1,vib:true,scare:'full',sub:1,quality:'auto',ctrl:'hands',fx:1};
 let SET=Object.assign({},SET_DEF);try{Object.assign(SET,JSON.parse(localStorage.getItem('awful_settings')||'{}'))}catch(e){}
 const SET_ROWS=[
-  {k:'bright',t:'밝기',d:'화면만 밝아짐. 괴물 판정은 그대로',min:.8,max:1.3,step:.05,f:v=>Math.round(v*100)+'%'},
+  {k:'bright',t:'밝기',d:'게임 판정에는 영향 없음',min:.8,max:1.3,step:.05,f:v=>Math.round(v*100)+'%'},
   {k:'vol',t:'전체 음량',min:0,max:1,step:.05,f:v=>Math.round(v*100)},
-  {k:'sfx',t:'효과음',d:'발소리, 형광등, 무전기 같은 신호 소리',min:0,max:1,step:.05,f:v=>Math.round(v*100)},
-  {k:'amb',t:'배경음',d:'낮은 웅웅거림, 공기 소리, 지지직',min:0,max:1,step:.05,f:v=>Math.round(v*100)},
-  {k:'scare',t:'점프스케어',opts:[['full','보통'],['soft','약하게']],d:'약하게: 비명 소리 줄이고 흰 섬광 없음'},
+  {k:'sfx',t:'효과음',d:'발소리·형광등·무전기 등 신호음',min:0,max:1,step:.05,f:v=>Math.round(v*100)},
+  {k:'amb',t:'배경음',d:'웅웅거림·공기 소리·잡음',min:0,max:1,step:.05,f:v=>Math.round(v*100)},
+  {k:'scare',t:'점프스케어',opts:[['full','보통'],['soft','약하게']],d:'약하게: 비명 소리 감소, 섬광 없음'},
   {k:'shake',t:'화면 흔들림',opts:[[true,'켜기'],[false,'끄기']]},
   {k:'grain',t:'필름 노이즈',opts:[[0,'끄기'],[.5,'약하게'],[1,'보통']]},
-  {k:'vib',t:'진동',d:'모바일에서 죽을 때',opts:[[true,'켜기'],[false,'끄기']]},
+  {k:'vib',t:'진동',d:'모바일, 사망 시',opts:[[true,'켜기'],[false,'끄기']]},
   {k:'sub',t:'자막 크기',opts:[[.85,'작게'],[1,'보통'],[1.2,'크게']]},
-  {k:'fx',t:'화면 질감',d:'저화질 픽셀·외곽선 (리썰컴퍼니 느낌)',opts:[[1,'보통'],[2,'강하게'],[0,'끄기']]},
-  {k:'quality',t:'그래픽',d:'느리면 낮음',opts:[['auto','자동'],['low','낮음'],['high','높음']]},
-  {k:'ctrl',t:'챕터 2 조작',d:'손으로: 손에 든 손전등·왼손·모니터를 직접 누름 / 버튼: 화면 버튼',opts:[['hands','손으로'],['buttons','버튼']]}];
+  {k:'fx',t:'화면 질감',d:'픽셀·외곽선 효과',opts:[[1,'보통'],[2,'강하게'],[0,'끄기']]},
+  {k:'quality',t:'그래픽',d:'끊기면 낮음으로',opts:[['auto','자동'],['low','낮음'],['high','높음']]},
+  {k:'ctrl',t:'챕터 2 조작',d:'손: 화면 속 물건을 직접 누름 / 버튼: 화면 버튼 사용',opts:[['hands','손으로'],['buttons','버튼']]}];
 function applySet(){
   cv.style.filter=SET.bright===1?'':`brightness(${SET.bright}) contrast(${(1+(SET.bright-1)*.3).toFixed(3)})`;
   document.documentElement.style.setProperty('--sub',SET.sub);
@@ -3707,7 +3831,7 @@ function buildSet(){
       const upd=()=>{val.textContent=r.f(+inp.value);inp.style.setProperty('--p',((inp.value-r.min)/(r.max-r.min)*100)+'%')};upd();
       inp.oninput=()=>{SET[r.k]=+inp.value;upd();applySet()};inp.onchange=()=>{saveSet();if(r.k!=='bright')sfx(700,.05,'sine',.05)};row.appendChild(inp);row.appendChild(val)}
     box.appendChild(row)});
-  if(!MOB){const h=document.createElement('div');h.className='skh';h.textContent='키 설정 · 챕터 2 (누르고 원하는 키나 마우스 버튼 입력, Esc 취소)';box.appendChild(h);
+  if(!MOB){const h=document.createElement('div');h.className='skh';h.textContent='키 설정 · 챕터 2 (칸을 누르고 키 입력, Esc 취소)';box.appendChild(h);
     KEY_ACT.forEach(([a,t])=>{const row=document.createElement('div');row.className='srow';const lab=document.createElement('div');lab.className='sl';lab.textContent=t;row.appendChild(lab);
       const b=document.createElement('button');b.className='kbtn'+(KEYWAIT===a?' wait':'');b.textContent=KEYWAIT===a?'입력 대기…':keyName(keyOf(a));
       b.onclick=e=>{e.stopPropagation();KEYWAIT=a;buildSet()};b.oncontextmenu=e=>e.preventDefault();row.appendChild(b);box.appendChild(row)})}
@@ -3746,7 +3870,7 @@ function toMenu(){
   $('play').classList.remove('show');
   setMode('menu');if(staticG)staticG.gain.setTargetAtTime(.009,AC.currentTime,.6);
 }
-function startGame(n,dev,hard=false,ch=1){initAudio();setChapter(ch);monLoad(ch===2?['stalker','diver','slider','hummer','drowned','shadow']:['stalker','hermit','runner']);DEV.on=dev;HARD=dev?DEV.hard:hard;DEV.speed=1;if(staticG)staticG.gain.setTargetAtTime(0,AC.currentTime,.1);newNight(n);buildDbg()}
+function startGame(n,dev,hard=false,ch=1){initAudio();setChapter(ch);monLoad(ch===2?['stalker','diver','slider','hummer','drowned','shadow']:['stalker','hermit','runner','shadow']);DEV.on=dev;HARD=dev?DEV.hard:hard;DEV.speed=1;if(staticG)staticG.gain.setTargetAtTime(0,AC.currentTime,.1);newNight(n);buildDbg()}
 // 3D 엔진(700KB)이 아직 오는 중이면 잠깐 기다렸다 시작. 안 그러면 느린 폰 회선에서 2D 방으로 시작됨
 let going=false;
 function go(fn){
