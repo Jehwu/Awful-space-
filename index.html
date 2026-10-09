@@ -353,7 +353,7 @@ body[data-mode=game] #pauseBtn{display:flex}
 <script nomodule>window.THREE_ERR='nomodule'</script>
 <script>
 // ===================== 기본 =====================
-const VER='0.26.1'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
+const VER='0.26.2'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
 const $=id=>document.getElementById(id);
 const cv=$('cv'),cx=cv.getContext('2d');
 let W,H,DPR=1;const MOB=matchMedia('(pointer:coarse)').matches||/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent); // 폰이면 가볍게
@@ -1676,7 +1676,7 @@ void main(){vec2 px=1./res,cell=floor(vUv*res),uv=(cell+.5)*px;vec3 c=texture2D(
   rd.setViewport(0,0,W,H);const ac=rd.autoClear;rd.autoClear=true;rd.render(FX.sc,FX.cam);rd.autoClear=ac}
 // ---- 3D 괴물 (model/m_*.glb, 뼈·애니메이션 포함): 처음 필요할 때 불러와 원본으로 두고, 쓰는 곳마다 복제 ----
 // h: 서 있을 때 키(m), em: 어두워도 형체가 보이게 살짝 스스로 빛남, still: 애니메이션 없이 통째로 움직임
-const MON={def:{stalker:{h:2.1,em:.05},hermit:{h:2.15,em:.05},runner:{h:.95,em:.1,still:1},diver:{h:1.9,em:.16},slider:{h:1.95,em:.45},hummer:{h:1.38,em:.06},drowned:{h:1.68,em:.08,still:1}},tpl:{},list:[],ld:null};
+const MON={def:{stalker:{h:2.1,em:.05},hermit:{h:2.15,em:.05},runner:{h:.95,em:.1,still:1},diver:{h:1.9,em:.22},slider:{h:1.95,em:.45},hummer:{h:1.38,em:.06},drowned:{h:1.68,em:.08,still:1}},tpl:{},list:[],ld:null};
 function monLoad(keys){if(!R3.T)return;
   if(!MON.ld)MON.ld=Promise.all([import('./lib/GLTFLoader.js'),import('./lib/SkeletonUtils.js')]).then(([a,b])=>{MON.GL=new a.GLTFLoader();MON.SU=b}).catch(e=>{console.warn('3D 괴물 불러오기 실패',e);MON.fail=1});
   keys.forEach(k=>{if(k in MON.tpl)return;MON.tpl[k]=null;MON.ld.then(()=>MON.fail?null:MON.GL.loadAsync('model/m_'+k+'.glb?v='+VER)).then(g=>{if(!g)return;const T=R3.T,d=MON.def[k];
@@ -1702,7 +1702,7 @@ function faceTo(I,x,z,cam){I.g.rotation.y=Math.atan2(cam.position.x-x,cam.positi
 // 뼈를 세상 기준 위쪽 축으로 돌림 (머리를 플레이어 쪽으로)
 function boneYaw(I,name,a){let b=null;I.o.traverse(o=>{if(!b&&o.isBone&&o.name.endsWith(name))b=o});if(!b||!a)return;const T=R3.T;b.updateWorldMatrix(true,false);
   const pw=new T.Quaternion();b.parent.getWorldQuaternion(pw);const bw=pw.clone().multiply(b.quaternion);bw.premultiply(new T.Quaternion().setFromAxisAngle(new T.Vector3(0,1,0),a));b.quaternion.copy(pw.invert().multiply(bw))}
-function mon2(P,cam,lit){const T3=R3.T,h=S.hum;
+function mon2(P,cam,lit){const T3=R3.T,h=S.hum;if(P.DVX==null){P.DVX=-2.2;P.DVZ=-3.3} // 테이블에 안 가리고 앉은 눈높이에서 보이는 자리
   // 교대자: 아치에 서 있음
   if(P.hum.visible&&m2(P,'hum','stalker')){const I=P.m3hum;P.hum.visible=false;I.g.position.set(P.hum.position.x,0,P.hum.position.z);faceTo(I,I.g.position.x,I.g.position.z,cam);I.g.rotation.x=I.g.rotation.z=0;monPlay(I,'idle')}
   else if(P.humPk.visible&&m2(P,'hum','stalker')){const I=P.m3hum;P.humPk.visible=false; // 의자 옆 난간 너머에서 몸을 꺾어 얼굴을 들이밂
@@ -1722,9 +1722,9 @@ function mon2(P,cam,lit){const T3=R3.T,h=S.hum;
   // 잠수부: 물 밑을 헤엄쳐 옴 → 물에서 천천히 일어섬 → (손전등을 끄고 버티면) 가라앉음
   const v=S.dv;
   if(v&&P.wake.visible&&m2(P,'dv','diver')){const I=P.m3dv;I.g.position.set(P.wake.position.x,WATER_Y-.6,P.wake.position.z-.5);I.g.rotation.set(0,0,0);monPlay(I,'swim',{speed:1.3,fade:0});I.dark=1}
-  else if(v&&P.dvBody.visible&&m2(P,'dv','diver')){const I=P.m3dv;P.dvBody.visible=false;const down=ease(Math.min(1,Math.max(0,(v.off||0)-2.2)/.8));
-    const up=ease(Math.min(1,(v.t3||0)/.9)); // 물 밑에서 쑥 올라와 허벅지까지 드러냄 (안전요원석 높이에서도 보이게)
-    I.g.position.set(P.dvBody.position.x,-.5+lerp(-1.15,0,up)-down*1.5,P.dvBody.position.z+.5);faceTo(I,I.g.position.x,I.g.position.z,cam);I.dark=0;
+  else if(v&&P.dvBody.visible&&m2(P,'dv','diver')){const I=P.m3dv;P.dvBody.visible=false;const down=ease(Math.min(1,Math.max(0,(v.off||0)-3.2)/.8));
+    const up=ease(Math.min(1,(v.t3||0)/1.3)); // 테이블에 가리지 않게 왼쪽 앞 물에서 천천히 올라와 허벅지까지 드러냄
+    I.g.position.set(P.DVX,-.42+lerp(-1.3,0,up)-down*1.6,P.DVZ);faceTo(I,I.g.position.x,I.g.position.z,cam);I.dark=0;
     const ra=I.acts.rise;if(!I.cur||I.cur==='swim')monPlay(I,'rise',{once:1,fade:0});if(down>0)monPlay(I,'sink',{once:1,fade:.25});else if(I.cur==='rise'&&ra&&ra.time>=MON.tpl.diver.clip.rise.duration*.5)monPlay(I,'stare',{fade:.6})} // 일어서는 동작을 끝까지 한 뒤 노려봄
   else m2off(P,'dv');
   if(P.m3dv&&P.m3dv.g.visible){const I=P.m3dv;if(I.dk!==I.dark){I.dk=I.dark;I.o.traverse(o=>{if(o.isMesh){o.material.color.setHex(I.dark?0x24383a:0xffffff);o.material.emissiveIntensity=I.dark?0:MON.def.diver.em}})}}
@@ -1737,9 +1737,9 @@ function mon2(P,cam,lit){const T3=R3.T,h=S.hum;
     I.g.quaternion.copy(P.slQ);I.g.position.copy(P.slE).addScaledVector(P.slD,lerp(.45,1.75,k));I.g.position.y+=Math.sin(T_*20)*.003;monPlay(I,'hang')}
   else m2off(P,'sl');
   // 익사자: 바닥에 누워 있다가 수면 바로 밑까지 떠오름 (그림과 같은 투명도·물빛)
-  if(P.drn&&P.drn.material.opacity>.01&&m2(P,'drn','drowned')){const I=P.m3drn,m=P.drn;if(!I.bm){I.bm=1;I.o.traverse(o=>{if(o.isMesh){o.material=new T3.MeshBasicMaterial({map:o.material.map,transparent:true,depthWrite:false});o.renderOrder=-1}})}
+  if(P.drn&&P.drn.material.opacity>.01&&m2(P,'drn','drowned')){const I=P.m3drn,m=P.drn;if(!I.bm){I.bm=1;I.o.traverse(o=>{if(o.isMesh){o.material=new T3.MeshBasicMaterial({map:o.material.map,transparent:true,depthWrite:false});o.renderOrder=3 /* 물 다음에 그려서 물빛 너머로 보이게 */}})}
     I.o.traverse(o=>{if(o.isMesh){o.material.opacity=m.material.opacity;o.material.color.copy(m.material.color)}});m.visible=false;
-    I.g.position.set(m.position.x,m.position.y+.05,m.position.z+.85);I.g.rotation.set(-PI2,0,m.rotation.z,'XYZ');I.g.rotation.order='XYZ';I.g.scale.set(1+Math.sin(T_*2.1)*.02,1,1)}
+    I.g.position.set(-2.6,m.position.y+.05,-4.7);I.g.rotation.set(-PI2,0,m.rotation.z,'XYZ');I.g.rotation.order='XYZ';I.g.scale.set(1+Math.sin(T_*2.1)*.02,1,1)}
   else{m2off(P,'drn');if(P.drn)P.drn.visible=true}
 }
 function monShown(I){let o=I.g;while(o){if(!o.visible)return false;o=o.parent}return true}
@@ -2694,8 +2694,8 @@ function update2(dt){
     if(v.st===0&&v.timer<=0&&(SHOOT||(S.hm&&S.hm.st>=1)))v.timer=rnd(3,6);
     else if(v.st===0&&v.timer<=0){v.st=1;v.timer=rnd(6,8);splashFar(0,.22);v.sT=0}
     else if(v.st===1&&v.timer<=0){v.st=2;v.timer=rnd(5,6.5);bubbles(0,.12)}
-    else if(v.st===2&&v.timer<=0){v.st=3;v.off=0;v.timer=S.hard?2.2:3.2;nburst(900,1,.5,.3,0);thump(70,.3,.35,0);if(torchOn())return die('잠수부')}
-    else if(v.st===3){if(torchOn())return die('잠수부');else{v.timer+=dt;v.off+=dt;if(v.off>=3){v.st=0;v.timer=Math.max(14,rnd(26,40)-S.night*2);bubbles(0,.15);0}}}}
+    else if(v.st===2&&v.timer<=0){v.st=3;v.off=0;v.timer=S.hard?2.2:3.2;surfaceSurge(0);if(torchOn())return die('잠수부')}
+    else if(v.st===3){if(torchOn())return die('잠수부');else{v.timer+=dt;v.off+=dt;if(v.off>=4){v.st=0;v.timer=Math.max(14,rnd(26,40)-S.night*2);bubbles(0,.15);0}}}}
   // 미끄럼틀 (4일 차~): 긁히며 내려오는 소리 → 끝에 손이 보일 때 앞을 보고 플래시
   if(S.night>=4&&!DVU){const l=S.sl;l.timer-=dt;
     if(l.st===0&&l.timer<=0&&h.st>=2)l.timer=rnd(3,6);
@@ -2802,7 +2802,7 @@ function build3D2(n){
   const BX=(w,h,d,x,y,z,m)=>{const g=new T3.BoxGeometry(w,h,d);g.translate(x,y,z);return add(g,m)};
   const Z0=1.6,Z1=-R,dep=Z0-Z1,c=(Z0+Z1)/2;
   // 바닥·천장·뒤 벽
-  P.wM=M.water.clone();P.wM.opacity=.66;P.wM.side=T3.DoubleSide;P.wM.userData.keep=false; // 풀 물: 조금 더 비치게 (바닥에 누운 익사자가 보이도록)
+  P.wM=M.water.clone();P.wM.opacity=.66;P.wM.depthWrite=false;P.wM.side=T3.DoubleSide;P.wM.userData.keep=false; // 풀 물: 조금 더 비치게 (바닥에 누운 익사자가 보이도록)
   {const [x0,x1,z0]=sp.pool,fl=(w,d,x,z)=>{const f=new T3.PlaneGeometry(w,d);f.rotateX(-PI2);f.translate(x,0,z);add(f,M.floor)};
    fl(2*R,Z0-z0,0,(Z0+z0)/2);fl(x0+R,z0-Z1,(x0-R)/2,(z0+Z1)/2);fl(R-x1,z0-Z1,(x1+R)/2,(z0+Z1)/2);
    const D=POOL_D,wl=(geo)=>{wUV(geo,2.6,2.6);const o=new T3.Mesh(geo,M.wall);sc.add(o);return o};
@@ -3062,9 +3062,9 @@ function draw3D2(){
   if(S.drn){const k=Math.min(1,Math.max(0,(S.drn.p-15)/85)),e=k*k*(3-2*k),m=P.drn; // 바닥에 누워 있다가 수면 바로 밑까지 천천히 떠오름
     m.material.opacity=lit||S.night<2?0:Math.min(.95,.25+e*.75);m.position.y=lerp(-POOL_D+.08,WATER_Y-.16,e);m.rotation.z=.35+Math.sin(T_*.37)*.07;
     m.scale.set(1+Math.sin(T_*2.1)*.025,1+Math.sin(T_*1.7+1)*.02,1);m.material.color.setRGB(lerp(.2,.62,e),lerp(.34,.8,e),lerp(.35,.78,e))} // 물에 일렁이는 굴절·깊을수록 어두운 청록
-  if(S.dv){const v=S.dv;P.wake.visible=!lit&&(v.st===1||v.st===2);if(P.wake.visible){const z=v.st===1?lerp(Z1C(P)-10,Z1C(P),1-Math.max(0,v.timer)/7):lerp(Z1C(P),-5.6,1-Math.max(0,v.timer)/6);const x=Math.sin(T_*.7)*.3;P.wake.position.set(x,0,z+.8);P.wake.userData.body.material.opacity=v.st===2?.9:.6;
+  if(S.dv){const v=S.dv;P.wake.visible=!lit&&(v.st===1||v.st===2);if(P.wake.visible){const e2=v.st===2?1-Math.max(0,v.timer)/6:0,z=v.st===1?lerp(Z1C(P)-10,Z1C(P),1-Math.max(0,v.timer)/7):lerp(Z1C(P),(P.DVZ??-2.9)-.8,e2);const x=Math.sin(T_*.7)*.3*(1-e2)+(P.DVX??0)*e2*e2; // 물 위로 올라올 자리(왼쪽 앞)로 다가옴P.wake.position.set(x,0,z+.8);P.wake.userData.body.material.opacity=v.st===2?.9:.6;
       P.wake.userData.rings.forEach((r,i)=>{const ph=(T_*.6+i/4)%1;r.position.set(Math.sin(T_*.7-ph*.9)*.3-x,WATER_Y+.03,-ph*1.1);r.scale.setScalar(.3+ph*1.6);r.material.opacity=(1-ph)*(1-ph)*.85})}
-    P.dvHead.visible=false;P.dvBody.visible=!lit&&v.st===3;if(P.dvBody.visible){if(!v.t3s)v.t3s=T_;v.t3=T_-v.t3s;const up=ease(Math.min(1,v.t3/.8)),down=ease(Math.min(1,Math.max(0,(v.off||0)-2.2)/.8)),hb=P.dvBH; // 물 밑에서 쑥 일어섰다가, 손전등을 끄고 버티면 다시 가라앉음
+    P.dvHead.visible=false;P.dvBody.visible=!lit&&v.st===3;if(P.dvBody.visible){if(!v.t3s)v.t3s=T_;v.t3=T_-v.t3s;const up=ease(Math.min(1,v.t3/.8)),down=ease(Math.min(1,Math.max(0,(v.off||0)-3.2)/.8)),hb=P.dvBH; // 물 밑에서 쑥 일어섰다가, 손전등을 끄고 버티면 다시 가라앉음
       P.dvBody.position.set(Math.sin(T_*.5)*.05,WATER_Y+hb*.5-.5+lerp(-1.6,0,up)-down*1.6+Math.sin(T_*1.3)*.02,lerp(-3.4,-2.7,Math.min(1,v.t3/3)));P.dvBody.lookAt(cam.position.x,P.dvBody.position.y,cam.position.z);P.dvBody.material.color.setHex(torchOn()?0x8a9e9c:0x4a5856)}else{v.t3=0;v.t3s=0}
     if(P.dvHead.visible){const yH=WATER_Y+P.dvH/2-.1+Math.sin(T_*1.3)*.03;P.dvHead.position.set(Math.sin(T_*.5)*.05,yH,lerp(-3.4,-2.25,Math.max(0,Math.min(1,(v.off||0)/3+(1-Math.max(0,v.timer)/3.2)*.4))));P.dvHead.material.color.setHex(torchOn()?0x7f9492:0x3c4846);P.dvHead.lookAt(cam.position.x,yH,cam.position.z)}}
   if(S.sl){const l=S.sl;P.slHand.visible=!lit&&l.st===1&&l.timer<=3;if(P.slHand.visible){P.slHand.position.copy(P.slLip);P.slHand.position.y+=Math.sin(T_*20)*.004;P.slHand.lookAt(cam.position);P.slHand.rotateZ(-.3)}
@@ -3252,8 +3252,13 @@ function post(){
 function tunOver(g,i){const h=S.hum,im=STK.close;if(!im||h.dir!==i||h.st!==1||!h.pk||h.timer>humStep2()*.55)return;h.pkd=(h.pkd||0)+1/60;
   const k=Math.min(1,h.pkd/.25),s2=Math.max(CW/im.width,CH/im.height)*lerp(1.6,1.15,k),w=im.width*s2,hh=im.height*s2;g.save();g.globalAlpha=.9*(Math.random()<.08?.4:1);g.filter='grayscale(.6) contrast(1.3) brightness(.85)';g.drawImage(im,CW/2-w/2+rnd(-3,3),CH*.42-hh/2+rnd(-2,2),w,hh);g.restore();
   if(!h.pkS){h.pkS=1;nburst(3000,3,.25,.12,DIRX[i]);S.camSw=Math.max(S.camSw,.35)}}
+// 가운데 수로 CCTV의 익사자 (3D): 얕은 물에 얼굴을 위로 하고 누운 채 점점 카메라 쪽으로 떠내려옴
+function canal3D(C){const d=S.drn,on=d&&S.night>=2&&monReady('drowned');C3.drn3=!!on;if(!on){if(C.drnI)C.drnI.g.visible=false;return}
+  if(!C.drnI){const I=monNew('drowned');if(!I)return;I.o.traverse(o=>{if(o.isMesh){o.material=new R3.T.MeshBasicMaterial({map:o.material.map,transparent:true,depthWrite:false})}});C.sc.add(I.g);C.drnI=I}
+  const I=C.drnI,k=Math.min(1,d.p/100),t=T_;I.g.visible=true;I.g.position.set(Math.sin(t*.4)*.15,.0,lerp(-9,-1.7,k));I.g.rotation.set(-PI2,0,Math.PI+Math.sin(t*.37)*.12,'XYZ');
+  I.o.traverse(o=>{if(o.isMesh){o.material.opacity=.3+k*.6;o.material.color.setRGB(lerp(.35,.75,k),lerp(.55,.88,k),lerp(.55,.86,k))}})}
 function canalOver(g,t){const d=S.drn;if(d&&S.night>=2){const k=Math.min(1,d.p/100),x=CW*.5,y=CH*(.92-k*.12),w=CW*(.16+k*.22),h=w*1.9;g.save();g.globalAlpha=.25+k*.6;
-    if(PIC.drowned){g.drawImage(PIC.drowned,x-w/2,y-h*.6,w,h)}else{g.translate(x,y);g.rotate(.3);g.fillStyle=`rgba(190,215,205,${.5+k*.4})`;g.beginPath();g.ellipse(0,-h*.42,w*.16,w*.18,0,0,7);g.fill();g.fillRect(-w*.14,-h*.3,w*.28,h*.4);g.fillRect(-w*.14,.1*h,w*.1,h*.36);g.fillRect(w*.04,.1*h,w*.1,h*.36);g.fillStyle='#000';[-1,1].forEach(sd=>{g.beginPath();g.arc(sd*w*.05,-h*.44,w*.022,0,7);g.fill()})}
+    if(C3.drn3){}else if(PIC.drowned){g.drawImage(PIC.drowned,x-w/2,y-h*.6,w,h)}else{g.translate(x,y);g.rotate(.3);g.fillStyle=`rgba(190,215,205,${.5+k*.4})`;g.beginPath();g.ellipse(0,-h*.42,w*.16,w*.18,0,0,7);g.fill();g.fillRect(-w*.14,-h*.3,w*.28,h*.4);g.fillRect(-w*.14,.1*h,w*.1,h*.36);g.fillRect(w*.04,.1*h,w*.1,h*.36);g.fillStyle='#000';[-1,1].forEach(sd=>{g.beginPath();g.arc(sd*w*.05,-h*.44,w*.022,0,7);g.fill()})}
     g.restore();const wg=g.createLinearGradient(0,CH*.6,0,CH);wg.addColorStop(0,'rgba(40,90,100,0)');wg.addColorStop(1,'rgba(40,90,100,.35)');g.fillStyle=wg;g.fillRect(0,CH*.6,CW,CH*.4)} // 물 너머로 흐릿하게
   if(S.dv&&S.dv.st===1){const k=1-Math.max(0,S.dv.timer)/7,y=lerp(CH*.5,CH*.92,k),sc=lerp(.25,1,k),x=CW/2+Math.sin(T_*.7)*CW*.04; // 수로를 따라 다가오는 검은 그림자와 동그란 물결
     g.save();g.fillStyle=`rgba(0,6,8,${.35+k*.35})`;g.beginPath();g.ellipse(x,y,CW*.05*sc,CH*.08*sc,0,0,7);g.fill();
@@ -3262,7 +3267,7 @@ function renderCam(i,menu){
   const g=cg,t=T_;let C=null;EXIT3.on=false;
   g.globalCompositeOperation='source-over';g.globalAlpha=1;
   if(R3.ok){if(menu)C=C3.menu;else{if(C3.key!==S.night+'|'+S.layout[0].seed)buildCams3D();C=C3.cams[i]}}
-  if(C){drawCam3D(g,C,i,menu,t);if(!menu&&S.ch===2&&i===1)canalOver(g,t);if(!menu&&S.ch===2&&i!==1)tunOver(g,i)} // 3D 화면 (수영장 가운데 수로는 익사자·물살을 덧그림)
+  if(C){if(!menu&&S.ch===2&&i===1)canal3D(C);drawCam3D(g,C,i,menu,t);if(!menu&&S.ch===2&&i===1)canalOver(g,t);if(!menu&&S.ch===2&&i!==1)tunOver(g,i)} // 3D 화면 (수영장 가운데 수로는 익사자·물살을 덧그림)
   else{const B=menu?MENUB:CAMB[i],I=B.info;g.drawImage(B.c,0,0);
   if(!menu&&EXIT_CAM[S.night-1]===i){const e=I.eye;EXIT3.on=true;EXIT3.x=e.x;EXIT3.y=e.y-e.s*.42;EXIT3.s=Math.max(2,e.s*.06);g.fillStyle='#1a9a44';g.fillRect(EXIT3.x-EXIT3.s,EXIT3.y-EXIT3.s*.45,EXIT3.s*2,EXIT3.s*.9)} // 2D 화면의 비상구
   if(!menu){
@@ -3452,7 +3457,7 @@ function crack(pan,v=.35){nburst(2600,1.5,.04,v,pan,0,'highpass');nburst(1200,8,
 function breathe(pan,v=.22){if(!AC)return;const t=AC.currentTime;[[0,1.1,700,1500],[1.25,1.5,1300,600]].forEach(([w,d,f0,f1])=>{const s2=AC.createBufferSource();s2.buffer=NB;const f=AC.createBiquadFilter(),am=AC.createGain(),lfo=AC.createOscillator(),lg2=AC.createGain(),g=AC.createGain();f.type='bandpass';f.Q.value=1.2;f.frequency.setValueAtTime(f0,t+w);f.frequency.linearRampToValueAtTime(f1,t+w+d);lfo.frequency.value=rnd(18,30);lg2.gain.value=.4;am.gain.value=.6;lfo.connect(lg2);lg2.connect(am.gain);g.gain.setValueAtTime(.0001,t+w);g.gain.linearRampToValueAtTime(v,t+w+d*.4);g.gain.linearRampToValueAtTime(.0001,t+w+d);s2.connect(f);f.connect(am);am.connect(g);g.connect(out(pan));s2.start(t+w,Math.random());lfo.start(t+w);s2.stop(t+w+d+.05);lfo.stop(t+w+d+.05)})}
 // 무언가 질질 끌리는 소리
 function drag(pan,v=.2){if(!AC)return;const t=AC.currentTime,s2=AC.createBufferSource();s2.buffer=NB;const f=AC.createBiquadFilter(),g=AC.createGain();f.type='lowpass';f.frequency.value=420;f.Q.value=2;g.gain.setValueAtTime(.0001,t);const cv3=new Float32Array(40);for(let i=0;i<40;i++)cv3[i]=v*(.3+Math.random()*.7)*Math.sin(i/39*Math.PI);g.gain.setValueCurveAtTime(cv3,t,2.6);s2.connect(f);f.connect(g);g.connect(out(pan));s2.start(t,Math.random());s2.stop(t+2.7)}
-function bubbles(pan,v=.08){if(!AC)return;for(let k=0;k<rnd(4,8);k++){const t=AC.currentTime+k*rnd(.05,.14),o=AC.createOscillator(),g=AC.createGain(),f0=rnd(180,420);o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(f0*2.4,t+.06);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v,t+.006);g.gain.exponentialRampToValueAtTime(.001,t+.09);o.connect(g);g.connect(out(pan));o.start(t);o.stop(t+.1)}} // 보글보글
+function bubbles(pan,v=.08){if(!AC)return;for(let k=0;k<rnd(4,8);k++)nburst(rnd(260,520),rnd(8,14),rnd(.05,.09),v*rnd(.6,1.2),pan,k*rnd(.05,.14))} // 보글보글: 물속에서 막힌 듯한 꾸르륵 (높은 음으로 튀지 않게)
 // 흥얼이: 입 다문 채 '음-' 하는 여자 목소리. 떨림 + 음 시작에 살짝 끌어올림 + 콧소리 울림
 function hmNote(f,dur,pan,v){if(!AC||!HMB)return;const t=AC.currentTime,pn=AC.createStereoPanner?AC.createStereoPanner():null,g=AC.createGain(),lp=AC.createBiquadFilter(),pk=AC.createBiquadFilter(),ns=AC.createBiquadFilter();
   lp.type='lowpass';lp.frequency.value=1250;lp.Q.value=.7;pk.type='peaking';pk.frequency.value=290;pk.Q.value=1.6;pk.gain.value=11;ns.type='peaking';ns.frequency.value=2500;ns.Q.value=3;ns.gain.value=4;
@@ -3465,8 +3470,11 @@ const HM_SONG=[[7,1],[10,1],[12,2],[10,1],[7,1],[5,2],[3,1],[5,1],[7,1],[3,1],[0
 // 수영장 소리: 멀리서 호루라기 (울림), 첨벙, 헤엄치는 물살, 미끄럼틀 긁힘, 섬뜩한 울림
 function whistleFar(pan){if(!AC)return;const t=AC.currentTime,o2=out(pan),g=AC.createGain(),lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=2600;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.035,t+.04);g.gain.setValueAtTime(.035,t+.5);g.gain.linearRampToValueAtTime(0,t+.62);
   [2950,3120].forEach(f=>{const o=AC.createOscillator(),lfo=AC.createOscillator(),lg=AC.createGain();o.frequency.value=f;lfo.frequency.value=28;lg.gain.value=90;lfo.connect(lg);lg.connect(o.frequency);o.connect(lp);o.start(t);lfo.start(t);o.stop(t+.7);lfo.stop(t+.7)});lp.connect(g);g.connect(o2)}
-function splashFar(pan,v=.12){if(!AC)return;nburst(900,.7,.7,v,pan,0,'lowpass');nburst(2400,1.2,.35,v*.5,pan,.05);thump(55,.25,v*1.3,pan)}
-function swimStroke(pan,v){if(!AC)return;nburst(650,.8,.42,v,pan,0,'lowpass');nburst(1600,1.5,.18,v*.35,pan,.08);if(Math.random()<.4)bubbles(pan,v*.3)}
+function splashFar(pan,v=.12){if(!AC)return;nburst(900,.7,.7,v,pan,0,'lowpass');nburst(2400,1.2,.35,v*.5,pan,.05);nburst(260,.7,.5,v*1.1,pan,0,'lowpass')}
+function waterSwish(pan,v,when=0,len=.8){if(!AC)return;const t=AC.currentTime+when,src=AC.createBufferSource();src.buffer=NB;const f=AC.createBiquadFilter();f.type='lowpass';f.Q.value=.9;f.frequency.setValueAtTime(220,t);f.frequency.linearRampToValueAtTime(rnd(800,1100),t+len*.4);f.frequency.linearRampToValueAtTime(260,t+len);
+  const g=AC.createGain();g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v,t+len*.35);g.gain.linearRampToValueAtTime(.0001,t+len);src.connect(f);f.connect(g);g.connect(out(pan));src.start(t,Math.random()*1.5);src.stop(t+len+.05)} // 물을 밀어내는 '쏴아' (부풀었다 가라앉음)
+function swimStroke(pan,v){if(!AC)return;waterSwish(pan,v*1.6,0,rnd(.7,.9));waterSwish(pan,v*1.1,rnd(.32,.42),rnd(.6,.8));if(Math.random()<.3)bubbles(pan,v*.25)} // 헤엄: 두 팔로 물을 젓는 소리
+function surfaceSurge(pan){if(!AC)return;waterSwish(pan,.42,0,1.1);nburst(500,.6,1.4,.22,pan,.25,'lowpass');for(let k=0;k<9;k++)nburst(rnd(1800,3200),3,rnd(.05,.1),rnd(.03,.07),pan,.5+k*rnd(.08,.2))} // 물속에서 몸이 솟구침 → 몸에서 물이 쏟아지고 뚝뚝
 // 미끄럼틀 안을 몸이 굴러 내려오는 소리: 플라스틱 관에 몸이 부딪히는 둔한 '쿵', 관이 울리는 '덩', 살이 쓸리는 소리 (음 높이가 미끄러지지 않게)
 function slideBump(v,pan,when=0){if(!AC)return;const t=AC.currentTime+when,o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.setValueAtTime(rnd(52,70),t);o.frequency.linearRampToValueAtTime(rnd(42,48),t+.18);
   g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v,t+.008);g.gain.exponentialRampToValueAtTime(.001,t+.28);o.connect(g);g.connect(out(pan));o.start(t);o.stop(t+.32);
