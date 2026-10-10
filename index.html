@@ -492,7 +492,7 @@ body:has(#battOv.show) #msg{bottom:118px}
 <script nomodule>window.THREE_ERR='nomodule'</script>
 <script>
 // ===================== 기본 =====================
-const VER='0.28.3'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
+const VER='0.28.4'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
 const $=id=>document.getElementById(id);
 const cv=$('cv'),cx=cv.getContext('2d');
 let W,H,DPR=1;const MOB=matchMedia('(pointer:coarse)').matches||/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent); // 폰이면 가볍게
@@ -2806,10 +2806,10 @@ const POOL_RULES=[
   [1,'비상등이 꺼짐','그쪽을 보고 플래시'],
   [1,'손전등이 깜빡임','테이블 위 배터리로 교체'],
   [2,'패널 가운데 화면','자주 볼 것. 안 보면 떠오른다'],
+  [2,'미끄럼틀 쿵쿵 소리','손이 보이면 앞을 보고 플래시'],
   [3,'헤엄치는 소리','손전등 끄기. 가라앉을 때까지'],
   [3,'불 꺼진 어둠 속 숨소리','손전등 다시 켜기'],
-  [4,'미끄럼틀 쿵쿵 소리','손이 보이면 앞을 보고 플래시'],
-  [5,'흥얼거림','눈 감기. 노래가 멀어질 때까지']];
+  [4,'흥얼거림','눈 감기. 노래가 멀어질 때까지']];
 const DEATH2={'그림자':['어둠 속에서 다가왔다.','숨소리가 들리면 손전등을 켜세요.'],'흥얼이':['눈을 뜨자 바로 앞에 있었다.','흥얼거림이 들리면 눈을 감고, 노래가 멀어질 때까지 기다리세요.'],'교대자':['통로에서 바로 앞까지 다가왔다.','비상등이 꺼지면 그쪽을 보고 플래시를 터뜨리세요.'],'익사자':['물 밑에서 떠올랐다.','패널의 가운데 수로 화면을 자주 확인하세요.'],'잠수부':['불빛을 보고 물 밖으로 올라왔다.','헤엄치는 소리가 나면 손전등을 끄세요.'],'미끄럼틀':['미끄럼틀 끝에서 쏟아져 나왔다.','쿵쿵 소리가 나면 앞을 보고, 손이 보일 때 플래시를 터뜨리세요.']};
 // 챕터 2는 한 자리(안전요원석)에서 버팀. 가운데 수로 끝 초록 비상구 불빛이 매일 아침 다가옴
 const SPOT1={name:'안전요원석',eye:2.05,R:7,plat:true,slide:true,pool:[-4.6,4.6,-1.8]},SPOT2=[SPOT1,SPOT1,SPOT1,SPOT1,SPOT1];
@@ -2828,7 +2828,7 @@ function update2(dt){
   if(S.t>=HOUR*6){S.dawn=.01;setHum(true);if(S.swap)endSwap(true);for(let k=0;k<6;k++)setTimeout(()=>relay(),400+k*260);setTimeout(()=>{thump(50,.4,.4,0);humTo(.7,.3)},2100);return}
   const h=S.hum;if(h.dir===undefined){humInit2(h);S.fl=1;S.spare=1;S.drn={p:0,said:0};S.dv={st:0,timer:rnd(40,55)-S.night*3,off:0};S.sl={st:0,timer:rnd(35,50),sT:0};S.hm={st:0,timer:rnd(30,45),nT:0,ni:0,side:0,said:0}}
   // 배터리: 손전등이 켜져 있으면 닳음 (한 밤에 한 번은 갈아야 함), 패널, 플래시는 한 번에
-  if(torchOn())S.power=Math.max(0,S.power-dt*((S.hard?.43:.37)+(S.mon?.07:0)));
+  if(torchOn())S.power=Math.max(0,S.power-dt*((S.hard?.43:.37)*(S.night===2?.93:1)+(S.mon?.07:0)));
   if(S.power<=0&&!S.outSaid){S.outSaid=true;say(S.spare>0?'손전등이 꺼졌다. 배터리를 갈아야 한다.':'손전등이 꺼졌다. 남은 배터리가 없다.','bad');sfx(50,1.5,'sawtooth',.2);buildUI()}
   if(S.power<20&&!S.lowSaid&&S.power>0){S.lowSaid=true;say('손전등 불빛이 깜빡인다.')}
   // 배터리 교체: 꾹 누르는 단계는 누르고 있는 동안만 진행
@@ -2862,13 +2862,13 @@ function update2(dt){
     else if(v.st===2&&v.timer<=0){v.st=3;v.off=0;v.timer=S.hard?2.2:3.2;surfaceSurge(0);if(torchOn())return die('잠수부')}
     else if(v.st===3){if(torchOn())return die('잠수부');else{v.timer+=dt;v.off+=dt;if(v.off>=4){v.st=0;v.timer=Math.max(14,rnd(26,40)-S.night*2);bubbles(0,.15);0}}}}
   // 미끄럼틀 (4일 차~): 긁히며 내려오는 소리 → 끝에 손이 보일 때 앞을 보고 플래시
-  if(S.night>=4&&!DVU){const l=S.sl;l.timer-=dt;
+  if(S.night>=2&&!DVU){const l=S.sl;l.timer-=dt*(l.st===0&&S.night<3?.4:1);
     if(l.st===0&&l.timer<=0&&h.st>=2)l.timer=rnd(3,6);
     else if(l.st===0&&l.timer<=0){l.st=1;l.timer=8;0}
     else if(l.st===1){l.sT-=dt;if(l.sT<=0){const k=1-l.timer/8;l.sT=rnd(.26,.55)*(1-k*.35);slideScrape(k,lerp(.95,.35,k))}if(l.timer<=3&&!l.saw){l.saw=1;slideBump(.6,.4);slideBump(.35,.4,.16)}if(l.timer<=0)return die('미끄럼틀')}}
   }
-  // 흥얼이 (5일 차~): 흥얼거리며 좌우 아치에서 옴 → 가까워지면 눈을 감음 → 의자 주위를 한 바퀴 돌고 감. 도는 동안 눈 뜨면 죽음
-  if(S.night>=5&&S.t>=10){const m=S.hm,SD=['왼쪽','','오른쪽'],sp=m.side===0?-1:1;
+  // 흥얼이 (4일 차~): 흥얼거리며 좌우 아치에서 옴 → 가까워지면 눈을 감음 → 의자 주위를 한 바퀴 돌고 감. 도는 동안 눈 뜨면 죽음
+  if(S.night>=4&&S.t>=10){const m=S.hm,SD=['왼쪽','','오른쪽'],sp=m.side===0?-1:1;
     if(m.st===0){m.timer-=dt;if(m.timer<=0&&(SHOOT||(S.dv&&S.dv.st>=1)))m.timer=rnd(3,6);else if(m.timer<=0){m.st=1;m.side=[0,2][ri(2)];m.timer=9;m.ni=0;m.nT=0;0}}
     else{m.timer-=dt;m.nT-=dt;
       if(m.st===1&&m.timer<=0){m.st=2;m.timer=7.5;m.grace=.8}
@@ -3206,7 +3206,7 @@ function handHit(p){if(!HND.sc||!handsOn())return null;const T3=R3.T,v=new T3.Ve
 function handLabels(){if(!HND.sc||S.t>18||S.dawn||S.mon)return;const a=Math.min(1,(18-S.t)/3)*.85,P2=R3.p2,P=(o,dx,dy,txt,c3)=>{const v=new R3.T.Vector3();o.getWorldPosition(v);v.project(c3);if(v.z>1)return;const x=(v.x+1)/2*W+dx,y=(1-v.y)/2*H+dy;cx.fillText(txt,x,y)};
   cx.save();cx.globalAlpha=a;cx.font=`${Math.round(Math.max(13,H*.03))}px 'Galmuri11',monospace`;cx.textAlign='center';cx.fillStyle='rgba(230,222,196,.95)';cx.shadowColor='#000';cx.shadowBlur=6;
   P(HND.pTorch,-10,-H*.12,'손전등: 끄기/켜기',HND.cam);if(S.view===1&&P2&&P2.mon){if(P2.batW.visible)P(P2.batW,0,-H*.05,'여분 배터리',R3.cam);P(P2.mon,0,-H*.1,'모니터: 통로 패널',R3.cam)}
-  if(S.night>=5)P(HND.pEye,W*.05,-H*.06,'왼손 꾹 누르기: 눈 감기',HND.cam);cx.restore()}
+  if(S.night>=4)P(HND.pEye,W*.05,-H*.06,'왼손 꾹 누르기: 눈 감기',HND.cam);cx.restore()}
 function draw3D2(){
   if(!R3.sc2||R3.p2.n!==S.night)build3D2(S.night);
   const T3=R3.T,P=R3.p2,cam=R3.cam,eye=P.sp.eye;
@@ -3249,7 +3249,7 @@ function draw3D2(){
    if(v){if(P.hum.userData.im!==im){P.hum.material.map=P.hum.material.emissiveMap=imgTex(im);P.hum.material.needsUpdate=true;P.hum.userData.im=im}
      const a=P.arch[h.dir],to=new T3.Vector3(a.x,0,a.z),me=new T3.Vector3(0,0,.45),dir=to.clone().sub(me).normalize(),dist=h.st===2?to.distanceTo(me)+.5:lerp(3.2,1.6,1-Math.max(0,h.timer)/humNear2()),hh=2.1;
      const p=me.clone().addScaledVector(dir,dist);P.hum.scale.set(hh*im.width/im.height,hh,1);P.hum.position.set(p.x+Math.sin(T_*1.7)*.02,hh/2,p.z);P.hum.lookAt(cam.position.x,hh/2,cam.position.z)}}
-  if(P.hmS){const m=S.hm,on=m&&!dw&&S.night>=5;P.hmS.visible=on&&m.st===1;P.hmP.visible=on&&m.st===2; /* 눈을 가려도 손가락 틈으로 도는 게 보임 */
+  if(P.hmS){const m=S.hm,on=m&&!dw&&S.night>=4;P.hmS.visible=on&&m.st===1;P.hmP.visible=on&&m.st===2; /* 눈을 가려도 손가락 틈으로 도는 게 보임 */
     if(P.hmS.visible){const a=P.arch[m.side],sx=Math.sign(a.x),k=1-Math.max(0,m.timer)/9,d=lerp(9,.6,k*k),hh=1.78; // 통로 깊은 곳에서 아치 입구까지
       P.hmS.scale.set(hh*P.hmS.userData.ar,hh,1);P.hmS.position.set(a.x+sx*d,hh/2+.01,a.z+Math.sin(T_*.8)*.04);P.hmS.lookAt(cam.position.x,hh/2,cam.position.z)}
     if(P.hmP.visible){const sp=m.side===0?-1:1,k=1-Math.max(0,m.timer)/7.5,th=sp*Math.cos(k*Math.PI)*1.25, // 의자 둘레를 도는 중 (눈을 떴다면 바로 옆을 스쳐 감)
