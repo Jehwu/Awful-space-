@@ -53,7 +53,7 @@ body:not([data-mode=game]) #msg{display:none}
 #play{background:radial-gradient(ellipse at center,rgba(16,12,6,.82),rgba(0,0,0,.96));z-index:6;overflow-y:auto;justify-content:safe center;padding:12px} /* 화면이 낮으면 스크롤 */
 #play .pw{display:flex;gap:min(22px,2vmax);width:min(1080px,94vmax);align-items:stretch;flex:none}
 #play .chs{flex:1;display:flex;flex-direction:column;gap:14px;min-width:0}
-#play .chc{position:relative;flex:1;display:block;min-height:clamp(84px,30vmin,280px);padding:0;border:2px solid rgba(220,205,160,.25);background:#000;overflow:hidden;text-align:left;color:#efe6cc;font-family:var(--ui)}
+#play .chc{position:relative;flex:1;display:block;min-height:clamp(64px,21vmin,200px);padding:0;border:2px solid rgba(220,205,160,.25);background:#000;overflow:hidden;text-align:left;color:#efe6cc;font-family:var(--ui)}
 #play .chc img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.55;transition:opacity .2s}
 #play .chc .ct{position:absolute;left:18px;top:12px;font-size:14px;letter-spacing:.3em;opacity:.8}#play .chc .cn{position:absolute;left:18px;top:30px;font-size:clamp(20px,5vmin,34px);letter-spacing:.14em;text-shadow:0 2px 8px #000}
 #play .chc .cp{position:absolute;left:18px;bottom:12px;font-size:14px;letter-spacing:.1em;opacity:.8;text-shadow:0 1px 4px #000}
@@ -136,7 +136,7 @@ body[data-mode=cut] #camOff,body[data-mode=cut] #camRep{display:none!important}
 .hb svg{display:block;width:56%;height:56%;margin:auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 2px rgba(0,0,0,.9))}
 .hb span{position:absolute;left:50%;top:100%;transform:translateX(-50%) rotate(-2deg);margin-top:3px;white-space:nowrap;font:17px/1 'Nanum Pen Script',cursive;color:rgba(226,218,192,.78);text-shadow:0 0 4px #000,0 0 2px #000;pointer-events:none}
 .hb:active{transform:translateY(1px) scale(.96)}
-body.hands .hb:not(#flashBtn){display:none!important} /* 손으로 조작할 땐 플래시 버튼만 남김 */
+body.hands .hb:not(#flashBtn):not(.c3){display:none!important} /* 손으로 조작할 땐 플래시 버튼만 남김 */
 body.hands #flashBtn{bottom:auto;top:30%;right:calc(max(52px,6.5vw) + 12px)} /* 오른손 위쪽 (손을 가리지 않게) */
 #flashBtn{right:20px;bottom:30px;width:84px;height:84px;color:#e6eee9;border:none;background:radial-gradient(circle at 40% 34%,rgba(255,255,255,.07),transparent 38%),radial-gradient(circle,#101414 0 61%,transparent 62%),conic-gradient(rgba(214,226,218,.8) calc(var(--c,1)*360deg),rgba(40,46,46,.7) 0);box-shadow:inset 0 0 0 5px rgba(0,0,0,.55),0 0 0 2px rgba(0,0,0,.6),0 6px 18px rgba(0,0,0,.75)}
 #flashBtn svg{width:46%;height:46%;opacity:calc(.3 + var(--c,1)*.7)}
@@ -414,6 +414,22 @@ body:has(#battOv.show) #msg{bottom:118px}
 #devp .pnl.wide.two{width:min(980px,96%)}
 .short #devp .psub{margin-bottom:2px}.short .dvh{margin:4px 0 3px}.short #devp .ph{padding-bottom:6px}.short #devp .srow2{margin-top:8px}.short #devp .pb{padding:6px}
 .short .dvt{min-height:29px}.short .dvb button{min-height:28px;font-size:13px}.short .dvb.cut button{font-size:12px;padding:2px 8px}.short .dvb{gap:5px}
+/* 챕터 3 */
+#backBtn,#peekBtn{left:50%;bottom:30px;margin-left:-38px;width:76px;height:76px;z-index:4}#backBtn.on,#peekBtn.on{color:#e9a53d;border-color:rgba(233,165,61,.6)}
+body:not([data-mode=game]) .c3,.scare .c3{display:none!important}
+body.c3w #clock,body.c3w #hud .meter{visibility:hidden}
+body.c3w #msg{bottom:128px}
+body.hands.c3t #eyeBtn.hb{display:block!important}
+#log.forest{background:radial-gradient(ellipse at center,rgba(8,10,6,.55),rgba(0,0,0,.92))}
+#log.forest .sheet{background:#c9bc98;color:#2e2416;border-radius:2px;transform:rotate(-.6deg);background-image:radial-gradient(ellipse at 28% 18%,rgba(255,255,255,.2),transparent 55%),radial-gradient(ellipse at 78% 88%,rgba(70,50,20,.32),transparent 50%),radial-gradient(ellipse at 10% 70%,rgba(60,70,40,.22),transparent 40%),repeating-linear-gradient(0deg,transparent 0 23px,rgba(60,80,110,.13) 23px 24px)}
+#log.forest .pl-h{background:none;color:#2b2014;border-bottom:2px solid rgba(60,40,20,.45);border-radius:0;margin:0 18px 10px;padding:16px 4px 10px;font-family:'Nanum Pen Script',var(--serif);font-size:30px;letter-spacing:.04em!important}
+#log.forest .pl-r{border-bottom:1px dashed rgba(60,40,20,.25);font-family:'Nanum Pen Script',var(--ui);font-size:19px;line-height:1.15}
+#log.forest .pl-r b{color:#2b2014;font-weight:400}#log.forest .pl-r span{color:#5a2a14}#log.forest .pl-r i{color:#5a4a30}
+#log.forest .pl-r.new{background:rgba(160,30,20,.1)}#log.forest .pl-r.new b::before{font-family:var(--ui)}
+#log.forest .pl-f{color:#5a4a34;font-family:'Nanum Pen Script',var(--ui);font-size:16px}
+#log.forest .lg-keys{border-color:rgba(60,40,20,.3);color:#3a2a18}#log.forest .lg-keys kbd{background:#e8dcc0;color:#2b2014;border-color:rgba(60,40,20,.4)}
+#log.forest #logClose{color:#2b2014;border-color:rgba(60,40,20,.5)}
+.short #log.forest .pl-r{font-size:16px}.short #log.forest .pl-h{font-size:24px;padding:10px 4px 6px}
 </style>
 </head>
 <body data-mode="menu">
@@ -432,6 +448,8 @@ body:has(#battOv.show) #msg{bottom:118px}
 <button id="flashBtn" class="hb"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/><path d="M17.5 10.5h.01"/></svg><span>플래시</span></button>
 <button id="torchBtn" class="hb"><svg viewBox="0 0 24 24"><path d="M9 9h6l-1 4v7h-4v-7z"/><path d="M9 9V6h6v3"/><path class="ray" d="M12 3V1.5M7 4.5 6 3.5M17 4.5l1-1"/></svg><span>손전등 끄기</span></button>
 <button id="eyeBtn" class="hb"><svg viewBox="0 0 24 24"><path class="lid" d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6S2 12 2 12z"/><circle class="lid" cx="12" cy="12" r="2.8"/><path class="shut" d="M2 11c3 3.5 6.5 5 10 5s7-1.5 10-5M6 15l-1.5 2M12 16.5V19M18 15l1.5 2"/></svg><span>눈 감기 (꾹)</span></button>
+<button id="backBtn" class="hb c3"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.5-5.8"/><path d="M4 3.5v4h4"/></svg><span>뒤돌아보기 (꾹)</span></button>
+<button id="peekBtn" class="hb c3"><svg viewBox="0 0 24 24"><path d="M12 3v18"/><path d="M9 7l3-2 3 2M9 17l3 2 3-2"/><circle cx="12" cy="12" r="1.6"/></svg><span>틈으로 보기 (꾹)</span></button>
 <div id="pnl"><button data-c="0">왼쪽</button><button data-c="1">가운데</button><button data-c="2">오른쪽</button><button class="x">닫기</button></div>
 <button id="pnlBtn" class="hb"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M7 7h10v8H7z"/><path d="M9 18h6"/></svg><span>패널</span></button>
 <button id="bpBack">← 돌아가기</button>
@@ -458,6 +476,7 @@ body:has(#battOv.show) #msg{bottom:118px}
     <div>
       <div class="dvh">챕터 1 · 경비실</div><div class="dvb" id="devN1"></div>
       <div class="dvh">챕터 2 · 수영장</div><div class="dvb" id="devN2"></div>
+      <div class="dvh">챕터 3 · 숲</div><div class="dvb" id="devN3"></div>
     </div>
     <div>
       <div class="dvh">옵션</div>
@@ -474,7 +493,7 @@ body:has(#battOv.show) #msg{bottom:118px}
   <div class="srow2"><button class="pb" id="devBack">닫기</button></div>
 </div></div>
 
-<div class="ov" id="play"><div class="pw"><div class="chs"><button class="chc" data-ch="1"><img src="img/ch1.jpg" alt=""><span class="ct">챕터 1</span><span class="cn">경비실</span><span class="cp"></span></button><button class="chc" data-ch="2"><img src="img/ch2.jpg" alt=""><span class="ct">챕터 2</span><span class="cn">수영장</span><span class="cp"></span><span class="lk">🔒 잠금</span></button></div>
+<div class="ov" id="play"><div class="pw"><div class="chs"><button class="chc" data-ch="1"><img src="img/ch1.jpg" alt=""><span class="ct">챕터 1</span><span class="cn">경비실</span><span class="cp"></span></button><button class="chc" data-ch="2"><img src="img/ch2.jpg" alt=""><span class="ct">챕터 2</span><span class="cn">수영장</span><span class="cp"></span><span class="lk">🔒 잠금</span></button><button class="chc" data-ch="3"><img src="img/ch3.jpg" alt=""><span class="ct">챕터 3</span><span class="cn">숲</span><span class="cp"></span><span class="lk">🔒 잠금</span></button></div>
 <div class="side"><div class="md"><button data-h="0">노말</button><button data-h="1">하드</button></div><button class="sb" id="pCont">이어하기</button><button class="sb" id="pNew">처음부터</button><button class="sb back" id="pBack">뒤로</button></div></div></div>
 <div class="ov" id="intro"><div class="big" id="introBig">12:00 AM</div><div class="small" id="introSmall"></div></div>
 <div class="ov" id="brkp"><div class="cab"><div class="cab-h"><span class="bpt">MAIN BREAKER</span><span class="hv"><span>고압 위험</span></span></div><div class="bhint">빨간 불 스위치를 전부 올리고 레버를 누르고 있을 것</div><div id="bsw"></div><div class="mrow"><button id="blever"><span class="knob"></span><span>메인 레버</span></button><div class="bbar"><i id="bprog"></i></div></div><button id="bclose">닫기</button></div></div>
@@ -492,7 +511,7 @@ body:has(#battOv.show) #msg{bottom:118px}
 <script nomodule>window.THREE_ERR='nomodule'</script>
 <script>
 // ===================== 기본 =====================
-const VER='0.28.4'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
+const VER='0.29.0'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
 const $=id=>document.getElementById(id);
 const cv=$('cv'),cx=cv.getContext('2d');
 let W,H,DPR=1;const MOB=matchMedia('(pointer:coarse)').matches||/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent); // 폰이면 가볍게
@@ -1278,7 +1297,7 @@ const VENT_Z=[2,4,5,7]; // 천장 환풍구가 있는 구역 (C, E, F, H)
 
 // ===================== 상태 =====================
 function setMode(m){mode=m;document.body.dataset.mode=m;$('dbg').style.display=(m==='game'&&DEV.on&&DEV.info)?'block':'none'}
-function newNight(n){
+function newNight(n){if(CHAP===3)return newDay3(n);
   S={ch:CHAP,paCD:0,night:n,t:0,power:100,san:100,view:1,mon:false,cam:0,door:false,light:true,brk:true,
      log:false,paused:true,over:false,msgT:0,shake:0,outSaid:false,silT:0,humOn:null,
      camX:1,monA:0,camSw:0,ring:0,ringT:rnd(60,150),monMsg:null,clockRev:0,sub:0,rattleT:0,h3:false,sw:Array(6).fill(true),bp:false,holding:false,hold:0,lockT:0,flickT:0,flOn:true,peek:null,ambT:rnd(6,12),hbT:0,dgT:0,
@@ -1315,6 +1334,7 @@ const lightVis=()=>lightOn()&&S.flOn;
 function update(dt){
   if(S.over)return;
   if(S.ch===2)return update2(dt);
+  if(S.ch===3)return update3(dt);
   S.t+=dt;
   if(S.t>=HOUR*6){win();return}
 
@@ -1468,7 +1488,7 @@ function update(dt){
 }
 
 // ===================== 분위기 (점프스케어 말고 공기로 무섭게) =====================
-function danger(){if(S.ch===2){const h2=S.hum;return Math.max(h2.dir>=0?[.15,.35,.8,1][h2.st]||0:0,(100-S.san)/160)}const h=S.hum,st=S.stat,rn=S.run;let d1=rn&&S.night>=3?(rn.phase===1?1:Math.max(0,rn.open-.5)*1.4):0;let d0=st&&S.night>=2?(st.duct>=1?1:st.duct>=0?st.duct*.8:0):0;let d=h.node===DOOR?1:Math.max(0,(2-DIST[h.node])/2)*.7+(DIST[h.node]===0?h.spot*.1:0);if(S.night>=2)d=Math.max(d,S.gaze.p/100);if(S.night>=3)d=Math.max(d,S.shadow.p/100);return Math.max(d,d0,d1,(100-S.san)/160)}
+function danger(){if(S.ch===3)return danger3();if(S.ch===2){const h2=S.hum;return Math.max(h2.dir>=0?[.15,.35,.8,1][h2.st]||0:0,(100-S.san)/160)}const h=S.hum,st=S.stat,rn=S.run;let d1=rn&&S.night>=3?(rn.phase===1?1:Math.max(0,rn.open-.5)*1.4):0;let d0=st&&S.night>=2?(st.duct>=1?1:st.duct>=0?st.duct*.8:0):0;let d=h.node===DOOR?1:Math.max(0,(2-DIST[h.node])/2)*.7+(DIST[h.node]===0?h.spot*.1:0);if(S.night>=2)d=Math.max(d,S.gaze.p/100);if(S.night>=3)d=Math.max(d,S.shadow.p/100);return Math.max(d,d0,d1,(100-S.san)/160)}
 function ambient(dt){
   S.ambT-=dt;if(S.ambT>0)return;
   S.ambT=rnd(9,24)*(.5+S.san/200);
@@ -1604,9 +1624,10 @@ function reportCam(){
 function keyGuide(box){if(MOB)return;const kn=a=>keyName(keyOf(a)),K=S.ch===2?[[kn('flash'),'플래시'],[kn('left')+' / '+kn('right'),'고개 돌리기 (패널에선 통로 바꾸기)'],[kn('pnl'),'통로 패널'],[kn('torch'),'손전등 끄기/켜기'],[kn('batt'),'배터리 교체'],...(S.night>=5?[[kn('eyes')+' 꾹','눈 감기']]:[]),['Esc','일시정지 · 설정에서 키 바꾸기']]:[['클릭','물건 누르기 · 양옆 화살표로 고개 돌리기'],['Esc','일시정지 · 창 닫기']];
   const d=document.createElement('div');d.className='lg-keys';d.innerHTML=K.map(([k,t])=>`<span><kbd>${k}</kbd>${t}</span>`).join('');box.insertBefore(d,box.children[2]||null)} // 제목 바로 아래 (스크롤 안 해도 보이게)
 function openLog(){
+  if(S.ch===3)return openLog3();
   if(S.view!==1||S.mon)return;
   const box=$('logText');box.innerHTML='';const el=(c,t)=>{const d=document.createElement('div');d.className=c;d.textContent=t;box.appendChild(d)};
-  $('log').classList.toggle('pool',S.ch===2);$('logClose').textContent=S.ch===2?'닫기':'일지 덮기';
+  $('log').classList.toggle('pool',S.ch===2);$('log').classList.remove('forest');$('logClose').textContent=S.ch===2?'닫기':'일지 덮기';
   if(S.ch===2){ // 수영장: 코팅된 흰 안내판. 한 줄씩 "신호 → 할 일"
     el('pl-h','안전요원 수칙');keyGuide(box);
     POOL_RULES.forEach(([d,a,b])=>{if(d>S.night)return;const r=document.createElement('div');r.className='pl-r'+(d===S.night&&d>1?' new':'');r.innerHTML='<b></b><i>→</i><span></span>';r.querySelector('b').textContent=a;r.querySelector('span').textContent=b;box.appendChild(r)});
@@ -1660,7 +1681,7 @@ function die(c){
   if(!DEV.on){AS.streak=0;achSave()}ach('missing');
   if(radioG)radioG.gain.setTargetAtTime(0,AC.currentTime,.05);if(humG)humG.gain.setTargetAtTime(0,AC.currentTime,.02);
   buildUI();
-  const end=()=>{setMode('end');const d=(S.ch===2&&DEATH2[c])||DEATH[c]||['',''];showEnd('실종',d[0],'다시 하기',()=>newNight(S.night),d[1])};
+  const end=()=>{setMode('end');const d=(S.ch===3&&DEATH3[c])||(S.ch===2&&DEATH2[c])||DEATH[c]||['',''];showEnd('실종',d[0],'다시 하기',S.ch===3?retry3():()=>newNight(S.night),d[1])};
   if(DEV.on&&DEV.noScare){end();return}
   scream();
   try{SET.vib&&navigator.vibrate&&navigator.vibrate([350,60,120,60,600])}catch(e){}
@@ -1690,7 +1711,7 @@ function buildUI(){
   const cam=S.mon&&!S.over;document.body.classList.toggle('cam',cam);
   const c2=S.ch===2;$('bpBack').style.display=S.bp&&R3.ok&&!S.over?'block':'none';$('map').style.display=cam&&!c2?'block':'none';$('camOff').style.display=cam&&!c2?'flex':'none';$('camRep').style.display=cam&&S.night>=4&&!c2?'flex':'none';
   $('pnl').style.display=cam&&c2?'flex':'none';$('flashBtn').style.display=c2?'flex':'none';$('pnlBtn').style.display=c2&&!cam?'block':'none';$('torchBtn').style.display=c2&&!S.swap?'block':'none';$('eyeBtn').style.display=c2&&S.night>=5&&!S.dawn?'block':'none';if(c2){$('torchBtn').querySelector('span').textContent=S.torchOff?'손전등 켜기':'손전등 끄기';$('torchBtn').classList.toggle('off',!!S.torchOff)}
-  $('battBtn').style.display=c2&&(S.spare??1)>0&&!S.swap&&!S.dawn?'block':'none';if(c2)$('battN').textContent=S.spare??1;$('pnl').querySelectorAll('[data-c]').forEach(b=>b.classList.toggle('on',+b.dataset.c===S.cam));updMap();
+  $('battBtn').style.display=c2&&(S.spare??1)>0&&!S.swap&&!S.dawn?'block':'none';if(c2)$('battN').textContent=S.spare??1;$('pnl').querySelectorAll('[data-c]').forEach(b=>b.classList.toggle('on',+b.dataset.c===S.cam));updMap();if(window.buildUI3)buildUI3();
 }
 function updHUD(){
   const hr=Math.floor(S.t/HOUR),mn=Math.floor((S.t%HOUR)/HOUR*6)*10;
@@ -2798,7 +2819,7 @@ let CHAP=1,INTRO2=0;const CHT={};
 CHT[2]={CAMS:['1','2','3'],CAMN:['왼쪽 통로','가운데 수로','오른쪽 통로'],KIND:['p_tun','p_canal','p_tun'],
   ADJ:[[1],[0,2],[1]],DIST:[1,1,1],MAPP:[[10,40],[50,30],[90,40]],EXIT_CAM:[-1,-1,-1,-1,-1]};
 function setChapter(c){if(EYEF)EYEF.frequency.setTargetAtTime(20000,AC.currentTime,.01);if(waterG)waterG.gain.setTargetAtTime(c===2?.09:0,AC.currentTime,.5);if(!CHT[1])CHT[1]={CAMS,CAMN,KIND,ADJ,DIST,MAPP,EXIT_CAM};CHAP=c;({CAMS,CAMN,KIND,ADJ,DIST,MAPP,EXIT_CAM}=CHT[c]);buildMap();
-  const lb=document.querySelector('#hud .meter .lab span');if(lb)lb.textContent=c===2?'배터리':'전력';const sm=$('sanM');if(sm)sm.style.display=c===2?'none':''}
+  const lb=document.querySelector('#hud .meter .lab span');if(lb)lb.textContent=c===2?'배터리':c===3?'숨':'전력';const sm=$('sanM');if(sm)sm.style.display=c!==1?'none':'';if(c!==3&&window.stop3)stop3()}
 // 안내판 (공공시설 말투)
 // 수영장 안전 수칙 (짧게: 신호 → 할 일). [몇 일 차부터, 신호, 할 일]
 const POOL_RULES=[
@@ -2916,7 +2937,7 @@ function win2(n,last){
   if(!last&&!DEV.on){try{if(S.hard){savedCh2h=Math.max(savedCh2h,n+1);localStorage.setItem('obs2_night_hard',savedCh2h)}else{savedCh2=Math.max(savedCh2,n+1);localStorage.setItem('obs2_night',savedCh2)}}catch(e){}}
   const fin=()=>{setMode('end');
   if(!last)showEnd('6:00 AM',`${n}일 차 생존.\n수로 끝 초록 불이 가까워졌다.`,`${n+1}일 차`,()=>newNight(n+1));
-  else showEnd('비상구','5일 차 생존.\n초록 불은 물속에 있었다.\n\n챕터 3에서 계속','메인 메뉴',toMenu)};
+  else{if(!DEV.on)try{localStorage.setItem('obs2_clear','1')}catch(e){}showEnd('비상구','5일 차 생존.\n초록 불은 물속에 있었다.','챕터 3',()=>go(()=>{INTRO3=0;startGame(1,false,S&&S.hard,3)}))}};
   if(!DEV.on&&R3.ok)playCut(last?'ending2':'reset2',fin,n);else fin();
 }
 
@@ -3179,9 +3200,9 @@ function drawHands(fk,lit,warn){if(!HND.sc)buildHands();const T3=R3.T,cam=HND.ca
   HND.lens.material.color.setHex(torchOn()&&!lit?0xfff2d0:0x2a2a26);
   // 두 팔: 오른손은 손전등을 쥐고, 왼손은 무릎 위 → 꾹 누르면 가로로 눈앞을 덮음 (손가락 틈으로 조금 보임)
   const c=ease(Math.min(1,HND.cov)),xl=-Math.min(hw*.55,.31),Hm=HND.H;
-  const showR=(handsOn()||HND.swK>.02)&&S.monA<.4,showL=(handsOn()||HND.cov>.01||HND.swK>.02)&&(S.monA<.4||HND.cov>.01);HND.R.visible=showR;HND.L.visible=showL;
+  const showR=(handsOn()||HND.swK>.02)&&S.monA<.4,showL=(handsOn()||HND.cov>.01||HND.swK>.02)&&(S.monA<.4||HND.cov>.01)&&S.ch!==3;HND.R.visible=showR;HND.L.visible=showL;
   if(Hm){const Rg=HND.rig;HND.fl.updateMatrixWorld(true);const qT=HND.fl.getWorldQuaternion(new T3.Quaternion());
-    Hm.by.R_arm.scale.setScalar(showR?1:0);const CV=HND.CV||(HND.CV={x:-.08,y:.011,z:-.125,sp:.5,s:1.45,cu:.02,r:-.3});Hm.by.L_arm.scale.setScalar(showL?lerp(1,CV.s,c):0);
+    Hm.by.R_arm.scale.setScalar(showR?1:0);const CV=S.ch===3?(HND.CV3||(HND.CV3={x:-.05,y:-.105,z:-.15,sp:.3,s:1.15,cu:.25,r:-.5})):HND.CV||(HND.CV={x:-.08,y:.011,z:-.125,sp:.5,s:1.45,cu:.02,r:-.3});Hm.by.L_arm.scale.setScalar(showL?lerp(1,CV.s,c):0);
     if(showR){poseFingers('R',GRIP.R.f,.4,[.3,.5,.05]);
       placeArm('R',qT.clone().multiply(Rg.qGrip),Rg.cGrip,FW(0,0,lerp(.03,SV.rg,k)),new T3.Vector3(lerp(-.8,SV.rf[0],k),lerp(.3,SV.rf[1],k),lerp(-1,SV.rf[2],k)))}
     if(showL){const swL=lT&&c<.5,L=HND.Ls||(HND.Ls={}),f=swL||HND.swK>.03?.3:1; // 왼손: 무릎 위 / 눈 가리기 / 교체 (사이를 부드럽게)
@@ -3193,7 +3214,7 @@ function drawHands(fk,lit,warn){if(!HND.sc)buildHands();const T3=R3.T,cam=HND.ca
       poseFingers('L',L.fg.slice(0,12),L.fg[12],L.fg.slice(13));placeArm('L',L.q,L.c,L.p,L.fd);
       const v=new T3.Vector3();Hm.by.L_hand.getWorldPosition(v);HND.pEye.position.copy(v).lerp(new T3.Vector3(0,0,-.088),c);HND.pEye.position.y+=.02*(1-c)}}
   // 빛
-  HND.hemi.intensity=lit?1.1:.3+.45*c;HND.rim.color.setHex(warn?0xff3020:0x6fd8e0);HND.rim.intensity=lit?.6:warn?(Math.sin(T_*14)>0?1.1:.1):.7;
+  HND.hemi.intensity=lit?1.1:.3+.45*c;HND.rim.color.setHex(warn?0xff3020:S.ch===3?0x7888a8:0x6fd8e0);HND.rim.intensity=lit?.6:warn?(Math.sin(T_*14)>0?1.1:.1):.7;
   const head=new T3.Vector3(0,0,-.17);HND.fl.localToWorld(head);HND.key.position.copy(head);HND.key.intensity=torchOn()&&!lit?.9:0;if(HND.swK>.05){HND.key.position.set(.04,.0,-.3);HND.key.intensity=.35*HND.swK}else if(c>.02){HND.key.position.set(.07,-.1,-.03);HND.key.intensity=(torchOn()&&!lit?.04:.02)*c} // 눈 가릴 땐 무릎 쪽 손전등 빛이 손바닥에 살짝 // 교체할 땐 손이 잘 보이게 (밖에서 새어 드는 빛)
   HND.fx.position.copy(head);HND.fx.intensity=fk>0?6*fk*fk:0;
   const rd=R3.rd;rd.autoClear=false;rd.clearDepth();rd.render(HND.sc,cam);rd.autoClear=true}
@@ -3290,6 +3311,7 @@ function drawPanel2(){
 // ===================== 게임 화면 그리기 =====================
 const SPOTS=[[.8,.95],[.06,.98],[.88,.96]]; // 그림자가 서는 자리 (방향별)
 function render(){
+  if(S.ch===3)return render3();
   if(R3.ok)return render3D();
   if(!VIEWS.length)buildViews(true);
   cx.save();
@@ -3811,6 +3833,10 @@ const ACH=[
   ['dark','어둠 속에서','하드 모드에서 정전이 있는 밤을 버틴다'],
   ['phone','녹음','전화 녹음을 다섯 밤 모두 끝까지 듣는다'],
   ['tally','다섯 획','한 번도 죽지 않고 1~5일 차 연속 클리어'],
+  ['ch3_normal','챕터 3: 숲의 끝','노말 모드 5일 차 클리어'],
+  ['ch3_hard','챕터 3: 다시 경비실','하드 모드 5일 차 클리어'],
+  ['lantern','숨 죽여','파수꾼이 텐트를 짚고 지나가게 5번 둔다'],
+  ['zipper','잠가','지퍼 여는 것을 5번 막아 낸다'],
   ['missing','실종','처음으로 사라진다']];
 const AS={got:{},n:{},calls:{},streak:0};try{Object.assign(AS,JSON.parse(localStorage.getItem('awful_ach')||'{}'))}catch(e){}
 function achSave(){try{localStorage.setItem('awful_ach',JSON.stringify(AS))}catch(e){}}
@@ -3876,6 +3902,7 @@ const PAUSE={on:false,confirm:false};
 function openPause(){
   if(mode!=='game'||!S||S.over||jump>0||PAUSE.on)return;PAUSE.on=true;PAUSE.confirm=false;$('pMenu').textContent='메인 메뉴로';$('pMenu').classList.remove('warn');
   const hr=Math.floor(S.t/HOUR);$('pauseSub').textContent=`${S.night}일 차 · ${hr===0?12:hr}:${String(Math.floor((S.t%HOUR)/HOUR*6)*10).padStart(2,'0')} AM${S.hard?' · 하드':''}`;
+  if(S.ch===3&&S.ph!=='tent')$('pauseSub').textContent=`${S.night}일 차 · 숲길${S.hard?' · 하드':''}`;$('pLog').textContent=S.ch===3?'쪽지 보기':'근무 일지 보기';
   $('pLog').style.display=S.mon||S.bp?'none':'block';$('pause').classList.add('show');if(AC&&AC.state==='running')AC.suspend();
 }
 function closePause(){if(!PAUSE.on)return;PAUSE.on=false;$('pause').classList.remove('show');closeSettings();if(AC&&AC.state==='suspended')AC.resume()}
@@ -3892,11 +3919,11 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)openPause()
 function toMenu(){
   if(PAUSE.on)closePause();
   if(S){S.over=true;if(radioG)radioG.gain.setTargetAtTime(0,AC.currentTime,.05);if(humG)humG.gain.setTargetAtTime(0,AC.currentTime,.05)}
-  document.body.classList.remove('scare');S=null;['end','devp','log','intro','brkp'].forEach(id=>$(id).classList.remove('show'));
+  document.body.classList.remove('scare');S=null;['end','devp','log','intro','brkp'].forEach(id=>$(id).classList.remove('show'));if(window.stop3)stop3();
   $('play').classList.remove('show');
   setMode('menu');if(staticG)staticG.gain.setTargetAtTime(.009,AC.currentTime,.6);
 }
-function startGame(n,dev,hard=false,ch=1){initAudio();setChapter(ch);monLoad(ch===2?['stalker','diver','slider','hummer','drowned','shadow']:['stalker','hermit','runner','shadow']);DEV.on=dev;HARD=dev?DEV.hard:hard;DEV.speed=1;if(staticG)staticG.gain.setTargetAtTime(0,AC.currentTime,.1);newNight(n);buildDbg()}
+function startGame(n,dev,hard=false,ch=1){initAudio();setChapter(ch);if(ch===3)c3Load();else monLoad(ch===2?['stalker','diver','slider','hummer','drowned','shadow']:['stalker','hermit','runner','shadow']);DEV.on=dev;HARD=dev?DEV.hard:hard;DEV.speed=1;if(staticG)staticG.gain.setTargetAtTime(0,AC.currentTime,.1);newNight(n);buildDbg()}
 // 3D 엔진(700KB)이 아직 오는 중이면 잠깐 기다렸다 시작. 안 그러면 느린 폰 회선에서 2D 방으로 시작됨
 let going=false;
 function go(fn){
@@ -3908,17 +3935,18 @@ function updFoot(){const f=$('foot'),st=R3.state;f.textContent=`v${VER}`+(st==='
 // 게임 플레이: 챕터 고르기 → 노말/하드 → 이어하기/처음부터. 챕터 2는 챕터 1을 깨야 열림
 const PLAY={ch:1,hard:false};
 const ch1Clear=()=>!!(AS.got.ch1_normal||AS.got.ch1_hard);
-const savedOf=(ch,h)=>ch===1?(h?savedHard:savedNight):(h?savedCh2h:savedCh2);
-function updPlay(){const lock2=!ch1Clear();if(lock2&&PLAY.ch===2)PLAY.ch=1;
-  $('play').querySelectorAll('.chc').forEach(b=>{const c=+b.dataset.ch;b.classList.toggle('on',c===PLAY.ch);b.classList.toggle('locked',c===2&&lock2);const n=savedOf(c,PLAY.hard);b.querySelector('.cp').textContent=n>1?`${PLAY.hard?'하드':'노말'} · ${n}일 차까지 옴`:''});
+const savedOf=(ch,h)=>ch===1?(h?savedHard:savedNight):ch===2?(h?savedCh2h:savedCh2):(h?savedCh3h:savedCh3);
+function updPlay(){const lock2=!ch1Clear(),lock3=!ch2Clear();if(lock2&&PLAY.ch===2)PLAY.ch=1;if(lock3&&PLAY.ch===3)PLAY.ch=1;
+  $('play').querySelectorAll('.chc').forEach(b=>{const c=+b.dataset.ch;b.classList.toggle('on',c===PLAY.ch);b.classList.toggle('locked',(c===2&&lock2)||(c===3&&lock3));const n=savedOf(c,PLAY.hard);b.querySelector('.cp').textContent=n>1?`${PLAY.hard?'하드':'노말'} · ${n}일 차까지 옴`:''});
   $('play').querySelectorAll('.md button').forEach(b=>b.classList.toggle('on',(+b.dataset.h===1)===PLAY.hard));
+  if(!lock3&&R3.ok&&window.c3Load)c3Load(); // 챕터 3이 열려 있으면 숲 모델을 미리 받아 둠
   const n=savedOf(PLAY.ch,PLAY.hard);$('pCont').disabled=n<=1;$('pCont').textContent=n>1?`이어하기 (${n}일 차)`:'이어하기'}
 $('mPlay').onclick=()=>{updPlay();$('play').classList.add('show')};
-$('play').querySelectorAll('.chc').forEach(b=>b.onclick=()=>{if(+b.dataset.ch===2&&!ch1Clear()){b.classList.remove('shake');void b.offsetWidth;return}PLAY.ch=+b.dataset.ch;updPlay()});
+$('play').querySelectorAll('.chc').forEach(b=>b.onclick=()=>{if((+b.dataset.ch===2&&!ch1Clear())||(+b.dataset.ch===3&&!ch2Clear())){b.classList.remove('shake');void b.offsetWidth;return}PLAY.ch=+b.dataset.ch;updPlay()});
 $('play').querySelectorAll('.md button').forEach(b=>b.onclick=()=>{PLAY.hard=b.dataset.h==='1';updPlay()});
 $('pBack').onclick=()=>$('play').classList.remove('show');
 $('pCont').onclick=()=>{const n=savedOf(PLAY.ch,PLAY.hard);$('play').classList.remove('show');go(()=>startGame(n,false,PLAY.hard,PLAY.ch))};
-$('pNew').onclick=()=>{$('play').classList.remove('show');const {ch,hard}=PLAY;go(()=>{if(ch===1&&!hard&&R3.ok)playCut('intro',()=>startGame(1,false),1);else startGame(1,false,hard,ch)})};
+$('pNew').onclick=()=>{$('play').classList.remove('show');const {ch,hard}=PLAY;go(()=>{if(ch===1&&!hard&&R3.ok)playCut('intro',()=>startGame(1,false),1);else{if(ch===3)INTRO3=0;startGame(1,false,hard,ch)}})};
 $('mDev').onclick=()=>$('devp').classList.add('show');
 $('devBack').onclick=()=>$('devp').classList.remove('show');
 [['1 · 인트로','intro',1],['1 · 밤 시작','night_start',3],['1 · 5일 시작','night5_open',5],['1 · 6시','reset',2],['1 · 엔딩','ending',5],['1 · 하드 엔딩','ending_hard',5],['2 · 인트로','intro2',1],['2 · 밤 시작','night2_start',3],['2 · 6시','reset2',2],['2 · 엔딩','ending2',5]].forEach(([t,id,n])=>{const b=document.createElement('button');b.textContent=t;b.onclick=()=>devCut(id,n);$('devCuts').appendChild(b)});
@@ -3934,12 +3962,13 @@ function buildDbg(){
   [1,2,4,8].forEach(s=>mb(s+'x',()=>DEV.speed=s,DEV.speed===s));
   mb('무적',()=>DEV.god=!DEV.god,DEV.god);
   mb('밝게',()=>DEV.bright=!DEV.bright,DEV.bright);
-  mb('6시로',()=>{if(S&&!S.over)S.t=HOUR*6-3});
+  if(S&&S.ch===3)mb('다음 단계',jumpTent3);else mb('6시로',()=>{if(S&&!S.over)S.t=HOUR*6-3});
   mb('메뉴',toMenu);
   $('dbg').style.display=(mode==='game'&&DEV.on&&DEV.info)?'block':'none';
   $('dbgTog').textContent=$('dbg').classList.contains('min')?'치트 ▸':'치트 ▾';
 }
 function updDbg(){
+  if(S.ch===3){$('dbgText').textContent=dbg3();return}
   if(S.ch===2){const f=o=>o?o.st+' / '+(o.timer||0).toFixed(0)+'s':'-';$('dbgText').textContent=
 `[치트] 수영장 ${S.night}일 차 · ${DEV.speed}x
 배터리 ${S.power.toFixed(1)} · 정신 ${S.san.toFixed(1)}
@@ -4002,5 +4031,6 @@ function loop(ts){
 }
 requestAnimationFrame(loop);
 </script>
+<script src="ch3.js?v=0.29.0"></script>
 </body>
 </html>
