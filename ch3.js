@@ -38,7 +38,7 @@ function c3Load(){if(F3.ld)return F3.ld;monLoad(['deer','axe','lantern','widow',
   F3.ld=(MON.ld||Promise.resolve()).then(()=>Promise.all(Object.keys(PROP3).map(k=>MON.fail?null:MON.GL.loadAsync('model/p_'+k+'.glb?v='+VER).then(g=>{const T=R3.T;let m=null;g.scene.traverse(o=>{if(o.isMesh&&!m)m=o});if(!m)return;
     g.scene.updateMatrixWorld(true);const geo=m.geometry.clone().applyMatrix4(m.matrixWorld);geo.computeBoundingBox();const b=geo.boundingBox,c=b.getCenter(new T.Vector3());geo.translate(-c.x,-b.min.y,-c.z);geo.computeBoundingBox();geo.computeBoundingSphere();
     const mat=m.material;mat.roughness=.92;mat.metalness=0;if(k==='pine'||k==='bush')mat.side=T.DoubleSide;
-    PROP3[k]={geo,mat,h:b.max.y-b.min.y,w:Math.max(b.max.x-b.min.x,b.max.z-b.min.z)}}).catch(e=>console.warn('소품',k,e))))).then(()=>{F3.ready=true});
+    PROP3[k]={geo,mat,h:b.max.y-b.min.y,w:Math.max(b.max.x-b.min.x,b.max.z-b.min.z)};F3.np=(F3.np||0)+1}).catch(e=>{console.warn('소품',k,e);F3.np=(F3.np||0)+1})))).then(()=>{F3.ready=true});
   return F3.ld}
 
 // ---------- 지형·길 ----------
@@ -158,7 +158,7 @@ function build3D3(day){const T=R3.T;if(F3.w&&F3.w.day===day&&F3.w.sc)return F3.w
     tie(M,f.s+s0+3.2,0xffffff,-f.side);if(f.fake)tie(f.tr,f.b0+3.2,0x8a8478,f.side)});
   // 야영지 (5일째는 숲 끝의 문)
   {const c=W3.camp,dir=Math.atan2(c.tx,c.tz);W3.campDir=dir;
-   if(day<5){const tp=PROP3.tent,ts=1.5/tp.h,tx=c.x+c.tx*3.4,tz=c.z+c.tz*3.4;const te=new T.Mesh(tp.geo,tp.mat);te.scale.setScalar(ts);te.position.set(tx,hg(tx,tz)-.04,tz);te.rotation.y=Math.atan2(c.tz,-c.tx);te.castShadow=te.receiveShadow=true;sc.add(te);W3.tentX=te;W3.tentP=new T.Vector3(tx,hg(tx,tz),tz);W3.tentRy=dir;
+   if(day<5){const tp=PROP3.tent,ts=1.5/tp.h,tx=c.x+c.tx*3.4,tz=c.z+c.tz*3.4;const te=new T.Mesh(tp.geo,tp.mat);te.scale.setScalar(ts);te.visible=false;{const bag=grp(tx,hg(tx,tz),tz,dir+.4,sc);CYL(.13,.13,.62,MS({color:0x3e4a30,roughness:.9}),0,.13,0,bag,14).rotation.z=PI2;[-.2,.2].forEach(x=>CYL(.135,.135,.03,MS({color:0x1a1a16}),x,.13,0,bag,14).rotation.z=PI2);BOX(.34,.46,.22,MS({color:0x29333b,roughness:.9}),.55,.23,.15,bag).rotation.y=.5}te.position.set(tx,hg(tx,tz)-.04,tz);te.rotation.y=Math.atan2(c.tz,-c.tx);te.castShadow=te.receiveShadow=true;sc.add(te);W3.tentX=te;W3.tentP=new T.Vector3(tx,hg(tx,tz),tz);W3.tentRy=dir;
      const fx=c.x+c.tx*.6-c.tz*1.7,fz=c.z+c.tz*.6+c.tx*1.7,rm=PROP3.rock;for(let k=0;k<8;k++){const a=k/8*6.28,x=fx+Math.cos(a)*.42,z=fz+Math.sin(a)*.42,r=new T.Mesh(rm.geo,rm.mat),s2=rnd(.22,.3)/rm.w;r.scale.set(s2,s2*.7,s2);r.position.set(x,hg(x,z)-.05,z);r.rotation.y=R()*6;sc.add(r)}
      const ash=mesh(new T.CircleGeometry(.36,14),MS({color:0x141210,roughness:1}),fx,hg(fx,fz)+.04,fz,sc,false);ash.rotation.x=-PI2;
      {const d=new T.Mesh(PROP3.dead.geo,mats.dead);const h=6.5/PROP3.dead.h;d.scale.setScalar(h);const x=c.x-c.tz*3.2+c.tx*1.5,z=c.z+c.tx*3.2+c.tz*1.5;d.position.set(x,hg(x,z)-.2,z);sc.add(d)}}
@@ -183,16 +183,15 @@ function newDay3(n,phase){
   ['end','start','devp','log','brkp'].forEach(id=>$(id)&&$(id).classList.remove('show'));jump=0;document.body.classList.remove('scare');
   if(!R3.ok){setMode('end');showEnd('3D 필요','챕터 3은 3D로만 할 수 있어요.\n('+(R3.why||'3D 불러오는 중')+')','메인 메뉴',toMenu);return}
   const go=()=>{if(!S||S.night!==n||S.ch!==3)return;build3D3(n);setMode('game');buildUI();updHUD();
-    if(phase==='tent'){startTent3(true);return}
+    if(phase==='tent'||(DEV.on&&DEV.ph3==='tent')){DEV.ph3=null;startTent3(true);if(DEV.solo)pracInit();return}
     if(DEV.on&&DEV.cut3){const id=DEV.cut3;DEV.cut3=null;S.paused=false;S.fade=0;S.fadeTo=0;if(id==='intro'){cut3('intro',toMenu);return}S.ps=F3.w.L-.4;S.wt=DUSK3[n]*.9;S.yaw=null;camWalk3();if(id==='pitch')cut3('pitch',toMenu);else cut3('exit',()=>end3());return}
-    if(n===1&&!INTRO3&&!DEV.on){INTRO3=1;try{localStorage.setItem('obs3_intro','1')}catch(e){}cut3('intro',()=>dayCard3(n,1))}else dayCard3(n)};
-  if(!F3.ready){setMode('end');$('endTitle').textContent='';$('endText').textContent='숲 불러오는 중...';$('endBtn').style.display='none';$('end').classList.add('show');
-    c3Load().then(()=>{$('endBtn').style.display='';$('end').classList.remove('show');go()});return}
+    if(n===1&&!INTRO3&&!DEV.on){INTRO3=1;try{localStorage.setItem('obs3_intro','1')}catch(e){}cut3('intro',()=>dayCard3(n,1))}else{dayCard3(n);if(DEV.solo)pracInit()}};
+  if(!F3.ready){c3Load();loadWait(3,()=>F3.ready,()=>(F3.np||0)/7,go);return}
   go()}
 // "N일 차" 글자 → 쪽지(규칙) → 닫으면 걷기 시작
 function dayCard3(n,keep){S.ph='walk';S.cut=null;S.yaw=null;if(!keep)S.fade=1;S.fadeTo=0;const tx=n+'일 차',el=$('introSmall');$('introBig').textContent=n===5?'숲의 끝':'해 지기 전에';el.textContent='';let k=0;const iv=setInterval(()=>{k++;el.textContent=tx.slice(0,k);if(k>=tx.length)clearInterval(iv)},40);
   const it=$('intro');it.classList.remove('show');void it.offsetWidth;it.classList.add('show');
-  setTimeout(()=>{it.classList.remove('show');if(S&&S.night===n&&!S.over&&mode==='game'&&S.ch===3){openLog();if(n===1)S.hintT=9}},DEV.on?600:2300)}
+  setTimeout(()=>{it.classList.remove('show');if(S&&S.night===n&&!S.over&&mode==='game'&&S.ch===3){if(!DEV.solo)openLog();else S.paused=false;if(n===1)S.hintT=9}},DEV.on?600:2300)}
 
 // ---------- 걷기 ----------
 const W3c=()=>F3.w;
@@ -203,7 +202,7 @@ function walk3(dt){const W3=F3.w,n=S.night;S.wt+=dt;
   if(S.hintT>0)S.hintT-=dt;
   const back=S.inBack&&!S.atFork&&S.loopT<=0;S.lb=Math.max(0,Math.min(1,S.lb+(back?1:-1)*dt*3.2));
   const can=S.inWalk&&S.lb<.04&&!S.atFork&&S.loopT<=0&&S.ph==='walk';S.v+=((can?WALK_V*(S.hard?1.04:1):0)-S.v)*Math.min(1,dt*(can?4:7));if(S.v<.02)S.v=0;
-  if(S.trk<0){S.ps+=S.v*dt;const f=W3.forks[S.fk];if(f&&S.ps>=f.s-1.3){S.ps=f.s-1.3;if(!S.atFork){S.atFork=true;S.v=0;if(!S.forkSaid){S.forkSaid=1;say('갈림길. 리본이 묶인 쪽으로.','',3)}}}
+  if(S.trk<0){S.ps+=S.v*dt;const f=W3.forks[S.fk];if(f&&S.ps>=f.s-1.3){S.ps=f.s-1.3;if(!S.atFork){S.atFork=true;S.v=0}}
     if(S.ps>=W3.L-.4){S.ps=W3.L-.4;arrive3();return}}
   else{S.sb+=S.v*dt;if(S.sb>15&&S.loopT<=0){S.loopT=1.1;sting(0);nburst(300,.6,1.2,.25,0,0,'lowpass')}}
   if(S.loopT>0){const was=S.loopT;S.loopT-=dt;if(was>.55&&S.loopT<=.55){const f=W3.forks[S.trk];S.trk=-1;S.sb=0;S.ps=f.s-30;S.yaw=null;S.dr.d=Math.max(S.dr.d,20);say(['...여기 아까 지나온 데다.','같은 나무. 같은 표지판.','또 여기야.'][Math.min(2,S.loops=(S.loops||0)+1)-1],'bad',3)}}
@@ -213,29 +212,29 @@ function walk3(dt){const W3=F3.w,n=S.night;S.wt+=dt;
 function chooseFork(main){const W3=F3.w,f=W3.forks[S.fk];if(!f||!S.atFork)return;S.atFork=false;leafStep(0,.2);
   if(main){S.fk++}else{S.trk=S.fk;S.sb=0}}
 // 사슴머리: 뒤에서 따라옴. 안 보고 있으면 다가오고, 돌아보면 그 자리에 굳음 → 계속 보고 있으면 숲으로 사라짐
-function deer3(dt){const d=S.dr,n=S.night,calm=S.cl.st==='call'||S.cl.after>0;
-  if(d.st==='off'){if(S.ps>12&&!calm&&!S.atFork)d.timer-=dt;if(d.timer<=0){d.st='come';d.d=rnd(36,42);d.wT=0;d.stepT=0}return}
+function deer3(dt){const d=S.dr,n=S.night,calm=S.cl.st==='call'||S.cl.after>0;if(!SOLO3('deer'))return;
+  if(d.st==='off'){if((S.ps>12||DEV.solo)&&!calm&&!S.atFork)d.timer-=dt;if(d.timer<=0){d.st='come';d.d=rnd(36,42);d.wT=0;d.stepT=0}return}
   if(d.st==='come'){const see=S.lb>.85&&d.d<30;if(see){d.wT+=dt;if(d.wT>1.15){d.st='leave';d.lT=0;d.side=Math.random()<.5?-1:1;thump(70,.2,.12,0);nburst(900,1,.5,.08,0)}return}d.wT=Math.max(0,d.wT-dt*2);
     if(calm||S.loopT>0)return;const vd=(1.8+n*.1)*(S.hard?1.15:1);d.d=Math.min(46,d.d-(vd-S.v)*dt);
     if(S.v<.3){d.stepT-=dt;if(d.stepT<=0){d.stepT=.6;deerStep(d.d,0)}} // 내가 멈춰도 발소리는 계속됨
     if(d.d<1.3)return die('사슴머리');return}
-  if(d.st==='leave'){d.lT+=dt;if(d.lT>2.8){d.st='off';d.timer=Math.max(9,rnd(16,25)-n*1.3)*(S.hard?.8:1)}}}
+  if(d.st==='leave'){d.lT+=dt;if(d.lT>2.8){d.st='off';d.timer=cd3(Math.max(9,rnd(16,25)-n*1.3)*(S.hard?.8:1))}}}
 // 나무꾼: 앞쪽 길 한가운데에 서 있음. 그동안 걸어서 가까이 가면 달려듦. 멈춰 있으면 숲으로 들어감
-function wood3(dt){const w=S.wc,W3=F3.w,n=S.night;if(n<2)return;
-  if(w.st==='off'){const f=W3.forks[S.fk],nearFork=f&&f.s-S.ps<40;if(S.trk<0&&!S.atFork&&!nearFork&&S.ps>25&&S.ps<W3.L-45)w.timer-=dt;
+function wood3(dt){const w=S.wc,W3=F3.w,n=S.night;if(n<2||!SOLO3('axe'))return;
+  if(w.st==='off'){const f=W3.forks[S.fk],nearFork=f&&f.s-S.ps<40;if(S.trk<0&&!S.atFork&&!nearFork&&S.ps>(DEV.solo?6:25)&&S.ps<W3.L-45)w.timer-=dt;
     if(w.timer<=0&&(S.dr.st!=='come'||S.dr.d>18)&&S.cl.st!=='call'){const a=trkAt(W3.main,S.ps+W3.s0),b=trkAt(W3.main,S.ps+W3.s0+23),dx=b.x-a.x,dz=b.z-a.z,l=Math.hypot(dx,dz);if((dx*a.tx+dz*a.tz)/l<.94){w.timer=1.5;return}w.st='stand';w.s=S.ps+rnd(22,24);w.wait=0;w.need=rnd(6,8.5)*(S.hard?1.2:1);axeTok(.18);setTimeout(()=>{if(S&&S.wc.st==='stand')axeTok(.14)},700)}return}
   const dist=w.s-S.ps;
   if(w.st==='stand'){if(S.trk>=0){w.st='off';w.timer=rnd(20,30);return}if(S.v>.25&&dist<12.5){w.st='charge';w.t=0;scrapeAxe();return}
     if(S.v<.12)w.wait+=dt;if(w.wait>w.need){w.st='leave';w.lT=0;w.side=Math.random()<.5?-1:1;leafStep(w.side*.4,.12)}return}
   if(w.st==='charge'){w.t+=dt;w.s-=dt*(w.t<.35?0:7.5);if(w.t>.95)return die('나무꾼');return}
-  if(w.st==='leave'){w.lT+=dt;if(w.lT>3.2){w.st='off';w.timer=rnd(38,55)-n*2}}}
+  if(w.st==='leave'){w.lT+=dt;if(w.lT>3.2){w.st='off';w.timer=cd3(rnd(38,55)-n*2)}}}
 // 부르는 것 (3일 차~): 뒤에서 부름. 돌아보면 죽음. 부르는 동안·직후엔 사슴머리가 안 움직임
 const CALL3=[['...저기요.',0],['...잠깐만 서 봐요.',2.3],['뒤에. 여기 있어.',4.6]];
-function caller3(dt){const c=S.cl,n=S.night;if(n<3)return;if(c.after>0)c.after-=dt;
-  if(c.st==='off'){if(!S.atFork&&S.loopT<=0&&S.ps>20)c.timer-=dt;if(c.timer<=0&&S.lb<.02&&(S.dr.st!=='come'||S.dr.d>22)&&S.wc.st!=='charge'){c.st='call';c.t=0;c.i=0}return}
+function caller3(dt){const c=S.cl,n=S.night;if(n<3||!SOLO3('caller'))return;if(c.after>0)c.after-=dt;
+  if(c.st==='off'){if(!S.atFork&&S.loopT<=0&&S.ps>(DEV.solo?4:20))c.timer-=dt;if(c.timer<=0&&S.lb<.02&&(S.dr.st!=='come'||S.dr.d>22)&&S.wc.st!=='charge'){c.st='call';c.t=0;c.i=0}return}
   c.t+=dt;while(c.i<CALL3.length&&c.t>=CALL3[c.i][1]){say(CALL3[c.i][0],'voice',2.2);whisperBehind(.16+c.i*.05);c.i++}
   if(S.lb>.22)return die('부르는 것');
-  if(c.t>7.2){c.st='off';c.timer=rnd(45,65)-n*3;c.after=3;say('(조용해졌다.)','',2)}}
+  if(c.t>7.2){c.st='off';c.timer=cd3(rnd(45,65)-n*3);c.after=3}}
 function arrive3(){const W3=F3.w;S.v=0;S.inWalk=false;S.late=S.wt>DUSK3[S.night];
   if(S.night>=5){cut3('exit',()=>end3());return}
   cut3('pitch',()=>startTent3(false))}
@@ -300,6 +299,7 @@ function draw3D3(){const W3=F3.w,T=R3.T,cam=R3.cam;if(!W3)return;F3.uT.value=T_;
   if(S.ph!=='cut'||S.cut&&S.cut.hands){HND.hemi&&HND.hemi.color.setHex(0x8090a8);drawHands(0,false,false)}
   if(fx)fxEnd(cam);cx.drawImage(R3.rd.domElement,0,0,W,H)}
 const torchOn3=()=>!S.torchOff&&!(S.cut&&S.cut.dark);
+const lightOut3=()=>torchOn3()&&!S.brH; // 텐트 밖·어둠 속에서 보이는 빛 (침낭을 뒤집어쓰면 가려짐)
 function camWalk3(){const cam=R3.cam,W3=F3.w,p=onTrk(),want=Math.atan2(-p.tx,-p.tz);if(S.yaw==null)S.yaw=want;let dA=want-S.yaw;dA=Math.atan2(Math.sin(dA),Math.cos(dA));S.yaw+=dA*Math.min(1,1/60*3.5);
   const vk=S.v/WALK_V;S.bobP=(S.bobP||0)+S.v/60*1.35;const bob=Math.sin(S.bobP*Math.PI*2)*.035*vk,sw=Math.sin(S.bobP*Math.PI)*.025*vk;
   cam.position.set(p.x-p.tz*sw,W3.hg(p.x,p.z)+1.62+bob,p.z+p.tx*sw);if(S.shake>0){cam.position.x+=rnd(-.015,.015);cam.position.y+=rnd(-.012,.012)}
@@ -324,10 +324,10 @@ function walkUI3(){const W3=F3.w,T=R3.T,cam=R3.cam;S.forkUI=null;
     S.forkUI.forEach(o=>{if(!o.ok)return;const hov=!PT.touch&&Math.hypot(PT.x-o.x,PT.y-o.y)<70,a2=hov?1:.75+.2*Math.sin(T_*3);cx.save();cx.translate(o.x,o.y);cx.globalAlpha=a2;cx.strokeStyle='#ece5cd';cx.lineWidth=3;cx.shadowColor='#000';cx.shadowBlur=8;
       const s2=Math.max(16,H*.03);for(let k=0;k<2;k++){cx.beginPath();cx.moveTo(-s2,k*s2*.8+s2*.2);cx.lineTo(0,k*s2*.8-s2*.5);cx.lineTo(s2,k*s2*.8+s2*.2);cx.stroke()}
       cx.restore();tapeLabel('이쪽으로',o.x,o.y+Math.max(16,H*.03)*1.9,a2)})}
-  if(S.hintT>0&&!S.log){const a=Math.min(1,S.hintT/1.5)*.9;tapeLabel(MOB?'화면을 누르고 있으면 걷기':'화면을 누르고 있으면 걷기 (W)',W/2,H*.36,a);if(S.hintT<6.5)tapeLabel(MOB?'뒤돌아보기 버튼: 누르는 동안 뒤를 봄':'뒤돌아보기: 버튼 또는 S 꾹',W/2,H*.36+Math.max(13,H*.026)*2.4,Math.min(1,(6.5-S.hintT)/1)*a)}}
+  if(S.hintT>0&&!S.log){const a=Math.min(1,S.hintT/1.5)*.9;tapeLabel(MOB?'화면 꾹: 걷기':'화면 꾹 (W): 걷기',W/2,H*.36,a);if(S.hintT<6.5)tapeLabel(MOB?'꾹 누른 채 아래로 끌기: 뒤돌아보기':'누른 채 아래로 끌기 · 우클릭 · S: 뒤돌아보기',W/2,H*.36+Math.max(13,H*.026)*2.4,Math.min(1,(6.5-S.hintT)/1)*a)}}
 
 CHT[3]={CAMS:['A'],CAMN:['-'],KIND:['p_tun'],ADJ:[[0]],DIST:[1],MAPP:[[50,50]],EXIT_CAM:[-1,-1,-1,-1,-1]};
-function buildUI3(){const w=S.ph==='walk',t=S.ph==='tent';document.body.classList.toggle('c3w',S.ph!=='tent'&&S.ph!=='dawn');document.body.classList.toggle('c3t',t);
+function buildUI3(){const w=S.ph==='walk',t=S.ph==='tent';document.body.classList.toggle('c3w',S.ph!=='tent'&&S.ph!=='dawn');document.body.classList.toggle('c3t',t);['backBtn','peekBtn','torchBtn','eyeBtn','flashBtn','battBtn','pnlBtn'].forEach(i=>$(i).style.display='none');return;
   $('backBtn').style.display=w&&!S.atFork?'block':'none';$('peekBtn').style.display=t&&S.tn&&S.view===1&&!S.tn.zip.on?'block':'none';
   if(t){$('torchBtn').style.display=handsOn()?'none':'block';$('torchBtn').querySelector('span').textContent=S.torchOff?'손전등 켜기':'손전등 끄기';$('torchBtn').classList.toggle('off',!!S.torchOff);
     $('eyeBtn').style.display='block';$('eyeBtn').querySelector('span').textContent='숨 참기 (꾹)';const sv=$('eyeBtn').querySelector('svg');if(!F3.eyeSvg){F3.eyeSvg=sv.innerHTML;sv.innerHTML='<path d="M6 10.5c1.8-1.6 3.8-2.2 6-2.2s4.2.6 6 2.2"/><path d="M6 13.5c1.8 1.6 3.8 2.2 6 2.2s4.2-.6 6-2.2"/><path d="M4 12h16"/>'}}}
@@ -341,10 +341,12 @@ function retry3(){const n=S.night,ph=S.ph==='tent'||S.ph==='dawn'?'tent':'walk';
 const act3=()=>S&&S.ch===3&&mode==='game'&&!S.over&&!S.paused&&!PAUSE.on&&!S.log&&jump<=0;
 addEventListener('pointerdown',e=>{if(e.target!==cv||!S||S.ch!==3||mode!=='game')return;initAudio();if(!act3())return;e.stopPropagation();const p=gameXY(e);PT.touch=e.pointerType!=='mouse';PT.x=p.x;PT.y=p.y;
   if(S.ph==='walk'){if(S.atFork&&S.forkUI){let b=null,bd=1e9;S.forkUI.forEach(o=>{const d=Math.hypot(p.x-o.x,p.y-o.y);if(o.ok&&d<bd){bd=d;b=o}});if(b&&bd<Math.max(110,W*.12)){chooseFork(b.main)}else if(b){const L=S.forkUI.reduce((a,o)=>o.x<a.x?o:a);chooseFork((p.x<W/2)===(L===S.forkUI[0]))}return}
-    S.walkId=e.pointerId;S.inWalk=true;return}
+    if(e.pointerType==='mouse'&&e.button===2){S.backId=e.pointerId;S.inBack=true;return}S.walkId=e.pointerId;S.walkY=p.y;S.inWalk=true;return}
   if(S.ph==='tent')tentDown3(p,e)},true);
-addEventListener('pointerup',e=>{if(!S||S.ch!==3)return;if(e.pointerId===S.walkId){S.inWalk=false;S.walkId=null}if(S.ph==='tent')tentUp3(e)},true);
-addEventListener('pointercancel',e=>{if(!S||S.ch!==3)return;if(e.pointerId===S.walkId){S.inWalk=false;S.walkId=null}if(S.ph==='tent')tentUp3(e)},true);
+addEventListener('pointermove',e=>{if(!S||S.ch!==3||e.pointerId!==S.walkId)return;const p=gameXY(e),dy=p.y-S.walkY;if(dy>Math.max(36,H*.07)){S.inBack=true;S.inWalk=false}else if(dy<Math.max(16,H*.03)&&S.inBack&&S.backId==null){S.inBack=false;S.inWalk=true}},true);
+addEventListener('contextmenu',e=>{if(S&&S.ch===3&&e.target===cv)e.preventDefault()},true);
+addEventListener('pointerup',e=>{if(!S||S.ch!==3)return;if(e.pointerId===S.backId){S.inBack=false;S.backId=null}if(e.pointerId===S.walkId){S.inWalk=false;S.walkId=null;S.inBack=false}if(S.ph==='tent')tentUp3(e)},true);
+addEventListener('pointercancel',e=>{if(!S||S.ch!==3)return;if(e.pointerId===S.walkId||e.pointerId===S.backId){S.inWalk=false;S.walkId=null;S.inBack=false;S.backId=null}if(S.ph==='tent')tentUp3(e)},true);
 {const hold=(id,on,off)=>{const b=$(id);b.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();initAudio();on();b.classList.add('on')});['pointerup','pointerleave','pointercancel'].forEach(k=>b.addEventListener(k,()=>{off();b.classList.remove('on')}));b.addEventListener('contextmenu',e=>e.preventDefault())};
   hold('backBtn',()=>{if(S&&S.ch===3)S.inBack=true},()=>{if(S&&S.ch===3)S.inBack=false});
   hold('peekBtn',()=>{if(S&&S.ch===3)peek3(true)},()=>{if(S&&S.ch===3)peek3(false)})}
@@ -409,7 +411,7 @@ void main(){`+GAPD+`vec3 tex=texture2D(map,vUv).rgb;vec3 L=uLP-vWP;float d=lengt
   tn.trans=mesh(geo,tn.m2,0,0,0,g,false);tn.trans.renderOrder=2;tn.trans.frustumCulled=false;
   // 바닥 깔개, 침낭, 배낭, 물병, 신발
   const fl=mesh(new T.PlaneGeometry(TA*2.1,TB*2.1),MS({color:0x23271f,roughness:1}),0,.012,0,g,false);fl.rotation.x=-PI2;fl.receiveShadow=true;
-  {const sb=mesh(new T.CapsuleGeometry(.27,1.25,6,14),MS({color:0x5a2a1c,roughness:.85}),.18,.1,.25,g);sb.rotation.x=PI2;sb.scale.set(1,1,.33)}
+  {const bm=MS({color:0x5a2a1c,roughness:.85}),sb=mesh(new T.CapsuleGeometry(.27,1.2,6,14),bm,0,.12,-.08,g);sb.rotation.x=PI2;sb.scale.set(1.1,1,.42);const lap=mesh(new T.CapsuleGeometry(.24,.3,6,12),bm,0,.36,.3,g);lap.rotation.z=PI2;lap.scale.set(.9,1.2,.8);tn.bag=[sb,lap]}
   {const bp=grp(-.7,0,.55,.4,g);BOX(.36,.5,.24,MS({color:0x29333b,roughness:.9}),0,.25,0,bp);BOX(.3,.16,.05,MS({color:0x1d252b,roughness:.9}),0,.2,.14,bp);BOX(.04,.42,.03,MS({color:0x151a1e}),-.1,.27,-.13,bp);BOX(.04,.42,.03,MS({color:0x151a1e}),.1,.27,-.13,bp)}
   CYL(.035,.035,.22,MS({color:0x4a6a7a,roughness:.3,metalness:.2}),-.48,.11,.12,g,12);
   [[-.32,-.78],[-.18,-.82]].forEach(([x,z])=>BOX(.11,.12,.27,MS({color:0x1a1612,roughness:.9}),x,.06,z,g));
@@ -433,14 +435,15 @@ function startTent3(retry){const W3=F3.w,tn=buildTent3(),n=S.night,hd=S.hard;S.p
   S.fade=1;S.fadeTo=0;S.fadeR=1.4;S.paused=true;
   const it=$('intro');$('introBig').textContent='12:00 AM';$('introSmall').textContent=n+'일 차 · 텐트';it.classList.remove('show');void it.offsetWidth;it.classList.add('show');
   setTimeout(()=>{it.classList.remove('show');if(S&&S.ch===3&&S.ph==='tent'&&!S.over){S.paused=false;if(n===1)S.hintT=10}},DEV.on?600:2200);buildUI()}
-function breath3(on){if(!S||!S.tn||S.ph!=='tent')return;if(on&&S.breath<.12)return;if(S.brH===on)return;S.brH=on;$('eyeBtn').classList.toggle('on',on);if(EYEF)EYEF.frequency.setTargetAtTime(on?900:20000,AC.currentTime,.08);if(!on)exhale(.12)}
+function breath3(on){if(!S||!S.tn||S.ph!=='tent')return;if(on&&S.breath<.12)return;if(S.brH===on)return;S.brH=on;if(EYEF)EYEF.frequency.setTargetAtTime(on?700:20000,AC.currentTime,.1);fabric3(0,on?.32:.22);if(!on)exhale(.1)} // 침낭을 머리끝까지 뒤집어씀 (그동안 손전등 빛도 가려짐)
 function peek3(on){if(!S||!S.tn||S.ph!=='tent')return;S.tn.pkHold=on;$('peekBtn').classList.toggle('on',on);if(on&&S.view===1&&!S.tn.zip.on)zipSnd(.06,.25)}
 function toggleTorch3(){if(!S||S.ph!=='tent'||S.over)return;S.torchOff=!S.torchOff;sfx(S.torchOff?700:1100,.03,'square',.05);thump(900,.02,.04,.2);buildUI()}
 function mash3(){const z=S.tn.zip;if(!z.on||z.st!=='fight')return;z.p=Math.max(0,z.p-z.k);z.clicks++;zipSnd(.05,.12);S.shake=.05;if(z.p<=0)zipWin3()}
 function tentDown3(p,e){const tn=S.tn;if(!tn)return;
   if(tn.zip.on){mash3();return}
   const nz=navZone3(p);if(nz){turn(nz);return}
-  if(handsOn()){const k=handHit(p);if(k==='torch'){HND.thP=1;toggleTorch3();return}if(k==='eye'){tn.brId=e.pointerId;breath3(true);return}}
+  {const k=handHit(p);if(k==='torch'){HND.thP=1;toggleTorch3();return}}
+  if(p.y>H*.76&&Math.abs(S.view-S.camX)<.2&&tn.pk<.1){tn.brId=e.pointerId;breath3(true);return} // 화면 아래 = 무릎 위 침낭
   if(S.view===1&&Math.abs(S.view-S.camX)<.1&&zipHit3(p)){tn.zipHold=e.pointerId;peek3(true);return}
   S.swipe={x:p.x,y:p.y,id:e.pointerId}}
 function tentUp3(e){const tn=S.tn;if(!tn)return;if(e.pointerId===tn.brId){tn.brId=null;breath3(false)}if(e.pointerId===tn.zipHold){tn.zipHold=null;peek3(false)}
@@ -454,20 +457,20 @@ function tent3(dt){const tn=S.tn,n=S.night,hd=S.hard?1.2:1,z=tn.zip,ln=tn.ln,st=
   S.t+=dt*60/HOUR3;if(S.t>=HOUR*6){dawn3();return}
   if(S.hintT>0)S.hintT-=dt;
   // 숨: 참는 동안 줄고, 다 떨어지면 저절로 크게 들이마심
-  if(S.brH){S.hbT=(S.hbT||0)-dt;if(S.hbT<=0){S.hbT=lerp(.62,.38,1-S.breath);thump(52,.12,.22,0);thump(48,.1,.14,0,.13)}S.breath-=dt/9;if(S.breath<=0){S.breath=0;breath3(false);gasp3();if(ln.st==='press'&&ln.t>.8)return die('파수꾼')}}else S.breath=Math.min(1,S.breath+dt/4);
+  if(S.brH){S.hbT=(S.hbT||0)-dt;if(S.hbT<=0){S.hbT=lerp(.62,.38,1-S.breath);thump(52,.12,.22,0);thump(48,.1,.14,0,.13)}S.breath-=dt/14;if(S.breath<=0){S.breath=0;breath3(false);gasp3();if(ln.st==='press'&&ln.t>.8)return die('파수꾼')}}else S.breath=Math.min(1,S.breath+dt/5);
   // 틈으로 보기 (앞을 볼 때만)
   tn.pk+=((tn.pkHold&&S.view===1&&Math.abs(S.camX-1)<.15&&!z.on?1:0)-tn.pk)*Math.min(1,dt*5);
   // 그림자: 손전등이 꺼져 있으면 발치 어둠에서 다가옴
-  if(!z.on){if(!torchOn3())tn.sh+=dt*(5.2+n*.55)*hd;else tn.sh=Math.max(0,tn.sh-dt*24)}
+  if(!z.on&&SOLO3('shadow')){if(!lightOut3())tn.sh+=dt*(5.2+n*.55)*hd;else tn.sh=Math.max(0,tn.sh-dt*24)}
   if(tn.sh>=100)return die('그림자');
   if(tn.sh>30&&Math.random()<dt*.35)breathe(rnd(-.3,.3),.1+tn.sh/600);
   if(tn.dcd>0)tn.dcd-=dt;
   if(z.on){zip3(dt);return} // 지퍼 싸움 중엔 다른 것들이 안 옴
   lantern3(dt);stalker3(dt);voice3(dt);
   // 지퍼 여는 것 (2일 차~)
-  if(n>=2){z.timer-=dt;if(z.timer<=0){if(ln.st==='off'&&st.stage<4&&!vo.on&&tn.sh<25){zipStart3()}else z.timer=4}}}
+  if(n>=2&&SOLO3('zip')){z.timer-=dt;if(z.timer<=0){if(ln.st==='off'&&st.stage<4&&!vo.on&&tn.sh<25){zipStart3()}else z.timer=4}}}
 // 파수꾼: 랜턴 들고 텐트 둘레를 돎 → 옆 벽에 손을 댐 (불 끄고 숨 참기) → 떠남
-function lantern3(dt){const ln=S.tn.ln,n=S.night,tn=S.tn;
+function lantern3(dt){const ln=S.tn.ln,n=S.night,tn=S.tn;if(!SOLO3('lantern'))return;
   if(ln.st==='off'){ln.timer-=dt;if(ln.timer<=0&&tn.st.stage<4){ln.st='come';ln.t=0;ln.dir=Math.random()<.5?1:-1;ln.side=ln.dir>0?Math.PI:0;ln.th=Math.PI/2-ln.dir*Math.PI*.55;ln.stepT=0}return}
   ln.t+=dt;ln.stepT-=dt;const lx=Math.cos(ln.th),pan=Math.max(-1,Math.min(1,lx*1.2));
   if(ln.st==='come'){if(ln.stepT<=0){ln.stepT=.62;leafStep(pan,.05+ln.t*.025)}if(Math.random()<dt*.6)creak3(pan,.05);if(ln.t>4.5){ln.st='circle';ln.t=0}return}
@@ -475,32 +478,32 @@ function lantern3(dt){const ln=S.tn.ln,n=S.night,tn=S.tn;
     if((ln.dir>0?ln.th>=ln.side:ln.th<=ln.side)&&!ln.pass&&(tn.st.stage>=4||tn.dcd>0)){ln.pass=1} // 교대자가 문 앞이거나 방금 다녀갔으면 짚지 않고 지나감
     if(ln.pass&&(ln.dir>0?ln.th>=ln.side+1.2:ln.th<=ln.side-1.2)){ln.st='leave';ln.t=0;ln.pass=0;return}
     if(!ln.pass&&(ln.dir>0?ln.th>=ln.side:ln.th<=ln.side)){ln.th=ln.side;ln.st='press';ln.t=0;ln.hs=Math.random()<.5?-1:1;ln.z=ln.hs*rnd(.22,.32);fabric3(pan,.3)}return}
-  if(ln.st==='press'){const bad=ln.t>.8&&(torchOn3()||!S.brH);tn.lbad=bad?tn.lbad+dt:Math.max(0,tn.lbad-dt*.5);if(ln.t>.8&&ln.t<.9&&!ln.sn){ln.sn=1;fabric3(pan,.45);breathe(pan,.18)}
-    if(tn.lbad>1.05)return die('파수꾼');if(ln.t>7.2){ln.st='leave';ln.t=0;ln.sn=0;tn.lbad=0;tn.dcd=7;fabric3(pan,.2)}return}
-  if(ln.st==='leave'){ln.th+=ln.dir*dt*.5;if(ln.stepT<=0){ln.stepT=.62;leafStep(pan,Math.max(.02,.16-ln.t*.03))}if(ln.t>5){ln.st='off';ln.timer=Math.max(24,rnd(48,66)-n*4)/(S.hard?1.2:1);achC3('lantern')}}}
+  if(ln.st==='press'){const bad=ln.t>.8&&!S.brH;tn.lbad=bad?tn.lbad+dt:Math.max(0,tn.lbad-dt*.5);if(ln.t>.8&&ln.t<.9&&!ln.sn){ln.sn=1;fabric3(pan,.45);breathe(pan,.18)}
+    if(tn.lbad>1.7)return die('파수꾼');if(ln.t>7.2){ln.st='leave';ln.t=0;ln.sn=0;tn.lbad=0;tn.dcd=7;fabric3(pan,.2)}return}
+  if(ln.st==='leave'){ln.th+=ln.dir*dt*.5;if(ln.stepT<=0){ln.stepT=.62;leafStep(pan,Math.max(.02,.16-ln.t*.03))}if(ln.t>5){ln.st='off';ln.timer=cd3(Math.max(24,rnd(48,66)-n*4)/(S.hard?1.2:1));achC3('lantern')}}}
 // 지퍼 여는 것: 밖에서 지퍼를 내림 → 고리 연타로 다시 닫기
 function zipStart3(){const z=S.tn.zip,n=S.night;z.on=true;z.st='warn';z.t=0;z.p=.12;z.clicks=0;const N=Math.round(12+(n-2)*8/3)+(S.hard?3:0),R=3.6+(n-2)*.4,pull=.11;z.pull=pull;z.k=(.18+pull*N/R)/N;z.need=N;
-  if(S.view!==1){S.view=1;buildUI()}S.tn.pkHold=false;$('peekBtn').classList.remove('on');zipSnd(.14,.9);say('지퍼가... 밖에서 내려간다!','bad',2.5);buildUI()}
+  if(S.view!==1){S.view=1;buildUI()}S.tn.pkHold=false;breath3(false);zipSnd(.14,.9);buildUI()}
 function zip3(dt){const z=S.tn.zip;z.t+=dt;
   if(z.st==='warn'){z.p=Math.min(.18,z.p+dt*.05);if(Math.random()<dt*8)zipSnd(.04,.08);if(z.t>1.1){z.st='fight';z.t=0}return}
   if(z.st==='fight'){z.p+=z.pull*dt*(S.hard?1.15:1);if(Math.random()<dt*7)zipSnd(.04,.07);if(z.p>=1)return die('지퍼 여는 것');return}
-  if(z.st==='win'){if(z.t>2.2){z.on=false;z.st='off';z.timer=rnd(60,85)-S.night*3;buildUI()}}}
+  if(z.st==='win'){if(z.t>2.2){z.on=false;z.st='off';z.timer=cd3(rnd(60,85)-S.night*3);buildUI()}}}
 function zipWin3(){const z=S.tn.zip;z.st='win';z.t=0;z.p=0;zipSnd(.12,.3);setTimeout(()=>{if(S&&S.ch===3){exhale(.2);leafStep(0,.15);setTimeout(()=>leafStep(.2,.1),600)}},500);achC3('zip')}
 // 교대자 (3일 차~): 나무 사이에서 점점 가까이. 텐트 바로 앞에 서면 불빛을 보고 들어옴
 const ST3=[0,15,10,5.5,1.45];
-function stalker3(dt){const st=S.tn.st;if(S.night<3)return;st.timer-=dt;
-  if(st.stage<4){if(st.timer<=0&&st.stage===3&&(S.tn.ln.st==='press'||S.tn.dcd>0)){st.timer=2;return}if(st.timer<=0){st.stage++;st.x=st.stage===4?rnd(-.15,.15):rnd(-2.5,2.5);if(st.stage<4){st.timer=rnd(11,17)/(S.hard?1.2:1);const v=[0,.05,.08,.12][st.stage];for(let k=0;k<3;k++)leafStep(rnd(-.2,.2),v*rnd(.7,1)*(k?1:1.2))}
+function stalker3(dt){const st=S.tn.st;if(S.night<3||!SOLO3('stalker'))return;st.timer-=dt;
+  if(st.stage<4){if(st.timer<=0&&st.stage===3&&(S.tn.ln.st==='press'||S.tn.dcd>0)){st.timer=2;return}if(st.timer<=0){st.stage++;st.x=st.stage===4?rnd(-.15,.15):rnd(-2.5,2.5);if(st.stage<4){st.timer=cd3(rnd(11,17)/(S.hard?1.2:1));const v=[0,.05,.08,.12][st.stage];for(let k=0;k<3;k++)leafStep(rnd(-.2,.2),v*rnd(.7,1)*(k?1:1.2))}
       else{st.timer=7;st.bad=0;setTimeout(()=>{if(S&&S.ch===3){leafStep(0,.32);setTimeout(()=>leafStep(.05,.36),520);setTimeout(()=>breathe(0,.16),1300)}},0)}}return}
   // 바로 앞
-  if(torchOn3())st.bad+=dt;else st.bad=Math.max(0,st.bad-dt);if(st.bad>2.1)return die('교대자');
-  if(st.timer<=0){st.stage=0;S.tn.dcd=7;st.timer=rnd(30,45)/(S.hard?1.2:1);leafStep(0,.14);setTimeout(()=>leafStep(.1,.08),600);achC3('stalker')}}
+  if(lightOut3())st.bad+=dt;else st.bad=Math.max(0,st.bad-dt);if(st.bad>2.1)return die('교대자');
+  if(st.timer<=0){st.stage=0;S.tn.dcd=7;st.timer=cd3(rnd(30,45)/(S.hard?1.2:1));leafStep(0,.14);setTimeout(()=>leafStep(.1,.08),600);achC3('stalker')}}
 // 내 목소리 (4일 차~): "열어 줘". 그동안 틈으로 보면 안 됨
 const VO3=[['...나야.',0],['추워. 열어 줘.',2.6],['왜 안 열어? 나라니까.',5.3]];
-function voice3(dt){const vo=S.tn.vo;if(S.night<4)return;
+function voice3(dt){const vo=S.tn.vo;if(S.night<4||!SOLO3('voice'))return;
   if(!vo.on){vo.timer-=dt;if(vo.timer<=0&&S.tn.pk<.05){vo.on=true;vo.t=0;vo.i=0}return}
   vo.t+=dt;while(vo.i<VO3.length&&vo.t>=VO3[vo.i][1]){say(VO3[vo.i][0],'voice',2.4);murmur3(.1);vo.i++}
   if(S.tn.pk>.35)return die('내 목소리');
-  if(vo.t>8){vo.on=false;vo.timer=rnd(80,110);S.tn.zip.timer=Math.max(S.tn.zip.timer,8)}}
+  if(vo.t>8){vo.on=false;vo.timer=cd3(rnd(80,110));S.tn.zip.timer=Math.max(S.tn.zip.timer,8)}}
 function dawn3(){if(S.ph==='dawn')return;S.ph='dawn';S.dawnT=0;S.dawnK=0;S.torchOff=false;breath3(false);peek3(false);say('6시. 천이 밝아진다.','',3);buildUI()}
 function dawnUpd3(dt){S.dawnT+=dt;S.dawnK=Math.min(1,S.dawnT/3.5);if(S.dawnT>4.2&&S.fadeTo!==1){S.fadeTo=1;S.fadeR=1.6}if(S.dawnT>5.6&&!S.winD){S.winD=1;win3()}}
 function win3(){const n=S.night,hard=S.hard;S.over=true;
@@ -518,7 +521,7 @@ function tentMons3(){const W3=F3.w,T=R3.T,tn=W3.tn,s=S.tn;if(!tn||!s)return;tn.g
   const z=s.zip;let yp=.06,wm=0;if(z.on){const p=z.st==='win'?Math.max(0,1-z.t*2)*.1:z.p;yp=lerp(.08,1.12,p);wm=lerp(.03,.3,p)}else if(s.pk>.01){const e=ease(s.pk);yp=lerp(.06,.8,e);wm=.16*e}
   tn.uGap.value.set(yp,wm,0);tn.pull.position.set(0,Math.max(.06,yp),tentFrontZ(Math.max(.06,yp))+.012);
   // 그림자 (텐트 안 앞 구석 어둠)
-  {const sp=s.sh,I=mon3('shd','shadow',1);if(I&&sp>18&&!torchOn3()){const k=Math.min(1,(sp-18)/82),sx=s.shSide||(s.shSide=Math.random()<.5?-1:1),lx=lerp(sx*.62,sx*.12,k*k),lz=lerp(-.82,.05,k*k),p=tl(lx,0,lz);
+  {const sp=s.sh,I=mon3('shd','shadow',1);if(I&&sp>18&&!lightOut3()){const k=Math.min(1,(sp-18)/82),sx=s.shSide||(s.shSide=Math.random()<.5?-1:1),lx=lerp(sx*.62,sx*.12,k*k),lz=lerp(-.82,.05,k*k),p=tl(lx,0,lz);
       if(!I.dk){I.dk=1;I.o.traverse(o=>{if(o.isMesh){o.material.color.setHex(0x30343a);o.material.emissiveIntensity=0}if(!I.hd&&o.isBone&&o.name.endsWith('HeadTop_End'))I.hd=o})}
       I.g.visible=true;I.g.scale.setScalar(.56);I.g.position.copy(p);I.g.position.y-=.08;lookYaw(I,p.x,p.z);I.g.rotation.x=lerp(.3,.62,k)+Math.sin(T_*.8)*.02;I.g.rotation.z=Math.sin(T_*.5)*.04;monPlay(I,'walk',{speed:0,fade:0});monFade(I,Math.min(1,(sp-18)/25));
       if(!W3.shdE){const ec=cvs(128,32,(q,w,h)=>{[w*.3,w*.7].forEach(x2=>{const g=q.createRadialGradient(x2,h/2,0,x2,h/2,h*.5);g.addColorStop(0,'rgba(255,240,225,1)');g.addColorStop(.25,'rgba(255,200,170,.7)');g.addColorStop(1,'rgba(255,120,90,0)');q.fillStyle=g;q.fillRect(0,0,w,h)})});
@@ -617,12 +620,10 @@ function office3(){const cam=R3.cam,T=R3.T;if(cam.far!==20){cam.far=20;cam.near=
   const fx=fxBegin();R3.rd.render(R3.sc,cam);if(fx)fxEnd(cam);cx.drawImage(R3.rd.domElement,0,0,W,H)}
 // ---------- 텐트 화면 위: 고개 돌리기 화살표, 지퍼 연타, 처음 안내, 틈 ----------
 function tentUI3(){const s=S.tn;if(!s)return;const W3=F3.w;
-  if(S.brH||s.brA>.01){s.brA=lerp(s.brA||0,S.brH?1:0,.12);const a=s.brA*(.55+.25*(1-S.breath));cx.save();const g=cx.createRadialGradient(W/2,H/2,H*.25,W/2,H/2,H*.85);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,`rgba(0,0,0,${a})`);cx.fillStyle=g;cx.fillRect(0,0,W,H);cx.restore()}
+  if(S.brH||s.brA>.01){s.brA=lerp(s.brA||0,S.brH?1:0,S.brH?.2:.12);const a=s.brA;cx.save();cx.globalAlpha=a;cx.fillStyle='#0b0605';cx.fillRect(0,0,W,H); // 침낭 속: 거의 깜깜, 천 틈으로 바깥 빛만 살짝
+    const lan=W3.tn?W3.tn.m2.uniforms.uLI.value:0,gl=Math.min(.5,lan*.12)+(torchOn3()?.06:0),g=cx.createRadialGradient(W*.5,H*1.05,H*.1,W*.5,H*1.05,H*.9);g.addColorStop(0,`rgba(${lan>.1?'150,70,20':'70,40,24'},${gl})`);g.addColorStop(1,'rgba(0,0,0,0)');cx.fillStyle=g;cx.fillRect(0,0,W,H);
+    cx.globalAlpha=a*.25;cx.fillStyle=NPm[ri(4)];cx.fillRect(0,0,W,H);cx.globalAlpha=a*(.35+.35*(1-S.breath));cx.drawImage(VIG,0,0,W,H);cx.restore()}
   if(s.pk>.02){const k=ease(s.pk);cx.save();cx.globalAlpha=k*.55;const g=cx.createRadialGradient(W/2,H/2,H*.18,W/2,H/2,H*.8);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'#000');cx.fillStyle=g;cx.fillRect(0,0,W,H);cx.restore()}
-  if(s.zip.on){const z=s.zip,a=z.st==='win'?Math.max(0,1-z.t*1.5):1,bw=Math.min(W*.5,360),bx=W/2-bw/2,by=H*.16;cx.save();cx.globalAlpha=a;
-    cx.fillStyle='rgba(0,0,0,.7)';cx.fillRect(bx-10,by-34,bw+20,58);cx.fillStyle='#2a2620';cx.fillRect(bx,by,bw,10);cx.fillStyle=z.p>.7?'#d93a25':'#e9a53d';cx.fillRect(bx,by,bw*Math.min(1,z.p),10);
-    cx.font=`700 ${Math.max(16,H*.032)}px 'Galmuri11',monospace`;cx.textAlign='center';cx.textBaseline='bottom';cx.fillStyle=z.st==='win'?'#ece5cd':(T_*6%1<.5?'#ff7058':'#ece5cd');
-    cx.fillText(z.st==='win'?'닫혔다':z.st==='warn'?'지퍼 고리를 잡아!':(MOB?'화면 연타!':'클릭 / Space 연타!'),W/2,by-6);cx.restore()}
   // 양옆 화살표
   if(!s.zip.on&&s.pk<.1&&!S.paused){const zw=navW3();[-1,1].forEach(d=>{const to=S.view+d;if(to<0||to>2)return;const hov=!PT.touch&&PT.x>=0&&((d<0&&PT.x<zw)||(d>0&&PT.x>W-zw)),a=hov?1:PT.touch?.6:.4,x0=d<0?0:W-zw;
     const gr=cx.createLinearGradient(d<0?0:W,0,d<0?zw:W-zw,0);gr.addColorStop(0,`rgba(0,0,0,${.6*a})`);gr.addColorStop(1,'rgba(0,0,0,0)');cx.fillStyle=gr;cx.fillRect(x0,0,zw,H);
@@ -631,7 +632,7 @@ function tentUI3(){const s=S.tn;if(!s)return;const W3=F3.w;
     const want=navZone3(PT)?'pointer':'default';if(cv.style.cursor!==want)cv.style.cursor=want}
   // 처음 안내
   if(S.hintT>0&&!S.paused){const a=Math.min(1,S.hintT/1.5)*.9,fs=Math.max(13,H*.026)*2.4;let y=H*.3;
-    [[handsOn()?'손전등 누르기: 끄기/켜기':'손전등 버튼: 끄기/켜기'],[MOB?'숨 참기 버튼 꾹':'숨 참기: 버튼 또는 E 꾹'],[MOB?'지퍼 꾹: 틈으로 보기':'지퍼 꾹 (Q): 틈으로 보기']].forEach(([t])=>{tapeLabel(t,W/2,y,a);y+=fs})}}
+    [['손에 든 손전등 누르기: 끄기/켜기'],[MOB?'화면 아래 침낭 꾹: 뒤집어쓰기':'화면 아래 침낭 꾹 (E): 뒤집어쓰기'],[MOB?'지퍼 꾹: 틈으로 보기':'지퍼 꾹 (Q): 틈으로 보기']].forEach(([t])=>{tapeLabel(t,W/2,y,a);y+=fs})}}
 // ---------- 숲 소리 ----------
 function amb3(){if(!AC)return null;if(F3.aud)return F3.aud;const A={};
   {const s=AC.createBufferSource();s.buffer=NB;s.loop=true;const f=AC.createBiquadFilter();f.type='lowpass';f.frequency.value=520;const g=AC.createGain();g.gain.value=0;const lfo=AC.createOscillator(),lg=AC.createGain();lfo.frequency.value=.09;lg.gain.value=220;lfo.connect(lg);lg.connect(f.frequency);s.connect(f);f.connect(g);g.connect(AMB);s.start();lfo.start();A.wind=g;A.windF=f}
@@ -660,3 +661,27 @@ function fabric3(pan,v){nburst(1200,.5,.35,v,pan);nburst(400,.8,.25,v*.5,pan,.05
 // 치트 모드: 챕터 3 날짜·컷씬
 for(let n=1;n<=5;n++){const b=document.createElement('button');b.textContent=n+'일';b.onclick=()=>{$('devp').classList.remove('show');go(()=>startGame(n,true,false,3))};$('devN3').appendChild(b)}
 [['3 · 인트로',1,'intro'],['3 · 텐트 치기',2,'pitch'],['3 · 숲 끝',5,'exit']].forEach(([t,n,id])=>{const b=document.createElement('button');b.textContent=t;b.onclick=()=>{$('devp').classList.remove('show');go(()=>{DEV.cut3=id;startGame(n,true,false,3)})};$('devCuts').appendChild(b)});
+// 치트 무적: 죽음 원인을 치움 (같은 것에 매 프레임 죽지 않게)
+function god3(c){const d=S.dr,w=S.wc,cl=S.cl,tn=S.tn;
+  if(c==='사슴머리'){d.st='leave';d.lT=0;d.side=1;d.d=Math.max(d.d,6)}else if(c==='나무꾼'){w.st='leave';w.lT=0;w.side=1}else if(c==='부르는 것'){cl.st='off';cl.timer=cd3(40);cl.after=3}
+  else if(tn){if(c==='파수꾼'){tn.ln.st='leave';tn.ln.t=0;tn.lbad=0}else if(c==='지퍼 여는 것')zipWin3();else if(c==='그림자')tn.sh=0;else if(c==='교대자'){tn.st.stage=0;tn.st.timer=cd3(30);tn.st.bad=0}else if(c==='내 목소리'){tn.vo.on=false;tn.vo.timer=cd3(80)}}}
+// ===================== 치트: 괴물 체험 =====================
+const SOLO3=k=>!DEV.solo||DEV.solo===k;
+const cd3=x=>DEV.solo?Math.max(4,x*.3):x; // 체험 중엔 금방 다시 옴
+const PRAC=[ // [챕터, 일차, 키, 이름, 할 일, (챕터3) 텐트에서 시작]
+  [1,1,'hum','교대자','형광등 소리가 끊기면 문 잠그기'],[1,2,'gaze','응시자','화면에 얼룩이 커지면 다른 화면으로'],[1,2,'stat','은둔자','무전기가 지직거리면 환풍구 닫기'],
+  [1,3,'shadow','그림자','불 끄면 다가옴. 다시 켜기'],[1,3,'run','질주자','창고 문 틈이 벌어지면 닫기'],[1,4,'clone','복제자','화면에 내가 앉아 있으면 신고'],
+  [2,1,'hum2','교대자','비상등이 깜빡이는 쪽을 보고 플래시'],[2,2,'drn','익사자','패널 가운데 화면을 자주 보기'],[2,2,'sl','미끄럼틀','손이 보이면 앞을 보고 플래시'],
+  [2,3,'dv','잠수부','헤엄치는 소리 → 손전등 끄기'],[2,3,'sh2','그림자','어둠 속 숨소리 → 손전등 켜기'],[2,4,'hm','흥얼이','흥얼거림 → 눈 감기'],
+  [3,1,'deer','사슴머리','발소리가 겹치면 뒤돌아보기'],[3,2,'axe','나무꾼','길 위에 서 있으면 멈추고 기다리기'],[3,3,'caller','부르는 것','뒤에서 불러도 돌아보지 않기'],
+  [3,1,'lantern','파수꾼','벽을 짚으면 침낭 뒤집어쓰기',1],[3,2,'zip','지퍼 여는 것','지퍼가 열리면 화면 연타',1],[3,1,'shadow','그림자','손전등 끄면 다가옴. 다시 켜기',1],
+  [3,3,'stalker','교대자','틈으로 보고, 앞에 서면 손전등 끄기',1],[3,4,'voice','내 목소리','목소리가 들리는 동안 열지 않기',1]];
+{const G=$('pracG');[1,2,3].forEach(ch=>{const col=document.createElement('div');col.innerHTML=`<div class="dvh">챕터 ${ch} · ${['','경비실','수영장','숲'][ch]}</div>`;const box=document.createElement('div');box.className='dvb';col.appendChild(box);G.appendChild(col);
+  PRAC.filter(x=>x[0]===ch).forEach(([c,n,k,name,tip,tent])=>{const b=document.createElement('button');b.innerHTML=`${name}<small>${tip}</small>`;b.onclick=()=>{$('pracp').classList.remove('show');$('devp').classList.remove('show');DEV.soloNext=k;DEV.pracTip=name+': '+tip;DEV.ph3=tent?'tent':null;go(()=>startGame(n,true,false,c))};box.appendChild(b)})})}
+$('devPrac').onclick=()=>{$('devp').classList.remove('show');$('pracp').classList.add('show')};$('pracBack').onclick=()=>{$('pracp').classList.remove('show');$('devp').classList.add('show')};
+// 체험 시작: 고른 괴물이 금방 나오게
+function pracInit(){const k=DEV.solo;if(!k||!S)return;
+  if(S.ch===1){if(k==='hum')S.hum.timer=2;else if(k==='gaze'){S.gaze.timer=1}else if(k==='stat')S.stat.timer=2;else if(k==='run')S.run.cd=2;else if(k==='clone')S.clone.timer=3}
+  else if(S.ch===2){if(k==='hum2')S.hum.timer=1;else if(k==='dv')S.dv.timer=2;else if(k==='sl')S.sl.timer=2;else if(k==='hm')S.hm.timer=1}
+  else if(S.ch===3){if(k==='deer')S.dr.timer=2;else if(k==='axe')S.wc.timer=2;else if(k==='caller')S.cl.timer=3;else if(S.tn){const t=S.tn;if(k==='lantern')t.ln.timer=2;else if(k==='zip')t.zip.timer=3;else if(k==='stalker')t.st.timer=2;else if(k==='voice')t.vo.timer=3}}
+  if(DEV.pracTip){const tp=DEV.pracTip;setTimeout(()=>{if(S&&!S.over)say('[체험] '+tp,'',4)},900)}}
