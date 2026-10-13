@@ -431,11 +431,18 @@ body:not([data-mode=game]) .c3,.scare .c3{display:none!important}
 body.c3w #clock,body.c3w #hud .meter{visibility:hidden}
 body.c3w #msg{bottom:128px}
 #log.forest{background:radial-gradient(ellipse at center,rgba(8,10,6,.55),rgba(0,0,0,.92))}
-#log.forest .sheet{background:#c9bc98;color:#2e2416;border-radius:2px;transform:rotate(-.6deg);background-image:radial-gradient(ellipse at 28% 18%,rgba(255,255,255,.2),transparent 55%),radial-gradient(ellipse at 78% 88%,rgba(70,50,20,.32),transparent 50%),radial-gradient(ellipse at 10% 70%,rgba(60,70,40,.22),transparent 40%),repeating-linear-gradient(0deg,transparent 0 23px,rgba(60,80,110,.13) 23px 24px)}
-#log.forest .pl-h{background:none;color:#2b2014;border-bottom:2px solid rgba(60,40,20,.45);border-radius:0;margin:0 18px 10px;padding:16px 4px 10px;font-family:'Nanum Pen Script',var(--serif);font-size:30px;letter-spacing:.04em!important}
-#log.forest .pl-r{border-bottom:1px dashed rgba(60,40,20,.25);font-family:'Nanum Pen Script',var(--ui);font-size:19px;line-height:1.15}
-#log.forest .pl-r b{color:#2b2014;font-weight:400}#log.forest .pl-r span{color:#5a2a14}#log.forest .pl-r i{color:#5a4a30}
-#log.forest .pl-r.new{background:rgba(160,30,20,.1)}#log.forest .pl-r.new b::before{font-family:var(--ui)}
+#log.forest .sheet{background:#cfc2a0 var(--wet) center/100% 100% no-repeat;color:#2e2416;border-radius:0;transform:rotate(-.8deg);clip-path:var(--wetclip);box-shadow:none;filter:drop-shadow(0 18px 30px rgba(0,0,0,.7))}
+#log.forest .sheet.back{transform:rotate(.7deg) scaleX(1)}
+#log.forest .pl-h{background:none;color:#1e2236;border-bottom:2px solid rgba(30,34,60,.35);border-radius:0;margin:0 18px 4px;padding:16px 4px 8px;font-family:'Nanum Pen Script',var(--serif);font-size:32px;letter-spacing:.04em!important;text-shadow:0 0 1.5px rgba(30,40,90,.55),0 0 5px rgba(30,40,90,.25)}
+#log.forest .pl-sd{margin:0 22px 10px;font-family:'Nanum Pen Script',var(--ui);font-size:18px;color:rgba(40,40,70,.7);text-shadow:0 0 2px rgba(30,40,90,.3)}
+#log.forest .pl-flip{display:block;margin:10px 14px 0 auto;padding:16px 14px 6px 26px;border:0;background:linear-gradient(225deg,rgba(0,0,0,0) 0 14px,#b8a983 14px 15px,#ddd2b2 15px 26px,rgba(0,0,0,0) 26px),linear-gradient(225deg,rgba(60,45,20,.35) 0 14px,transparent 14px);color:#2a2e4a;font-family:'Nanum Pen Script',var(--ui);font-size:19px;cursor:pointer;min-height:0;text-shadow:0 0 1.5px rgba(30,40,90,.4)}
+#log.forest .pl-flip:hover{color:#5a1810}
+#log.forest .pl-r{border-bottom:1px solid rgba(40,50,90,.16);font-family:'Nanum Pen Script',var(--ui);font-size:20px;line-height:1.15;background:none}
+#log.forest .pl-r b{color:#1e2236;font-weight:400;text-shadow:0 0 1.5px rgba(30,40,90,.55),0 0 5px rgba(30,40,90,.22)}#log.forest .pl-r span{color:#5a1810;text-shadow:0 0 1.5px rgba(120,20,10,.5),0 0 6px rgba(120,30,10,.2)}#log.forest .pl-r i{color:#3a3e5a;opacity:.7}
+#log.forest .pl-r.blur b,#log.forest .pl-r.blur span{filter:blur(.55px)}
+#log.forest .pl-r.run span{position:relative}#log.forest .pl-r.run span::after{content:'';position:absolute;left:38%;top:78%;width:2px;height:22px;border-radius:1px;background:linear-gradient(rgba(110,25,15,.45),rgba(110,25,15,0));filter:blur(.7px)}
+#log.forest .pl-r.run b{position:relative}#log.forest .pl-r.run b::after{content:'';position:absolute;left:62%;top:80%;width:2px;height:16px;background:linear-gradient(rgba(30,34,70,.4),rgba(30,34,70,0));filter:blur(.7px)}
+#log.forest .pl-r.new{background:rgba(160,30,20,.08)}#log.forest .pl-r.new b::before{font-family:var(--ui)}
 #log.forest .pl-f{color:#5a4a34;font-family:'Nanum Pen Script',var(--ui);font-size:16px}
 #log.forest .lg-keys{border-color:rgba(60,40,20,.3);color:#3a2a18}#log.forest .lg-keys kbd{background:#e8dcc0;color:#2b2014;border-color:rgba(60,40,20,.4)}
 #log.forest #logClose{color:#2b2014;border-color:rgba(60,40,20,.5)}
@@ -523,7 +530,7 @@ body.c3w #msg{bottom:128px}
 <script nomodule>window.THREE_ERR='nomodule'</script>
 <script>
 // ===================== 기본 =====================
-const VER='0.30.0'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
+const VER='0.31.0'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
 const $=id=>document.getElementById(id);
 const cv=$('cv'),cx=cv.getContext('2d');
 let W,H,DPR=1;const MOB=matchMedia('(pointer:coarse)').matches||/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent); // 폰이면 가볍게
@@ -4067,6 +4074,6 @@ function loop(ts){
 }
 requestAnimationFrame(loop);
 </script>
-<script src="ch3.js?v=0.30.0"></script>
+<script src="ch3.js?v=0.31.0"></script>
 </body>
 </html>
