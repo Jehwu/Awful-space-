@@ -508,14 +508,14 @@ function win3(){const n=S.night,hard=S.hard;S.over=true;
   setMode('end');showEnd('6:00 AM',`${n}일 차 생존.\n${['','숲은 어젯밤보다 조용하다.','텐트 둘레에 발자국이 한 바퀴.','지퍼 고리가 휘어 있다.','텐트 앞 흙이 패여 있다. 맨발 자국.'][n]||''}`,`${n+1}일 차`,()=>newDay3(n+1))}
 // ---------- 텐트 안 카메라·괴물 ----------
 function camTent3(){const W3=F3.w,tn=W3.tn,cam=R3.cam,T=R3.T;if(!tn)return;const k=ease(S.tn?S.tn.pk:0),br=Math.sin(T_*1.25)*.006*(S.brH?.2:1);
-  const lp=new T.Vector3(lerp(TCAM[0],0,k),lerp(TCAM[1],.52,k)+br,lerp(TCAM[2],tentFrontZ(.52)+.2,k));tn.g.updateMatrixWorld();cam.position.copy(lp.applyMatrix4(tn.g.matrixWorld));
+  const lp=new T.Vector3(lerp(TCAM[0],0,k),lerp(TCAM[1],.48,k)+br,lerp(TCAM[2],tentFrontZ(.48)+.22,k));tn.g.updateMatrixWorld();cam.position.copy(lp.applyMatrix4(tn.g.matrixWorld));
   if(S.shake>0){cam.position.x+=rnd(-.008,.008);cam.position.y+=rnd(-.006,.006)}
-  const yaw=(1-S.camX)*1.25*(1-k);cam.rotation.set(-.12+k*.1+Math.sin(T_*.5)*.004,W3.tentRy+yaw+Math.sin(T_*.31)*.004,0)}
+  const yaw=(1-S.camX)*1.25*(1-k);cam.rotation.set(-.12+k*.13+Math.sin(T_*.5)*.004,W3.tentRy+yaw+Math.sin(T_*.31)*.004,0)}
 function tentHide3(){const W3=F3.w;if(!W3)return;['lan','wid','stk','shd'].forEach(k=>monHide(W3.mons[k]));if(W3.lanM)W3.lanM.visible=false;W3.lan.intensity=0;if(W3.tn){W3.tn.g.visible=false;if(W3.shdE)W3.shdE.visible=false}}
 function tl(x,y,z){const tn=F3.w.tn;return new R3.T.Vector3(x,y,z).applyMatrix4(tn.g.matrixWorld)}
 function tentMons3(){const W3=F3.w,T=R3.T,tn=W3.tn,s=S.tn;if(!tn||!s)return;tn.g.visible=true;tn.g.updateMatrixWorld();const ry=W3.tentRy;
   // 지퍼 틈: 지퍼 싸움 > 틈으로 보기
-  const z=s.zip;let yp=.06,wm=0;if(z.on){const p=z.st==='win'?Math.max(0,1-z.t*2)*.1:z.p;yp=lerp(.08,1.12,p);wm=lerp(.03,.3,p)}else if(s.pk>.01){const e=ease(s.pk);yp=lerp(.06,.62,e);wm=.065*e}
+  const z=s.zip;let yp=.06,wm=0;if(z.on){const p=z.st==='win'?Math.max(0,1-z.t*2)*.1:z.p;yp=lerp(.08,1.12,p);wm=lerp(.03,.3,p)}else if(s.pk>.01){const e=ease(s.pk);yp=lerp(.06,.8,e);wm=.16*e}
   tn.uGap.value.set(yp,wm,0);tn.pull.position.set(0,Math.max(.06,yp),tentFrontZ(Math.max(.06,yp))+.012);
   // 그림자 (텐트 안 앞 구석 어둠)
   {const sp=s.sh,I=mon3('shd','shadow',1);if(I&&sp>18&&!torchOn3()){const k=Math.min(1,(sp-18)/82),sx=s.shSide||(s.shSide=Math.random()<.5?-1:1),lx=lerp(sx*.62,sx*.12,k*k),lz=lerp(-.82,.05,k*k),p=tl(lx,0,lz);
@@ -550,7 +550,7 @@ function tentMons3(){const W3=F3.w,T=R3.T,tn=W3.tn,s=S.tn;if(!tn||!s)return;tn.g
   {const I=mon3('wid','widow');const on=z.on&&(z.st!=='win'||z.t<.7);if(I&&on){I.g.visible=true;const p=tl(0,0,-TB-.62+(z.st==='win'?-z.t*.8:0));I.g.position.copy(p);I.g.position.y+=-1.5+z.p*.28;I.g.rotation.set(.04,ry,0);monPlay(I,'reach',{speed:.6})}else monHide(I);
    tn.fingers.forEach((f,i)=>{const sd=i<4?-1:1,j=i%4,show=on&&z.p>.05&&z.st!=='win';f.visible=show;if(!show)return;const y=lerp(.12,Math.max(.16,yp-.1),j/3+.05*Math.sin(T_*3+i)),hw=yp>y?wm*Math.pow(1-y/yp,.85):0;f.position.set(sd*(hw+.004),y,tentFrontZ(y)+.004);f.rotation.set(Math.sin(T_*6+i)*.15,-sd*.5,0)})}
   // 교대자: 앞쪽 나무 사이 (틈으로만 보임)
-  {const st=s.st,I=mon3('stk','stalker');if(I&&st.stage>0){I.g.visible=true;const p=tl(st.x||0,0,-TB-ST3[st.stage]);I.g.position.copy(p);I.g.position.y=W3.hg(p.x,p.z);lookYaw(I,p.x,p.z);monPlay(I,'idle')}else monHide(I)}
+  {const st=s.st,I=mon3('stk','stalker',1);if(I&&!I.emB){I.emB=1;I.o.traverse(o=>{if(o.isMesh)o.material.emissiveIntensity=.32})}if(I&&st.stage>0){I.g.visible=true;const p=tl(st.x||0,0,-TB-ST3[st.stage]);I.g.position.copy(p);I.g.position.y=W3.hg(p.x,p.z);lookYaw(I,p.x,p.z);monPlay(I,'idle')}else monHide(I)}
   // 새벽: 천이 밝아짐
   const dk=S.dawnK||0;tn.m2.uniforms.uAmb.value.set(.13+dk*.9,.15+dk*1,.19+dk*1.1)}
 // 파수꾼 손이 닿은 곳: 손바닥 + 손가락 모양으로 천이 안으로 눌림
