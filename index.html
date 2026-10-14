@@ -530,7 +530,7 @@ body.c3w #msg{bottom:128px}
 <script nomodule>window.THREE_ERR='nomodule'</script>
 <script>
 // ===================== 기본 =====================
-const VER='0.32.0'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
+const VER='0.33.0'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
 const $=id=>document.getElementById(id);
 const cv=$('cv'),cx=cv.getContext('2d');
 let W,H,DPR=1;const MOB=matchMedia('(pointer:coarse)').matches||/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent); // 폰이면 가볍게
@@ -1551,7 +1551,7 @@ function threeAM(){
   if(S.h3||S.t<HOUR*3)return;S.h3=true;flicker(2.4);musicBoxFar();setTimeout(()=>{if(S&&!S.over){wail(.8,.05);say('03:00')}},2600);
 }
 function heartbeat(dt){
-  const d=danger();
+  let d=danger();if(!isFinite(d))d=0;
   S.dgT-=dt;if(S.dgT<=0&&droneG){S.dgT=.5;droneG.gain.setTargetAtTime(.03+S.night*.006+d*.09,AC.currentTime,.6)}
   if(d<.45)return;S.hbT-=dt;if(S.hbT<=0){heart();S.hbT=lerp(1.1,.42,(d-.45)/.55)}
 }
@@ -1802,7 +1802,7 @@ function drawNav(){
     const gr=cx.createLinearGradient(d<0?0:W,0,d<0?zw:W-zw,0);gr.addColorStop(0,`rgba(0,0,0,${.6*a})`);gr.addColorStop(1,'rgba(0,0,0,0)');cx.fillStyle=gr;cx.fillRect(x0,0,zw,H);
     const cxp=d<0?zw*.4:W-zw*.4,cy=H*.5,s2=Math.min(14,zw*.22);cx.save();cx.strokeStyle=`rgba(236,224,170,${.75*a})`;cx.lineWidth=2;cx.shadowColor='rgba(255,220,150,.5)';cx.shadowBlur=hov?10:0;
     for(let k=0;k<2;k++){const o=k*s2*.9*d,a2=s2*.5;cx.beginPath();cx.moveTo(cxp+o-d*a2,cy-s2);cx.lineTo(cxp+o+d*a2,cy);cx.lineTo(cxp+o-d*a2,cy+s2);cx.stroke()}
-    cx.shadowBlur=0;cx.fillStyle=`rgba(236,224,170,${.75*a*(Math.random()<.04?.3:1)})`;cx.font=`${Math.max(13,Math.min(16,H*.026))}px 'Galmuri11',monospace`;cx.textAlign='center';cx.textBaseline='top';cx.fillText((S.ch===2?VNAME2:VNAME)[to],cxp,cy+s2+10);cx.restore()});
+    cx.shadowBlur=0;cx.fillStyle=`rgba(236,224,170,${.75*a*(Math.random()<.04?.3:1)})`;cx.font=`${Math.max(13,Math.min(16,H*.026))}px 'Galmuri11',monospace`;cx.textAlign=d<0?'left':'right';cx.textBaseline='top';cx.fillText((S.ch===2?VNAME2:VNAME)[to],d<0?4:W-4,cy+s2+10);cx.restore()}); // 글자가 화면 밖으로 잘리지 않게 가장자리에 붙임
 }
 // ===================== 3D 경비실 (Three.js) =====================
 // 의자에 앉은 시점에서 고개를 돌림: 0=출입문(왼쪽 -X) 1=책상(정면 -Z) 2=배전반(오른쪽 +X)
@@ -3947,7 +3947,8 @@ function toMenu(){
   $('play').classList.remove('show');
   setMode('menu');if(staticG)staticG.gain.setTargetAtTime(.009,AC.currentTime,.6);
 }
-function startGame(n,dev,hard=false,ch=1,after){initAudio();setChapter(ch);const keys=ch===3?['deer','axe','lantern','widow','shadow','stalker']:ch===2?['stalker','diver','slider','hummer','drowned','shadow']:['stalker','hermit','runner','shadow'];if(ch===3)c3Load();else monLoad(keys);
+function startGame(n,dev,hard=false,ch=1,after){initAudio();if(S&&mode==='game'){S.paused=true;if(S.ch===3&&ch!==3)stop3()} // 불러오는 동안 하던 판이 다른 챕터 표로 돌아가지 않게 멈춤
+  setChapter(ch);const keys=ch===3?['deer','axe','lantern','widow','shadow','stalker']:ch===2?['stalker','diver','slider','hummer','drowned','shadow']:['stalker','hermit','runner','shadow'];if(ch===3)c3Load();else monLoad(keys);
   DEV.on=dev;HARD=dev?DEV.hard:hard;DEV.speed=1;DEV.solo=dev?DEV.soloNext||null:null;DEV.soloNext=null;if(staticG)staticG.gain.setTargetAtTime(0,AC.currentTime,.1);
   const ok=k=>!!MON.tpl[k]||(MON.bad&&MON.bad[k])||MON.fail,ready=()=>!R3.ok||(keys.every(ok)&&(ch!==3||F3.ready)),prog=()=>(keys.filter(ok).length+(ch===3?F3.np||0:0))/(keys.length+(ch===3?7:0));
   loadWait(ch,ready,prog,()=>{newNight(n);if(DEV.solo&&S&&S.ch===1)pracInit();buildDbg();if(after)after()})}
@@ -4075,6 +4076,6 @@ function loop(ts){
 }
 requestAnimationFrame(loop);
 </script>
-<script src="ch3.js?v=0.32.0"></script>
+<script src="ch3.js?v=0.33.0"></script>
 </body>
 </html>
