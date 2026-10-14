@@ -338,14 +338,14 @@ function post3(){cx.save();cx.globalCompositeOperation='soft-light';cx.globalAlp
 function danger3(){if(!S)return 0;const d=S.dr,tn=S.tn;let v=0;if(S.ph==='walk'){if(d.st==='come')v=Math.max(v,1-d.d/17);if(S.wc.st==='stand'||S.wc.st==='out')v=Math.max(v,.75);if(S.cl.st==='call')v=Math.max(v,.85)}
   if(tn){v=Math.max(v,(tn.sh||0)/100,tn.zip&&tn.zip.on?.9:0,lanLit3()?.95:0,tn.st&&tn.st.stage>=4?.8:0,axOn3()?.9:0)}return v}
 // 걷기 화면 위: 갈림길 화살표, 처음 안내
-function walkUI3(){const W3=F3.w,T=R3.T,cam=R3.cam;S.forkUI=null;
+function walkUI3(){const W3=F3.w,T=R3.T,cam=R3.cam;S.forkUI=null;if(window.TRL)return;
   if(S.atFork&&S.lb<.05){const f=W3.forks[S.fk],pr=(tr,s)=>{const p=trkAt(tr,s),v=new T.Vector3(p.x,W3.hg(p.x,p.z)+.9,p.z).project(cam);return{x:(v.x+1)/2*W,y:(1-v.y)/2*H,ok:v.z<1}};
     const a=pr(W3.main,f.s+W3.s0+6),b=pr(f.tr,f.b0+6);S.forkUI=[Object.assign(a,{main:true}),Object.assign(b,{main:false})];
     S.forkUI.forEach(o=>{if(!o.ok)return;const hov=!PT.touch&&Math.hypot(PT.x-o.x,PT.y-o.y)<70,a2=hov?1:.75+.2*Math.sin(T_*3);cx.save();cx.translate(o.x,o.y);cx.globalAlpha=a2;cx.strokeStyle='#ece5cd';cx.lineWidth=3;cx.shadowColor='#000';cx.shadowBlur=8;
       const s2=Math.max(16,H*.03);for(let k=0;k<2;k++){cx.beginPath();cx.moveTo(-s2,k*s2*.8+s2*.2);cx.lineTo(0,k*s2*.8-s2*.5);cx.lineTo(s2,k*s2*.8+s2*.2);cx.stroke()}
       cx.restore();tapeLabel('이쪽으로',o.x,o.y+Math.max(16,H*.03)*1.9,a2)})}
   // 양옆: 누르고 있는 동안 그쪽 어깨 너머로 뒤돌아봄
-  if(!S.atFork&&S.loopT<=0&&!S.paused&&!S.log){const zw=navW3();[-1,1].forEach(d=>{const held=S.inBack&&S.lb>.05&&(S.lbDir||1)===-d,hov=!PT.touch&&PT.x>=0&&walkNav3(PT)===d,a=held||hov?1:PT.touch?.55:.36,x0=d<0?0:W-zw;
+  if(!S.atFork&&S.loopT<=0&&!S.paused&&!S.log&&!window.TRL){const zw=navW3();[-1,1].forEach(d=>{const held=S.inBack&&S.lb>.05&&(S.lbDir||1)===-d,hov=!PT.touch&&PT.x>=0&&walkNav3(PT)===d,a=held||hov?1:PT.touch?.55:.36,x0=d<0?0:W-zw;
     const gr=cx.createLinearGradient(d<0?0:W,0,d<0?zw:W-zw,0);gr.addColorStop(0,`rgba(0,0,0,${.55*a})`);gr.addColorStop(1,'rgba(0,0,0,0)');cx.fillStyle=gr;cx.fillRect(x0,0,zw,H);
     const cxp=d<0?zw*.45:W-zw*.45,cy=H*.5,r=Math.min(13,zw*.2);cx.save();cx.strokeStyle=cx.fillStyle=`rgba(236,224,170,${.8*a})`;cx.lineWidth=2.2;cx.lineCap='round';
     cx.beginPath();cx.arc(cxp,cy,r,d<0?-.2:Math.PI+.2,d<0?Math.PI*1.25:-Math.PI*.25,d>0);cx.stroke(); // 휘어 돌아가는 화살표
@@ -893,7 +893,7 @@ function tentUI3(){const s=S.tn;if(!s)return;const W3=F3.w;
   const hk=s.hd||0;if(hk>.01){const air=S.breath;cx.save();cx.globalAlpha=hk*.18;cx.fillStyle=NPm[ri(4)];cx.fillRect(0,0,W,H);cx.globalAlpha=hk*(.25+.45*(1-air));cx.drawImage(VIG,0,0,W,H);cx.restore()} // 침낭 속 (모양은 3D)
   if(s.pk>.02){const k=ease(s.pk);cx.save();cx.globalAlpha=k*.55;const g=cx.createRadialGradient(W/2,H/2,H*.18,W/2,H/2,H*.8);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'#000');cx.fillStyle=g;cx.fillRect(0,0,W,H);cx.restore()}
   // 양옆 화살표
-  if(!s.zip.on&&s.pk<.1&&!S.paused&&(s.hd||0)<.1&&!axOn3()){const zw=navW3();[-1,1].forEach(d=>{const to=S.view+d;if(to<0||to>2)return;const hov=!PT.touch&&PT.x>=0&&((d<0&&PT.x<zw)||(d>0&&PT.x>W-zw)),a=hov?1:PT.touch?.6:.4,x0=d<0?0:W-zw;
+  if(!s.zip.on&&s.pk<.1&&!S.paused&&(s.hd||0)<.1&&!axOn3()&&!window.TRL){const zw=navW3();[-1,1].forEach(d=>{const to=S.view+d;if(to<0||to>2)return;const hov=!PT.touch&&PT.x>=0&&((d<0&&PT.x<zw)||(d>0&&PT.x>W-zw)),a=hov?1:PT.touch?.6:.4,x0=d<0?0:W-zw;
     const gr=cx.createLinearGradient(d<0?0:W,0,d<0?zw:W-zw,0);gr.addColorStop(0,`rgba(0,0,0,${.28*a})`);gr.addColorStop(1,'rgba(0,0,0,0)');cx.fillStyle=gr;cx.fillRect(x0,0,zw,H);
     const cxp=d<0?zw*.4:W-zw*.4,cy=H*.5,s2=Math.min(14,zw*.22);cx.save();cx.strokeStyle=`rgba(236,224,170,${.75*a})`;cx.lineWidth=2;for(let k=0;k<2;k++){const o=k*s2*.9*d,a2=s2*.5;cx.beginPath();cx.moveTo(cxp+o-d*a2,cy-s2);cx.lineTo(cxp+o+d*a2,cy);cx.lineTo(cxp+o-d*a2,cy+s2);cx.stroke()}
     cx.fillStyle=`rgba(236,224,170,${.75*a})`;cx.font=`${Math.max(13,Math.min(16,H*.026))}px 'Galmuri11',monospace`;cx.textAlign='center';cx.textBaseline='top';cx.fillText(VNAME3[to],cxp,cy+s2+10);cx.restore()});

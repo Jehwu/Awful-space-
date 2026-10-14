@@ -530,7 +530,7 @@ body.c3w #msg{bottom:128px}
 <script nomodule>window.THREE_ERR='nomodule'</script>
 <script>
 // ===================== 기본 =====================
-const VER='0.33.0'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
+const VER='0.33.1'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
 const $=id=>document.getElementById(id);
 const cv=$('cv'),cx=cv.getContext('2d');
 let W,H,DPR=1;const MOB=matchMedia('(pointer:coarse)').matches||/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent); // 폰이면 가볍게
@@ -1776,7 +1776,7 @@ function hotAt(p){
   if(p.x<0||!canAct()||Math.abs(S.view-S.camX)>.15||navZone(p))return null;const v=toView(p);
   for(const h of hots(S.view)){const r=h.r;if(!r)continue;const px=Math.max(0,(46-r.w)/2),py=Math.max(0,(46-r.h)/2);if(v.x>=r.x-px&&v.x<=r.x+r.w+px&&v.y>=r.y-py&&v.y<=r.y+r.h+py)return h}return null}
 // 가리키는 물건 테두리 + 이름. 터치 화면이거나 밤 시작 직후엔 모든 물건에 희미한 테두리
-function tapeLabel(t,cxp,y,a,red){ // 가리키는 물건 이름: 검은 칸에 픽셀 글씨 (왼쪽 강조 막대)
+function tapeLabel(t,cxp,y,a,red){if(window.TRL)return; // 가리키는 물건 이름: 검은 칸에 픽셀 글씨 (왼쪽 강조 막대)
   const fs=Math.max(13,Math.min(16,H*.026));cx.font=`${fs}px 'Galmuri11',monospace`;const tw=cx.measureText(t).width,w=Math.round(tw+fs*1.6),h=Math.round(fs*1.9),x=Math.round(Math.max(6,Math.min(W-w-6,cxp-w/2))),yy=Math.round(y);
   cx.save();cx.globalAlpha=a;cx.fillStyle='rgba(0,0,0,.78)';cx.fillRect(x,yy,w,h);cx.fillStyle=red?'#d93a25':'#e9a53d';cx.fillRect(x,yy,3,h);
   cx.fillStyle=red?'#ff9a86':'#ece5cd';cx.textAlign='left';cx.textBaseline='middle';cx.fillText(t,x+fs*.9,yy+h/2+1);cx.restore()}
@@ -1795,7 +1795,7 @@ function drawHints(ox){
   const want=hv||navZone(PT)?'pointer':'default';if(cv.style.cursor!==want)cv.style.cursor=want;
 }
 // 화면 양옆: 누르면 고개를 돌림
-function drawNav(){
+function drawNav(){if(window.TRL)return; // 트레일러 찍을 때 화면 위 글자·화살표 숨김
   if(!canAct()){if(cv.style.cursor!=='default'&&!(S&&S.mon))cv.style.cursor='default';return}
   const zw=navW();
   [-1,1].forEach(d=>{const to=S.view+d;if(to<0||to>2)return;const hov=!PT.touch&&navZone(PT)===d,a=hov?1:PT.touch?.6:.4,x0=d<0?0:W-zw;
@@ -3248,7 +3248,7 @@ function handHit(p){if(!HND.sc||(!handsOn()&&S.ch!==3))return null;const T3=R3.T
     [[P.monHit,'mon',true],[P.batHit,'batt',P.batW.visible]].forEach(([o,k,on])=>{if(!on)return;const h=rc.intersectObject(o,false)[0];if(h&&h.distance<bd){bd=h.distance;best=k}});if(best)return best}
   rc.setFromCamera(v,HND.cam);[[HND.pTorch,'torch',HND.R.visible],[HND.pEye,'eye',HND.L.visible]].forEach(([o,k,on])=>{if(!on)return;const h=rc.intersectObject(o,false)[0];if(h&&h.distance<bd){bd=h.distance;best=k}});return best}
 // 처음 몇 초: 누를 수 있는 것마다 손글씨 이름표
-function handLabels(){if(!HND.sc||S.t>18||S.dawn||S.mon)return;const a=Math.min(1,(18-S.t)/3)*.85,P2=R3.p2,P=(o,dx,dy,txt,c3)=>{const v=new R3.T.Vector3();o.getWorldPosition(v);v.project(c3);if(v.z>1)return;const x=(v.x+1)/2*W+dx,y=(1-v.y)/2*H+dy;cx.fillText(txt,x,y)};
+function handLabels(){if(!HND.sc||S.t>18||S.dawn||S.mon||window.TRL)return;const a=Math.min(1,(18-S.t)/3)*.85,P2=R3.p2,P=(o,dx,dy,txt,c3)=>{const v=new R3.T.Vector3();o.getWorldPosition(v);v.project(c3);if(v.z>1)return;const x=(v.x+1)/2*W+dx,y=(1-v.y)/2*H+dy;cx.fillText(txt,x,y)};
   cx.save();cx.globalAlpha=a;cx.font=`${Math.round(Math.max(13,H*.03))}px 'Galmuri11',monospace`;cx.textAlign='center';cx.fillStyle='rgba(230,222,196,.95)';cx.shadowColor='#000';cx.shadowBlur=6;
   P(HND.pTorch,-10,-H*.12,'손전등: 끄기/켜기',HND.cam);if(S.view===1&&P2&&P2.mon){if(P2.batW.visible)P(P2.batW,0,-H*.05,'여분 배터리',R3.cam);P(P2.mon,0,-H*.1,'모니터: 통로 패널',R3.cam)}
   if(S.night>=4)P(HND.pEye,W*.05,-H*.06,'왼손 꾹 누르기: 눈 감기',HND.cam);cx.restore()}
@@ -4076,6 +4076,6 @@ function loop(ts){
 }
 requestAnimationFrame(loop);
 </script>
-<script src="ch3.js?v=0.33.0"></script>
+<script src="ch3.js?v=0.33.1"></script>
 </body>
 </html>
