@@ -730,7 +730,7 @@ function pole3(dt){const pl=S.tn.pl,n=S.night,tn=S.tn;pl.t+=dt;
       if(Math.abs(S.camX-(c.sd<0?0:2))<.35&&torchOn3()){c.st='skid';c.t=0;c.d0=c.d;thump(50,.25,.35,0);nburst(1800,1.5,.5,.2,0);nburst(600,.7,.6,.15,0,.05,'lowpass');return} // 빛에 놀라 미끄러지며 멈춤
       if(c.t>=c.win)return die('질주자');return}
     if(c.st==='skid'){if(c.t>1.7){c.st='wait';c.t=0;c.w=rnd(.9,1.7);pl.k++}}return}
-  if(pl.st==='back'){if(pl.t>.45&&!pl.bk){pl.bk=1;tn.out=0;pl.sag=0;S.view=1;S.camX=1;S.fadeTo=0;S.fadeR=4;zipSnd(.1,.6);buildUI()}if(pl.t>1.1){pl.st='done';achC3('pole');say('...섰다. 발소리가 멀어진다.','',2.8)}}}
+  if(pl.st==='back'){if(pl.t>.45&&!pl.bk){pl.bk=1;tn.out=0;pl.sag=0;S.view=1;S.camX=1;S.fadeTo=0;S.fadeR=4;zipSnd(.1,.6);buildUI()}if(pl.t>1.1){pl.st='done';achC3('pole');say('...텐트가 다시 버틴다. 발소리가 멀어진다.','',2.8)}}}
 function rcStepT3(pan,v){thump(62,.08,v,pan);nburst(700,1.6,.05,v*.7,pan);if(Math.random()<.4)nburst(2600,4,.03,v*.3,pan)}
 // 파수꾼: 랜턴 들고 텐트 둘레를 돎 → 옆 벽을 짚음 (손자국) → 문 앞으로 가서 지퍼를 열고 안을 들여다봄 → 닫고 떠남
 // 손자국이 찍히면 침낭을 뒤집어쓰고 지퍼가 다시 닫힐 때까지 버팀
