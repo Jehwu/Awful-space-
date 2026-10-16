@@ -530,7 +530,7 @@ body.c3w #msg{bottom:128px}
 <script nomodule>window.THREE_ERR='nomodule'</script>
 <script>
 // ===================== 기본 =====================
-const VER='0.34.1'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
+const VER='0.34.2'; // 올릴 때마다 바꾸기 (캐시에 남은 옛 버전을 새로고침하는 데 씀)
 const $=id=>document.getElementById(id);
 const cv=$('cv'),cx=cv.getContext('2d');
 let W,H,DPR=1;const MOB=matchMedia('(pointer:coarse)').matches||/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent); // 폰이면 가볍게
@@ -3995,17 +3995,17 @@ function loadHide(){if(!LOAD.on)return;LOAD.on=false;LOAD.p=1;$('loadB').style.w
 // 다 받을 때까지 기다렸다가 시작 (최대 40초, 실패한 건 건너뜀)
 function loadWait(ch,ready,prog,then){if(ready()){loadHide();return then()}loadShow(ch);const t0=performance.now(),iv=setInterval(()=>{LOAD.p=Math.max(LOAD.p,Math.min(.98,prog()));if(!ready()&&performance.now()-t0<40000)return;clearInterval(iv);LOAD.p=1;setTimeout(()=>{loadHide();then()},300)},100)}
 function updFoot(){const f=$('foot'),st=R3.state;f.textContent=`v${VER}`+(st==='wait'?' · 불러오는 중':st==='fail'?' · 2D 모드 ('+R3.why+')':'');f.classList.toggle('warn',st==='fail')}
-// 게임 플레이: 챕터 고르기 → 노말/하드 → 이어하기/처음부터. 챕터 2는 챕터 1을 깨야 열림
+// 게임 플레이: 챕터 고르기 → 노말/하드 → 이어하기/처음부터. 모든 챕터 처음부터 열림
 const PLAY={ch:1,hard:false};
 const ch1Clear=()=>!!(AS.got.ch1_normal||AS.got.ch1_hard);
 const savedOf=(ch,h)=>ch===1?(h?savedHard:savedNight):ch===2?(h?savedCh2h:savedCh2):(h?savedCh3h:savedCh3);
-function updPlay(){const lock2=!ch1Clear(),lock3=!ch2Clear();if(lock2&&PLAY.ch===2)PLAY.ch=1;if(lock3&&PLAY.ch===3)PLAY.ch=1;
+function updPlay(){const lock2=false,lock3=false; // 모든 챕터 처음부터 열림if(lock2&&PLAY.ch===2)PLAY.ch=1;if(lock3&&PLAY.ch===3)PLAY.ch=1;
   $('play').querySelectorAll('.chc').forEach(b=>{const c=+b.dataset.ch;b.classList.toggle('on',c===PLAY.ch);b.classList.toggle('locked',(c===2&&lock2)||(c===3&&lock3));const n=savedOf(c,PLAY.hard);b.querySelector('.cp').textContent=n>1?`${PLAY.hard?'하드':'노말'} · ${n}일 차까지 옴`:''});
   $('play').querySelectorAll('.md button').forEach(b=>b.classList.toggle('on',(+b.dataset.h===1)===PLAY.hard));
   if(!lock3&&R3.ok&&window.c3Load)c3Load(); // 챕터 3이 열려 있으면 숲 모델을 미리 받아 둠
   const n=savedOf(PLAY.ch,PLAY.hard);$('pCont').disabled=n<=1;$('pCont').textContent=n>1?`이어하기 (${n}일 차)`:'이어하기'}
 $('mPlay').onclick=()=>{updPlay();$('play').classList.add('show')};
-$('play').querySelectorAll('.chc').forEach(b=>b.onclick=()=>{if((+b.dataset.ch===2&&!ch1Clear())||(+b.dataset.ch===3&&!ch2Clear())){b.classList.remove('shake');void b.offsetWidth;return}PLAY.ch=+b.dataset.ch;updPlay()});
+$('play').querySelectorAll('.chc').forEach(b=>b.onclick=()=>{if(false){b.classList.remove('shake');void b.offsetWidth;return}PLAY.ch=+b.dataset.ch;updPlay()});
 $('play').querySelectorAll('.md button').forEach(b=>b.onclick=()=>{PLAY.hard=b.dataset.h==='1';updPlay()});
 $('pBack').onclick=()=>$('play').classList.remove('show');
 $('pCont').onclick=()=>{const n=savedOf(PLAY.ch,PLAY.hard);$('play').classList.remove('show');go(()=>startGame(n,false,PLAY.hard,PLAY.ch))};
@@ -4094,6 +4094,6 @@ function loop(ts){
 }
 requestAnimationFrame(loop);
 </script>
-<script src="ch3.js?v=0.34.1"></script>
+<script src="ch3.js?v=0.34.2"></script>
 </body>
 </html>
